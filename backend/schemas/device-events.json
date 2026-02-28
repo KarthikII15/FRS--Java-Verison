@@ -1,0 +1,252 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Device Event Schema",
+  "description": "Schema for events sent from cameras and LPU devices to the attendance system",
+  "definitions": {
+    "FaceDetectedEvent": {
+      "type": "object",
+      "required": ["eventType", "timestamp", "frameData"],
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": ["FACE_DETECTED"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the event occurred"
+        },
+        "faceData": {
+          "type": "object",
+          "description": "Face detection results",
+          "properties": {
+            "embedding": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 512,
+              "maxItems": 512,
+              "description": "512-dimensional face embedding vector from ArcFace/FaceNet"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Face detection confidence score"
+            },
+            "boundingBox": {
+              "type": "object",
+              "description": "Face location in the frame",
+              "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" },
+                "width": { "type": "number" },
+                "height": { "type": "number" }
+              },
+              "required": ["x", "y", "width", "height"]
+            },
+            "qualityScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Face image quality score"
+            }
+          }
+        },
+        "frameData": {
+          "type": "object",
+          "required": ["frameId", "timestamp"],
+          "properties": {
+            "frameId": { 
+              "type": "string",
+              "description": "Unique identifier for this frame"
+            },
+            "timestamp": { 
+              "type": "string", 
+              "format": "date-time",
+              "description": "When the frame was captured"
+            },
+            "imageUrl": { 
+              "type": "string", 
+              "format": "uri",
+              "description": "URL to the stored frame image (if already uploaded)"
+            },
+            "imageData": { 
+              "type": "string",
+              "description": "Base64 encoded image data (if embedding in request)"
+            }
+          }
+        },
+        "deviceMetadata": {
+          "type": "object",
+          "properties": {
+            "firmwareVersion": { "type": "string" },
+            "temperature": { "type": "number" },
+            "cpuUsage": { "type": "number" },
+            "memoryUsage": { "type": "number" }
+          }
+        }
+      }
+    },
+    
+    "EmployeeEntryEvent": {
+      "type": "object",
+      "required": ["eventType", "timestamp", "frameData", "faceData"],
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": ["EMPLOYEE_ENTRY"]
+        },
+        "timestamp": { 
+          "type": "string", 
+          "format": "date-time" 
+        },
+        "faceData": {
+          "type": "object",
+          "properties": {
+            "embedding": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 512,
+              "maxItems": 512
+            },
+            "confidence": { "type": "number" },
+            "matchedEmployeeId": { 
+              "type": "string",
+              "description": "UUID of matched employee (if local matching performed)"
+            },
+            "matchConfidence": { 
+              "type": "number",
+              "description": "Confidence of the match"
+            }
+          }
+        },
+        "frameData": {
+          "type": "object",
+          "required": ["frameId", "timestamp"],
+          "properties": {
+            "frameId": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" },
+            "imageUrl": { "type": "string" }
+          }
+        },
+        "entryData": {
+          "type": "object",
+          "properties": {
+            "direction": { 
+              "type": "string", 
+              "enum": ["in", "out"],
+              "description": "Entry or exit direction"
+            },
+            "zone": { 
+              "type": "string",
+              "description": "Zone or area identifier"
+            },
+            "method": { 
+              "type": "string", 
+              "enum": ["face_recognition", "access_card", "manual"],
+              "description": "Method used for entry"
+            }
+          }
+        }
+      }
+    },
+    
+    "EmployeeExitEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/EmployeeEntryEvent" },
+        {
+          "properties": {
+            "eventType": {
+              "enum": ["EMPLOYEE_EXIT"]
+            }
+          }
+        }
+      ]
+    },
+    
+    "DeviceHeartbeatEvent": {
+      "type": "object",
+      "required": ["eventType", "timestamp"],
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": ["DEVICE_HEARTBEAT"]
+        },
+        "timestamp": { 
+          "type": "string", 
+          "format": "date-time" 
+        },
+        "deviceMetadata": {
+          "type": "object",
+          "properties": {
+            "firmwareVersion": { "type": "string" },
+            "temperature": { "type": "number" },
+            "cpuUsage": { "type": "number" },
+            "memoryUsage": { "type": "number" },
+            "uptime": { 
+              "type": "number",
+              "description": "Device uptime in seconds"
+            },
+            "cameraStatus": {
+              "type": "object",
+              "properties": {
+                "connected": { "type": "boolean" },
+                "resolution": { "type": "string" },
+                "fps": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "MotionDetectedEvent": {
+      "type": "object",
+      "required": ["eventType", "timestamp"],
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": ["MOTION_DETECTED"]
+        },
+        "timestamp": { 
+          "type": "string", 
+          "format": "date-time" 
+        },
+        "motionData": {
+          "type": "object",
+          "properties": {
+            "region": { "type": "string" },
+            "confidence": { "type": "number" }
+          }
+        }
+      }
+    },
+    
+    "DeviceErrorEvent": {
+      "type": "object",
+      "required": ["eventType", "timestamp"],
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": ["DEVICE_ERROR"]
+        },
+        "timestamp": { 
+          "type": "string", 
+          "format": "date-time" 
+        },
+        "errorData": {
+          "type": "object",
+          "properties": {
+            "errorCode": { "type": "string" },
+            "errorMessage": { "type": "string" },
+            "severity": { 
+              "type": "string", 
+              "enum": ["low", "medium", "high", "critical"]
+            },
+            "component": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

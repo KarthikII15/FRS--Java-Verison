@@ -1,0 +1,141 @@
+[
+    {
+        "id": "authentication",
+        "name": "Authentication",
+        "description": "User login, session management, and role assignment",
+        "roles": [
+            "superAdmin",
+            "admin",
+            "hr",
+            "employee"
+        ],
+        "features": [
+            "Login",
+            "Logout",
+            "Session verification",
+            "Role-based routing"
+        ]
+    },
+    {
+        "id": "deviceManagement",
+        "name": "Device Management",
+        "description": "Management of vision devices and their telemetry",
+        "roles": [
+            "superAdmin",
+            "admin"
+        ],
+        "features": [
+            "Register device",
+            "Status monitoring",
+            "Accuracy tracking",
+            "Remote config",
+            "Alerting"
+        ]
+    },
+    {
+        "id": "facilityIntelligence",
+        "name": "Facility Intelligence",
+        "description": "Hierarchy and insights of buildings, floors, and areas",
+        "roles": [
+            "superAdmin",
+            "admin",
+            "hr"
+        ],
+        "features": [
+            "Manage locations",
+            "Live occupancy",
+            "Camera assignments"
+        ]
+    },
+    {
+        "id": "floorMapping",
+        "name": "Floor Mapping",
+        "description": "Visual representation of floors and defined zones",
+        "roles": [
+            "superAdmin",
+            "admin",
+            "hr"
+        ],
+        "features": [
+            "Upload floor plan",
+            "Draw zones",
+            "Live heatmap view"
+        ]
+    },
+    {
+        "id": "employeeManagement",
+        "name": "Employee Management",
+        "description": "HR functionality for workforce tracking",
+        "roles": [
+            "superAdmin",
+            "admin",
+            "hr"
+        ],
+        "features": [
+            "CRUD employees",
+            "Assign departments",
+            "Assign shifts",
+            "Face enrollment tracking"
+        ]
+    },
+    {
+        "id": "attendance",
+        "name": "Attendance tracking",
+        "description": "Core attendance data ingestion and reporting",
+        "roles": [
+            "superAdmin",
+            "admin",
+            "hr",
+            "employee"
+        ],
+        "features": [
+            "Event processing",
+            "Daily records generation",
+            "Leave management",
+            "Reporting"
+        ]
+    },
+    {
+        "id": "presenceMonitoring",
+        "name": "Presence Monitoring",
+        "description": "Continuous intra-day tracking of personnel whereabouts",
+        "roles": [
+            "superAdmin",
+            "admin",
+            "hr"
+        ],
+        "features": [
+            "Live feeds",
+            "Duration tracking",
+            "Zone violation alerts"
+        ]
+    },
+    {
+        "id": "adminPanel",
+        "name": "Admin Dashboard",
+        "description": "System-wide insights and low-level control",
+        "roles": [
+            "superAdmin",
+            "admin"
+        ],
+        "features": [
+            "System health",
+            "Audit logs",
+            "User role management"
+        ]
+    },
+    {
+        "id": "hrPanel",
+        "name": "HR Dashboard",
+        "description": "Workforce analytics and high-level behavioral insights",
+        "roles": [
+            "superAdmin",
+            "hr"
+        ],
+        "features": [
+            "AI anomaly detection",
+            "Multi-employee comparisons",
+            "Trend visualization"
+        ]
+    }
+]

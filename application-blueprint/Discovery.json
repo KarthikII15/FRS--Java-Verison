@@ -1,0 +1,911 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/app-discovery-lineage.schema.json",
+  "title": "Application Discovery & Lineage Schema",
+  "description": "Schema for capturing end-to-end lineage of an existing application: features → UI → APIs → authn/authz → data → integrations → runtime, with evidence pointers back to code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "system", "repos", "components", "features", "lineage"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "generatedAt", "generator", "confidencePolicy"],
+      "properties": {
+        "schemaVersion": { "type": "string", "pattern": "^1\\.[0-9]+\\.[0-9]+$" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "generator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "mode"],
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "mode": { "type": "string", "enum": ["agentic", "batch", "interactive"] },
+            "notes": { "type": "string" }
+          }
+        },
+        "confidencePolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["levels"],
+          "properties": {
+            "levels": {
+              "type": "array",
+              "minItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["name", "min", "max", "meaning"],
+                "properties": {
+                  "name": { "type": "string", "enum": ["low", "medium", "high"] },
+                  "min": { "type": "number", "minimum": 0, "maximum": 1 },
+                  "max": { "type": "number", "minimum": 0, "maximum": 1 },
+                  "meaning": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "sourceSnapshot": {
+          "description": "Optional: repo snapshot metadata used for discovery to keep lineage reproducible.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "git": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "commit": { "type": "string" },
+                "branch": { "type": "string" },
+                "tag": { "type": "string" },
+                "dirty": { "type": "boolean" }
+              }
+            },
+            "build": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tool": { "type": "string" },
+                "profiles": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systemId", "name", "domain", "architectureStyle"],
+      "properties": {
+        "systemId": { "type": "string", "pattern": "^[a-zA-Z0-9_.-]{3,64}$" },
+        "name": { "type": "string" },
+        "domain": { "type": "string", "description": "Business domain (e.g., EdTech, BFSI, Healthcare, Travel)." },
+        "architectureStyle": {
+          "type": "string",
+          "enum": ["monolith", "modular-monolith", "microservices", "soa", "serverless", "hybrid", "unknown"]
+        },
+        "description": { "type": "string" },
+        "owners": { "type": "array", "items": { "$ref": "#/$defs/Person" } },
+        "stakeholders": { "type": "array", "items": { "$ref": "#/$defs/Person" } }
+      }
+    },
+
+    "repos": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Repo" }
+    },
+
+    "components": {
+      "description": "All deployable and non-deployable components discovered across repos: UIs, services, libraries, jobs, infra modules.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Component" }
+    },
+
+    "features": {
+      "description": "Feature catalog. Each feature links to UI, API, DB, integrations via lineage edges and explicit references.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Feature" }
+    },
+
+    "lineage": {
+      "description": "A graph of edges connecting features, screens, API endpoints, data entities, integrations, events, and runtime nodes.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/LineageNode" }
+        },
+        "edges": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/LineageEdge" }
+        }
+      }
+    },
+
+    "security": {
+      "description": "System-wide security posture as discovered: authn/authz, secrets, threat surfaces, auditability.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authnProviders": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AuthnProvider" }
+        },
+        "authzModel": { "$ref": "#/$defs/AuthzModel" },
+        "secrets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SecretRef" }
+        },
+        "audit": { "$ref": "#/$defs/Auditability" },
+        "securityFindings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Finding" }
+        }
+      }
+    },
+
+    "data": {
+      "description": "Logical/physical data model and stores.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataStores": { "type": "array", "items": { "$ref": "#/$defs/DataStore" } },
+        "entities": { "type": "array", "items": { "$ref": "#/$defs/DataEntity" } },
+        "migrations": { "type": "array", "items": { "$ref": "#/$defs/ArtifactRef" } }
+      }
+    },
+
+    "integrations": {
+      "description": "External systems and internal integration patterns (REST, gRPC, messaging, ETL, webhooks).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/Integration" }
+    },
+
+    "runtime": {
+      "description": "Deployment/runtime topology, environments, CI/CD, config, scaling.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "environments": { "type": "array", "items": { "$ref": "#/$defs/Environment" } },
+        "deploymentUnits": { "type": "array", "items": { "$ref": "#/$defs/DeploymentUnit" } },
+        "cicd": { "type": "array", "items": { "$ref": "#/$defs/CICD" } },
+        "configs": { "type": "array", "items": { "$ref": "#/$defs/ConfigItem" } }
+      }
+    },
+
+    "observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "logging": { "$ref": "#/$defs/ObservabilityLogging" },
+        "metrics": { "$ref": "#/$defs/ObservabilityMetrics" },
+        "tracing": { "$ref": "#/$defs/ObservabilityTracing" },
+        "dashboards": { "type": "array", "items": { "$ref": "#/$defs/ArtifactRef" } },
+        "alerts": { "type": "array", "items": { "$ref": "#/$defs/AlertRule" } }
+      }
+    },
+
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "testAssets": { "type": "array", "items": { "$ref": "#/$defs/TestAsset" } },
+        "codeQuality": { "type": "array", "items": { "$ref": "#/$defs/QualitySignal" } },
+        "knownGaps": { "type": "array", "items": { "$ref": "#/$defs/Finding" } }
+      }
+    },
+
+    "changeRequests": {
+      "description": "Optional: once discovery JSON exists, you can append enhancement requests for coding agents to implement.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/ChangeRequest" }
+    },
+
+    "glossary": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/GlossaryTerm" }
+    }
+  },
+
+  "$defs": {
+    "Id": {
+      "type": "string",
+      "description": "Stable identifier for cross-references. Recommended prefixes: repo:, comp:, feat:, ui:, api:, db:, int:, evt:, job:, lib:.",
+      "pattern": "^[a-z]+:[a-zA-Z0-9_.:/#\\-\\s]{2,128}$"
+    },
+
+    "Ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "label": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["repo", "component", "feature", "ui", "api", "dataStore", "dataEntity", "integration", "event", "job", "library", "artifact", "unknown"]
+        }
+      }
+    },
+
+    "Evidence": {
+      "description": "Pointers back to code or configs that support a discovered fact. Used heavily by agents.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "location"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["file", "folder", "symbol", "route", "query", "migration", "config", "logSample", "runbook", "readme", "openapi", "postman", "diagram", "other"]
+        },
+        "location": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["repoId", "path"],
+          "properties": {
+            "repoId": { "$ref": "#/$defs/Id" },
+            "path": { "type": "string" },
+            "lineStart": { "type": "integer", "minimum": 1 },
+            "lineEnd": { "type": "integer", "minimum": 1 },
+            "symbol": { "type": "string" },
+            "url": { "type": "string" }
+          }
+        },
+        "excerpt": { "type": "string", "maxLength": 2000 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "Person": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "team": { "type": "string" },
+        "contact": { "type": "string" }
+      }
+    },
+
+    "Repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "type"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["monorepo", "polyrepo", "infra", "docs", "unknown"] },
+        "url": { "type": "string" },
+        "rootPath": { "type": "string", "description": "Local path relative to discovery bundle." },
+        "primaryLanguages": { "type": "array", "items": { "type": "string" } },
+        "buildSystems": { "type": "array", "items": { "type": "string" } },
+        "packageManagers": { "type": "array", "items": { "type": "string" } },
+        "frameworks": { "type": "array", "items": { "type": "string" } },
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "version"],
+            "properties": {
+              "name": { "type": "string", "description": "e.g., Java, Spring Boot, Node, React, .NET, Python" },
+              "version": { "type": "string" },
+              "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+            }
+          }
+        },
+        "artifacts": { "type": "array", "items": { "$ref": "#/$defs/ArtifactRef" } }
+      }
+    },
+
+    "ArtifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "kind": { "type": "string", "enum": ["openapi", "postman", "erd", "sequence", "runbook", "readme", "architectureDoc", "terraform", "helm", "k8sManifest", "pipeline", "other"] },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "Component": {
+      "description": "A logical component (UI app, backend service, worker/job, shared library, infra module).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "componentType"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "componentType": {
+          "type": "string",
+          "enum": ["ui", "service", "gateway", "worker", "job", "library", "infra", "database", "unknown"]
+        },
+        "repoRefs": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+        "description": { "type": "string" },
+        "techStack": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "version": { "type": "string" },
+              "role": { "type": "string", "description": "What this tech is used for in the component." },
+              "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+            }
+          }
+        },
+        "interfaces": {
+          "description": "UI routes, API endpoints, events, scheduled triggers, CLI commands, etc.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/Interface" }
+        },
+        "dependsOn": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+        "ownedBy": { "type": "array", "items": { "$ref": "#/$defs/Person" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "Interface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "interfaceType", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "interfaceType": { "type": "string", "enum": ["uiRoute", "apiEndpoint", "eventTopic", "webhook", "cron", "cli", "dbAccess", "other"] },
+        "name": { "type": "string" },
+        "method": { "type": "string", "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"] },
+        "pathOrTopic": { "type": "string" },
+        "description": { "type": "string" },
+        "auth": { "$ref": "#/$defs/AuthRequirement" },
+        "request": { "$ref": "#/$defs/APISignature" },
+        "response": { "$ref": "#/$defs/APISignature" },
+        "errors": { "type": "array", "items": { "$ref": "#/$defs/APIError" } },
+        "rateLimits": { "$ref": "#/$defs/RateLimit" },
+        "idempotency": { "type": "boolean" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "APISignature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contentTypes": { "type": "array", "items": { "type": "string" } },
+        "schemaRef": { "$ref": "#/$defs/Ref" },
+        "example": { "type": "object" }
+      }
+    },
+
+    "APIError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": { "type": "string", "description": "HTTP status or app-specific code." },
+        "message": { "type": "string" },
+        "conditions": { "type": "string" }
+      }
+    },
+
+    "RateLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": { "type": "integer", "minimum": 1 },
+        "perSeconds": { "type": "integer", "minimum": 1 },
+        "scope": { "type": "string", "enum": ["global", "tenant", "user", "ip", "client", "unknown"] }
+      }
+    },
+
+    "Feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "status", "priority", "capabilities"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "deprecated", "planned", "unknown"] },
+        "priority": { "type": "string", "enum": ["p0", "p1", "p2", "p3", "unknown"] },
+        "description": { "type": "string" },
+
+        "capabilities": {
+          "description": "What the feature does in business terms. Agents should derive these from UI text, APIs, domain names, docs, tests.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/Capability" }
+        },
+
+        "uiRefs": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+        "apiRefs": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+        "dataEntityRefs": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+        "integrationRefs": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+
+        "personas": { "type": "array", "items": { "$ref": "#/$defs/Persona" } },
+        "acceptanceCriteria": { "type": "array", "items": { "type": "string" } },
+        "businessRules": { "type": "array", "items": { "$ref": "#/$defs/BusinessRule" } },
+
+        "nfrs": { "type": "array", "items": { "$ref": "#/$defs/NFR" } },
+        "risks": { "type": "array", "items": { "$ref": "#/$defs/Finding" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "Capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "inputs": { "type": "array", "items": { "type": "string" } },
+        "outputs": { "type": "array", "items": { "type": "string" } },
+        "happyPath": { "type": "array", "items": { "type": "string" } },
+        "edgeCases": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "Persona": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "permissionsHint": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "BusinessRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule"],
+      "properties": {
+        "rule": { "type": "string" },
+        "when": { "type": "string" },
+        "then": { "type": "string" },
+        "exceptions": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "NFR": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "statement"],
+      "properties": {
+        "type": { "type": "string", "enum": ["performance", "availability", "security", "privacy", "scalability", "maintainability", "usability", "compliance", "cost", "unknown"] },
+        "statement": { "type": "string" },
+        "slo": { "$ref": "#/$defs/SLO" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "SLO": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "metric": { "type": "string" },
+        "target": { "type": "string", "description": "e.g., p95<300ms, uptime 99.9%, error rate <0.1%" },
+        "window": { "type": "string", "description": "e.g., 30d" }
+      }
+    },
+
+    "LineageNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "nodeType", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "nodeType": {
+          "type": "string",
+          "enum": ["feature", "uiScreen", "uiComponent", "apiEndpoint", "service", "library", "dataStore", "dataEntity", "query", "integration", "event", "job", "infra", "config", "unknown"]
+        },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "componentRef": { "$ref": "#/$defs/Ref" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "LineageEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "relation"],
+      "properties": {
+        "from": { "$ref": "#/$defs/Id" },
+        "to": { "$ref": "#/$defs/Id" },
+        "relation": {
+          "type": "string",
+          "enum": [
+            "implements",
+            "renders",
+            "navigatesTo",
+            "calls",
+            "authenticatesVia",
+            "authorizesVia",
+            "reads",
+            "writes",
+            "queries",
+            "mutates",
+            "publishes",
+            "subscribes",
+            "invokes",
+            "configures",
+            "deploysWith",
+            "dependsOn"
+          ]
+        },
+        "direction": { "type": "string", "enum": ["forward", "reverse", "bidirectional"], "default": "forward" },
+        "notes": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "AuthRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": { "type": "boolean" },
+        "schemes": { "type": "array", "items": { "type": "string", "enum": ["oauth2", "oidc", "jwt", "session", "apiKey", "mtls", "saml", "ldap", "basic", "none", "unknown"] } },
+        "scopes": { "type": "array", "items": { "type": "string" } },
+        "roles": { "type": "array", "items": { "type": "string" } },
+        "permissions": { "type": "array", "items": { "type": "string" } },
+        "tenantAware": { "type": "boolean" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "AuthnProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "providerType", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "providerType": { "type": "string", "enum": ["keycloak", "auth0", "cognito", "entraId", "okta", "adfs", "custom", "unknown"] },
+        "name": { "type": "string" },
+        "protocols": { "type": "array", "items": { "type": "string", "enum": ["oidc", "oauth2", "saml", "ldap", "jwt", "unknown"] } },
+        "tenantModel": { "type": "string", "enum": ["singleTenant", "multiTenant", "unknown"] },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "AuthzModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modelType": { "type": "string", "enum": ["rbac", "abac", "re-bac", "acl", "custom", "unknown"] },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "permissions": { "type": "array", "items": { "type": "string" } },
+              "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+            }
+          }
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "rule": { "type": "string", "description": "Human-readable policy summary." },
+              "engine": { "type": "string", "description": "e.g., Spring Security, OPA, Cedar, custom middleware." },
+              "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+            }
+          }
+        }
+      }
+    },
+
+    "SecretRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "storage"],
+      "properties": {
+        "name": { "type": "string" },
+        "storage": { "type": "string", "enum": ["env", "vault", "ssm", "secretsManager", "k8sSecret", "file", "unknown"] },
+        "rotation": { "type": "string", "enum": ["none", "manual", "automatic", "unknown"] },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "Auditability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "auditEvents": { "type": "array", "items": { "type": "string" } },
+        "whereStored": { "type": "array", "items": { "type": "string" } },
+        "retention": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "DataStore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "storeType", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "storeType": { "type": "string", "enum": ["postgres", "mysql", "mssql", "oracle", "mongodb", "dynamodb", "redis", "elasticsearch", "s3", "gcs", "blob", "kafka", "rabbitmq", "other", "unknown"] },
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "logicalSchemas": { "type": "array", "items": { "type": "string" } },
+        "connectionHints": { "type": "array", "items": { "type": "string" }, "description": "Do not store secrets; only placeholders/hints." },
+        "ownership": { "type": "string", "enum": ["appOwned", "shared", "vendor", "unknown"] },
+        "backups": { "type": "string" },
+        "dr": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "DataEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "entityType"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "entityType": { "type": "string", "enum": ["table", "view", "collection", "topic", "index", "bucket", "file", "other", "unknown"] },
+        "dataStoreRef": { "$ref": "#/$defs/Ref" },
+        "primaryKeys": { "type": "array", "items": { "type": "string" } },
+        "columnsOrFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "nullable": { "type": "boolean" },
+              "pii": { "type": "boolean" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["toEntityRef", "kind"],
+            "properties": {
+              "toEntityRef": { "$ref": "#/$defs/Ref" },
+              "kind": { "type": "string", "enum": ["oneToOne", "oneToMany", "manyToOne", "manyToMany", "unknown"] },
+              "via": { "type": "string" }
+            }
+          }
+        },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "Integration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "integrationType", "direction"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "integrationType": { "type": "string", "enum": ["rest", "grpc", "graphql", "webhook", "messageBus", "etl", "fileDrop", "sdk", "dbLink", "unknown"] },
+        "direction": { "type": "string", "enum": ["inbound", "outbound", "bidirectional", "unknown"] },
+        "endpointsOrTopics": { "type": "array", "items": { "type": "string" } },
+        "contracts": { "type": "array", "items": { "$ref": "#/$defs/ArtifactRef" } },
+        "auth": { "$ref": "#/$defs/AuthRequirement" },
+        "dataMapping": { "type": "array", "items": { "$ref": "#/$defs/DataMapping" } },
+        "sla": { "type": "string" },
+        "failureModes": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "DataMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "transform": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "Environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["dev", "qa", "uat", "staging", "prod", "dr", "unknown"] },
+        "urls": { "type": "array", "items": { "type": "string" } },
+        "regions": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "DeploymentUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind", "componentRef"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "kind": { "type": "string", "enum": ["container", "lambda", "vm", "k8sWorkload", "batch", "mobileApp", "desktopApp", "unknown"] },
+        "componentRef": { "$ref": "#/$defs/Ref" },
+        "imagesOrArtifacts": { "type": "array", "items": { "type": "string" } },
+        "resources": { "type": "object" },
+        "scaling": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "CICD": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "tool"],
+      "properties": {
+        "name": { "type": "string" },
+        "tool": { "type": "string", "description": "e.g., GitHub Actions, Jenkins, Azure DevOps, GitLab CI, CodePipeline" },
+        "pipelines": { "type": "array", "items": { "type": "string" } },
+        "deployTargets": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "ConfigItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "scope"],
+      "properties": {
+        "name": { "type": "string" },
+        "scope": { "type": "string", "enum": ["app", "service", "env", "tenant", "user", "unknown"] },
+        "source": { "type": "string", "enum": ["env", "file", "ssm", "vault", "db", "k8sConfigMap", "unknown"] },
+        "keys": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "ObservabilityLogging": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tools": { "type": "array", "items": { "type": "string" } },
+        "logFormats": { "type": "array", "items": { "type": "string" } },
+        "correlationId": { "type": "string" }
+      }
+    },
+
+    "ObservabilityMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tools": { "type": "array", "items": { "type": "string" } },
+        "keyMetrics": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "ObservabilityTracing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tools": { "type": "array", "items": { "type": "string" } },
+        "propagation": { "type": "string" }
+      }
+    },
+
+    "AlertRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "condition": { "type": "string" },
+        "severity": { "type": "string", "enum": ["sev1", "sev2", "sev3", "sev4", "unknown"] },
+        "runbookRef": { "$ref": "#/$defs/Ref" }
+      }
+    },
+
+    "TestAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "location"],
+      "properties": {
+        "type": { "type": "string", "enum": ["unit", "integration", "e2e", "contract", "performance", "security", "unknown"] },
+        "location": { "type": "string" },
+        "framework": { "type": "string" },
+        "coverageHint": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "QualitySignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "description": "e.g., SonarQube quality gate, lint, SAST, dependency scan." },
+        "status": { "type": "string", "enum": ["pass", "fail", "unknown"] },
+        "details": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "Finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "severity"],
+      "properties": {
+        "title": { "type": "string" },
+        "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "info"] },
+        "description": { "type": "string" },
+        "impact": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "refs": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+      }
+    },
+
+    "ChangeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "type", "targets", "desiredOutcome"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["enhancement", "bugfix", "refactor", "security", "performance", "migration", "newFeature"] },
+        "targets": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/Ref" } },
+        "desiredOutcome": { "type": "string" },
+        "constraints": { "type": "array", "items": { "type": "string" } },
+        "acceptanceCriteria": { "type": "array", "items": { "type": "string" } },
+        "impactAnalysis": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "affectedNodes": { "type": "array", "items": { "$ref": "#/$defs/Ref" } },
+            "risk": { "type": "string" },
+            "testPlanHint": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "GlossaryTerm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "definition"],
+      "properties": {
+        "term": { "type": "string" },
+        "definition": { "type": "string" },
+        "synonyms": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

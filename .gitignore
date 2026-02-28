@@ -1,0 +1,65 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+dist-ssr
+build
+*.local
+
+*.cvs
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Log files
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing
+coverage
+*.lcov
+
+# Temporary files
+tmp_*
+*.tmp
+*.temp
+.cache
+
+# Keycloak
+keycloak_data/
+keycloak/realm-config/*.json
+!keycloak/realm-config/.gitkeep
+
+# Database
+*.sqlite
+*.sqlite3
+
+# OS files
+Thumbs.db
+
+WEEK1_IMPLEMENTATION_SUMMARY.md
+INTEGRATION_READINESS_CHECKLIST.md
+WEEK1_IMPLEMENTATION_PLAN.md
+COMMIT_MESSAGE.md
+keycloak/

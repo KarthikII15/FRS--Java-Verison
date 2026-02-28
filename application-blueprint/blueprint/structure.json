@@ -1,0 +1,22 @@
+{
+    "frontend": [
+        "pages",
+        "components",
+        "services",
+        "contexts",
+        "utils",
+        "styles",
+        "hooks",
+        "types"
+    ],
+    "backend": [
+        "controllers",
+        "services",
+        "models",
+        "repositories",
+        "middleware",
+        "config",
+        "types",
+        "utils"
+    ]
+}

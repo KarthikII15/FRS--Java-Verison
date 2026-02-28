@@ -1,0 +1,218 @@
+[
+    {
+        "group": "Employee APIs",
+        "baseUrl": "/api/employees",
+        "endpoints": [
+            {
+                "method": "GET",
+                "path": "/",
+                "description": "List all employees",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "Array<Employee>"
+            },
+            {
+                "method": "GET",
+                "path": "/{id}",
+                "description": "Get employee by ID",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "Employee"
+            },
+            {
+                "method": "POST",
+                "path": "/",
+                "description": "Create new employee",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": {
+                    "type": "Employee"
+                },
+                "responseSchema": "Employee"
+            },
+            {
+                "method": "PUT",
+                "path": "/{id}",
+                "description": "Update employee details",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": {
+                    "type": "Employee"
+                },
+                "responseSchema": "Employee"
+            },
+            {
+                "method": "DELETE",
+                "path": "/{id}",
+                "description": "Deactivate employee",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "SuccessMessage"
+            }
+        ]
+    },
+    {
+        "group": "Device APIs",
+        "baseUrl": "/api/devices",
+        "endpoints": [
+            {
+                "method": "GET",
+                "path": "/",
+                "description": "List all edge devices",
+                "roles": [
+                    "admin"
+                ],
+                "requestBody": null,
+                "responseSchema": "Array<Device>"
+            },
+            {
+                "method": "GET",
+                "path": "/{id}",
+                "description": "Get device status",
+                "roles": [
+                    "admin"
+                ],
+                "requestBody": null,
+                "responseSchema": "Device"
+            },
+            {
+                "method": "POST",
+                "path": "/",
+                "description": "Register hardware",
+                "roles": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "type": "Device"
+                },
+                "responseSchema": "Device"
+            },
+            {
+                "method": "PUT",
+                "path": "/{id}",
+                "description": "Update config",
+                "roles": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "type": "Device"
+                },
+                "responseSchema": "Device"
+            },
+            {
+                "method": "DELETE",
+                "path": "/{id}",
+                "description": "Remove logic device",
+                "roles": [
+                    "admin"
+                ],
+                "requestBody": null,
+                "responseSchema": "SuccessMessage"
+            },
+            {
+                "method": "POST",
+                "path": "/{id}/command",
+                "description": "Ping or reboot device",
+                "roles": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "type": "DeviceCommand"
+                },
+                "responseSchema": "CommandStatus"
+            }
+        ]
+    },
+    {
+        "group": "Attendance APIs",
+        "baseUrl": "/api/attendance",
+        "endpoints": [
+            {
+                "method": "GET",
+                "path": "/",
+                "description": "Query historical attendance logs",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "Array<AttendanceEvent>"
+            },
+            {
+                "method": "POST",
+                "path": "/events",
+                "description": "Webhook ingestion from devices",
+                "roles": [
+                    "system"
+                ],
+                "requestBody": {
+                    "type": "AttendanceEvent"
+                },
+                "responseSchema": "SuccessMessage"
+            },
+            {
+                "method": "GET",
+                "path": "/summary",
+                "description": "Aggregated stats",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "AttendanceSummary"
+            }
+        ]
+    },
+    {
+        "group": "Presence APIs",
+        "baseUrl": "/api/presence",
+        "endpoints": [
+            {
+                "method": "GET",
+                "path": "/",
+                "description": "Fetch current occupancy by area",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "Array<ZoneOccupancy>"
+            },
+            {
+                "method": "GET",
+                "path": "/sessions",
+                "description": "List historical dwell times",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "Array<PresenceSession>"
+            },
+            {
+                "method": "GET",
+                "path": "/live",
+                "description": "Live feed endpoint metadata",
+                "roles": [
+                    "admin",
+                    "hr"
+                ],
+                "requestBody": null,
+                "responseSchema": "StreamConfig"
+            }
+        ]
+    }
+]

@@ -1,0 +1,70 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "group": {
+                "type": "string",
+                "description": "Logical grouping name"
+            },
+            "baseUrl": {
+                "type": "string",
+                "description": "Base path prefix"
+            },
+            "endpoints": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "method": {
+                            "type": "string",
+                            "enum": [
+                                "GET",
+                                "POST",
+                                "PUT",
+                                "DELETE",
+                                "PATCH"
+                            ]
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "roles": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "requestBody": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "description": "Logical description of request payload"
+                        },
+                        "responseSchema": {
+                            "type": "string",
+                            "description": "Reference to model ID or structural description"
+                        }
+                    },
+                    "required": [
+                        "method",
+                        "path",
+                        "description",
+                        "roles",
+                        "responseSchema"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "group",
+            "baseUrl",
+            "endpoints"
+        ]
+    }
+}

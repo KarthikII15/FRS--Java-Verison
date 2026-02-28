@@ -1,0 +1,76 @@
+[
+    {
+        "id": "bldg_hq",
+        "name": "Global Headquarters",
+        "description": "Main corporate office",
+        "type": "building",
+        "parentId": null,
+        "metadata": {
+            "floors": 3
+        }
+    },
+    {
+        "id": "fl_ground",
+        "name": "Ground Floor",
+        "description": "Public entrance and lobby",
+        "type": "floor",
+        "parentId": "bldg_hq",
+        "metadata": {
+            "level": 0,
+            "has_map": true
+        }
+    },
+    {
+        "id": "fl_one",
+        "name": "First Floor",
+        "description": "Engineering and Product Teams",
+        "type": "floor",
+        "parentId": "bldg_hq",
+        "metadata": {
+            "level": 1,
+            "has_map": true
+        }
+    },
+    {
+        "id": "zone_entrance",
+        "name": "Main Entrance Gate",
+        "description": "Turnstile entry",
+        "type": "area",
+        "parentId": "fl_ground",
+        "metadata": {
+            "capacity": 500
+        }
+    },
+    {
+        "id": "zone_engineering",
+        "name": "Engineering Bullpen",
+        "description": "Open plan workspace",
+        "type": "area",
+        "parentId": "fl_one",
+        "metadata": {
+            "capacity": 150
+        }
+    },
+    {
+        "id": "cam_l1_ent",
+        "name": "Entrance Camera Alpha",
+        "description": "Primary face recognition unit",
+        "type": "camera",
+        "parentId": "zone_entrance",
+        "metadata": {
+            "direction": "IN",
+            "resolution": "4K"
+        }
+    },
+    {
+        "id": "cam_eng_door",
+        "name": "Engineering Door Monitor",
+        "description": "Secured zone access",
+        "type": "camera",
+        "parentId": "zone_engineering",
+        "metadata": {
+            "direction": "BOTH",
+            "resolution": "1080p"
+        }
+    }
+]

@@ -1,0 +1,76 @@
+[
+    {
+        "id": "DeviceCommandCenter",
+        "name": "Device Command Center",
+        "module": "deviceManagement",
+        "roles": [
+            "admin"
+        ],
+        "description": "Table displaying all registered smart cameras and their health"
+    },
+    {
+        "id": "SystemHealth",
+        "name": "System Health Overview",
+        "module": "adminPanel",
+        "roles": [
+            "admin"
+        ],
+        "description": "Uptime and API reliability metrics charts"
+    },
+    {
+        "id": "AttendanceStatusDashboard",
+        "name": "Attendance Status Board",
+        "module": "attendance",
+        "roles": [
+            "hr"
+        ],
+        "description": "Real-time aggregation of present, absent, and late employees"
+    },
+    {
+        "id": "AnalyticsCharts",
+        "name": "HR Analytics Charts",
+        "module": "hrPanel",
+        "roles": [
+            "hr"
+        ],
+        "description": "Recharts rendering of 30-day structural workforce trends"
+    },
+    {
+        "id": "AIInsightsPanel",
+        "name": "AI Anomaly Insights",
+        "module": "hrPanel",
+        "roles": [
+            "hr"
+        ],
+        "description": "Machine learning suggestions based on variance in attendance habits"
+    },
+    {
+        "id": "PresenceMonitor",
+        "name": "Live Zone Monitor",
+        "module": "presenceMonitoring",
+        "roles": [
+            "hr",
+            "admin"
+        ],
+        "description": "Tabular feed of users entering and retreating from mapped areas"
+    },
+    {
+        "id": "EmployeeLifecycleManagement",
+        "name": "Employee CRUD Tab",
+        "module": "employeeManagement",
+        "roles": [
+            "hr"
+        ],
+        "description": "Forms for onboarding, transferring, and terminating employees"
+    },
+    {
+        "id": "FilterPanel",
+        "name": "Global Filter Sidebar",
+        "module": "shared",
+        "roles": [
+            "hr",
+            "admin"
+        ],
+        "description": "Date, department, and facility filters applied to HR and Admin visualizations"
+    }
+]

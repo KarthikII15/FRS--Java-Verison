@@ -1,0 +1,66 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "description": "Event identifier (e.g. AttendanceEvent)"
+            },
+            "name": {
+                "type": "string",
+                "description": "Human-readable name"
+            },
+            "description": {
+                "type": "string",
+                "description": "When this event fires"
+            },
+            "source": {
+                "type": "string",
+                "enum": [
+                    "device",
+                    "system",
+                    "user"
+                ],
+                "description": "What triggers it"
+            },
+            "fields": {
+                "type": "array",
+                "description": "Payload fields",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "type"
+                    ]
+                }
+            },
+            "eventTypes": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "Allowed enum values for an event_type field, if applicable"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "description",
+            "source",
+            "fields"
+        ]
+    }
+}

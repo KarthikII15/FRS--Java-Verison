@@ -1,0 +1,154 @@
+[
+    {
+        "id": "AttendanceEvent",
+        "name": "Edge Recognition Event",
+        "description": "Fired when camera validates a face",
+        "source": "device",
+        "eventTypes": [
+            "ENTRY",
+            "EXIT"
+        ],
+        "fields": [
+            {
+                "name": "employee_id",
+                "type": "uuid",
+                "description": "Subject identified"
+            },
+            {
+                "name": "device_id",
+                "type": "uuid",
+                "description": "Camera ID"
+            },
+            {
+                "name": "event_type",
+                "type": "enum",
+                "description": "ENTRY or EXIT"
+            },
+            {
+                "name": "timestamp",
+                "type": "datetime",
+                "description": "Time of recognition"
+            },
+            {
+                "name": "confidence_score",
+                "type": "float",
+                "description": "AI model certainty"
+            },
+            {
+                "name": "face_match_id",
+                "type": "string",
+                "description": "Model log track trace"
+            }
+        ]
+    },
+    {
+        "id": "DeviceStatusChanged",
+        "name": "Device Heartbeat Status",
+        "description": "Fired when a device connects or drops offline",
+        "source": "system",
+        "eventTypes": [
+            "Online",
+            "Offline",
+            "Error"
+        ],
+        "fields": [
+            {
+                "name": "device_id",
+                "type": "uuid",
+                "description": "Affected device"
+            },
+            {
+                "name": "previous_status",
+                "type": "string",
+                "description": "Old state"
+            },
+            {
+                "name": "new_status",
+                "type": "string",
+                "description": "New state"
+            },
+            {
+                "name": "timestamp",
+                "type": "datetime",
+                "description": "When state changed"
+            },
+            {
+                "name": "error_code",
+                "type": "string",
+                "description": "Diagnostic info if Error"
+            }
+        ]
+    },
+    {
+        "id": "PresenceSessionStarted",
+        "name": "Presence Tracking Opened",
+        "description": "Fired when employee enters a tracked zone",
+        "source": "system",
+        "eventTypes": [
+            "AreaEntry"
+        ],
+        "fields": [
+            {
+                "name": "employee_id",
+                "type": "uuid",
+                "description": "Tracked worker"
+            },
+            {
+                "name": "area_id",
+                "type": "uuid",
+                "description": "Zone entered"
+            },
+            {
+                "name": "start_time",
+                "type": "datetime",
+                "description": "Entry boundary"
+            },
+            {
+                "name": "triggered_by",
+                "type": "uuid",
+                "description": "Attendance event ID"
+            }
+        ]
+    },
+    {
+        "id": "AlertTriggered",
+        "name": "System Alert Dispatch",
+        "description": "Fired on rule violation or system error",
+        "source": "system",
+        "eventTypes": [
+            "Alert"
+        ],
+        "fields": [
+            {
+                "name": "alert_id",
+                "type": "uuid",
+                "description": "Unique log ID"
+            },
+            {
+                "name": "severity",
+                "type": "string",
+                "description": "critical, high, medium, low"
+            },
+            {
+                "name": "type",
+                "type": "string",
+                "description": "Category like Connectivity or LateArrival"
+            },
+            {
+                "name": "message",
+                "type": "string",
+                "description": "Human readable context"
+            },
+            {
+                "name": "entity_id",
+                "type": "string",
+                "description": "Target employee/device ID"
+            },
+            {
+                "name": "timestamp",
+                "type": "datetime",
+                "description": "Execution time"
+            }
+        ]
+    }
+]
