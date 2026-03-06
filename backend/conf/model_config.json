@@ -1,4 +1,18 @@
 {
-  "models": []
+  "person": {
+    "path": "Fv",
+    "filename": "fv"
+  },
+  "vehicle": {
+    "path": "Fv",
+    "filename": "fv"
+  },
+  "face": {
+    "path": "Face",
+    "filename": "face"
+  },
+  "landmarks": {
+    "path": "Landmarks",
+    "filename": "landmarks"
+  }
 }
-

@@ -67,3 +67,6 @@ keycloak/
 # User exclusions
 scanalitix-edge-ai/
 FRS-Models/
+
+# Big models
+backend/models/**/*.bin

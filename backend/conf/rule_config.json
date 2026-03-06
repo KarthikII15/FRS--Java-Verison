@@ -1,4 +1,41 @@
 {
+  "webcam-01": [
+    {
+      "type": "ZoneIntrusionRule",
+      "enabled": true,
+      "priority": "normal",
+      "parameters": {
+        "zones": [
+          {
+            "id": "webcam_full_frame",
+            "polygon": [
+              [
+                0,
+                0
+              ],
+              [
+                640,
+                0
+              ],
+              [
+                640,
+                480
+              ],
+              [
+                0,
+                480
+              ]
+            ],
+            "objectTypes": [
+              "person",
+              "face"
+            ],
+            "minConfidence": 0.5
+          }
+        ]
+      }
+    }
+  ],
   "camera_1": [
     {
       "type": "ZoneIntrusionRule",
@@ -8,8 +45,28 @@
         "zones": [
           {
             "id": "restricted_area_1",
-            "polygon": [[100, 100], [300, 100], [300, 300], [100, 300]],
-            "objectTypes": ["person", "vehicle"],
+            "polygon": [
+              [
+                100,
+                100
+              ],
+              [
+                300,
+                100
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                100,
+                300
+              ]
+            ],
+            "objectTypes": [
+              "person",
+              "vehicle"
+            ],
             "minConfidence": 0.6
           }
         ]
@@ -19,9 +76,13 @@
       "type": "LoiteringRule",
       "enabled": true,
       "parameters": {
-        "zones": ["restricted_area_1"],
+        "zones": [
+          "restricted_area_1"
+        ],
         "maxDwellTimeMs": 30000,
-        "objectTypes": ["person"]
+        "objectTypes": [
+          "person"
+        ]
       }
     }
   ],
@@ -44,4 +105,3 @@
     }
   ]
 }
-

@@ -1,0 +1,325 @@
+# Attendance Intelligence Platform — Comprehensive Project Analysis
+
+---
+
+## 1. What Is This Project?
+
+The **Attendance Intelligence Platform** is an enterprise-grade, AI-powered workforce management system. It uses **smart cameras (edge devices)** with face recognition to automatically track employee attendance, monitor real-time physical presence inside buildings, and surface intelligent HR analytics — all secured behind **Keycloak** authentication, persisted in **PostgreSQL**, and streamed via **Kafka**.
+
+---
+
+## 2. High-Level Architecture
+
+```mermaid
+graph TD
+    subgraph "Edge Layer"
+        CAM["Smart Cameras<br/>(Face Recognition)"]
+    end
+
+    subgraph "Streaming Layer"
+        KAFKA["Apache Kafka<br/>Event Bus"]
+    end
+
+    subgraph "Backend Layer"
+        API["Express.js API Server"]
+        RULES["Rules Engine<br/>(BaseRule subclasses)"]
+        MODELS["AI ModelManager<br/>(OpenVINO .xml/.bin)"]
+        WS["WebSocket / SSE<br/>Realtime Push"]
+    end
+
+    subgraph "Data Layer"
+        PG["PostgreSQL<br/>(9 migrations)"]
+        KC["Keycloak<br/>(Auth + RBAC)"]
+    end
+
+    subgraph "Frontend Layer"
+        UI["React + Vite + Tailwind<br/>(96 components)"]
+    end
+
+    CAM -->|AttendanceEvent| KAFKA
+    KAFKA --> API
+    API --> RULES
+    API --> MODELS
+    API --> PG
+    API --> KC
+    API --> WS
+    WS --> UI
+    UI -->|REST calls| API
+```
+
+---
+
+## 3. The Application Blueprint (Single Source of Truth)
+
+The `application-blueprint/` folder is a **technology-agnostic logical blueprint** containing 13 JSON definition files. It is designed so the entire application can theoretically be regenerated from scratch in any stack.
+
+| Blueprint File | Purpose |
+|---|---|
+| [application.json](file:///c:/Yash/FRS/application-blueprint/blueprint/application.json) | Top-level app metadata |
+| [modules.json](file:///c:/Yash/FRS/application-blueprint/blueprint/modules.json) | 9 functional modules (Auth, Device Mgmt, HR, etc.) |
+| [models.json](file:///c:/Yash/FRS/application-blueprint/blueprint/models.json) | 10 data entities (Employee, Device, Building, Floor, Area, etc.) |
+| [apis.json](file:///c:/Yash/FRS/application-blueprint/blueprint/apis.json) | 4 API groups with 17 total endpoints |
+| [events.json](file:///c:/Yash/FRS/application-blueprint/blueprint/events.json) | 4 event types (AttendanceEvent, DeviceStatus, PresenceSession, Alert) |
+| [realtime.json](file:///c:/Yash/FRS/application-blueprint/blueprint/realtime.json) | 4 real-time streams (WebSocket + SSE) |
+| [roles.json](file:///c:/Yash/FRS/application-blueprint/blueprint/roles.json) | 4 RBAC roles with granular permissions |
+| [ui-pages.json](file:///c:/Yash/FRS/application-blueprint/blueprint/ui-pages.json) | 6 UI pages mapped to routes and components |
+| [components.json](file:///c:/Yash/FRS/application-blueprint/blueprint/components.json) | 8 reusable dashboard widgets |
+| [facility.json](file:///c:/Yash/FRS/application-blueprint/blueprint/facility.json) | Sample facility hierarchy (Building → Floor → Area → Camera) |
+| [relationships.json](file:///c:/Yash/FRS/application-blueprint/blueprint/relationships.json) | 10 entity relationships (many-to-one, one-to-one) |
+| [business-rules.json](file:///c:/Yash/FRS/application-blueprint/blueprint/business-rules.json) | 5 core business rules (grace periods, confidence thresholds, etc.) |
+| [structure.json](file:///c:/Yash/FRS/application-blueprint/blueprint/structure.json) | Folder layout reference |
+
+---
+
+## 4. RBAC & Permissions (Keycloak)
+
+Four roles, each with scoped permissions:
+
+| Role | Permissions | UI Access |
+|---|---|---|
+| **Super Admin** | `tenant:create/update/delete`, `admin:create/view`, `system:config` | Everything |
+| **Admin** | `user:*`, `device:*`, `facility:manage`, `audit:read`, `report:generate` | Admin Dashboard, Operations Console, Facility Console |
+| **HR Manager** | `employee:*`, `attendance:read/modify`, `shift:manage`, `insights:view` | HR Dashboard, Presence Monitor, Employee Profiles |
+| **Employee** | `profile:read/update`, `attendance:own_read`, `leave:request` | Self-service portal |
+
+The backend enforces this via middleware:
+- [keycloakJwtMiddleware.js](file:///c:/Yash/FRS/backend/src/middleware/keycloakJwtMiddleware.js) — Validates Keycloak JWT tokens
+- [keycloakVerifier.js](file:///c:/Yash/FRS/backend/src/middleware/keycloakVerifier.js) — JWKS-based signature verification
+- [authz.js](file:///c:/Yash/FRS/backend/src/middleware/authz.js) — Permission-level authorization checks
+- [scopeExtractor.js](file:///c:/Yash/FRS/backend/src/middleware/scopeExtractor.js) — Multi-tenant scope extraction (tenant → customer → site → unit)
+
+---
+
+## 5. API Contract (17 Endpoints)
+
+| Group | Base URL | Endpoints |
+|---|---|---|
+| **Employee APIs** | `/api/employees` | `GET /` list, `GET /:id`, `POST /` create, `PUT /:id` update, `DELETE /:id` deactivate |
+| **Device APIs** | `/api/devices` | `GET /` list, `GET /:id` status, `POST /` register, `PUT /:id` update, `DELETE /:id` remove, `POST /:id/command` ping/reboot |
+| **Attendance APIs** | `/api/attendance` | `GET /` historical logs, `POST /events` webhook ingestion, `GET /summary` aggregated stats |
+| **Presence APIs** | `/api/presence` | `GET /` zone occupancy, `GET /sessions` dwell times, `GET /live` stream config |
+
+Additional backend routes not in the blueprint: `authRoutes`, `dashboardRoutes`, `faceRoutes`, `healthRoutes`, `liveRoutes`, `meRoutes`, `reportRoutes`, `searchRoutes`.
+
+---
+
+## 6. Data Model & Database
+
+### 10 Core Entities
+
+```mermaid
+erDiagram
+    Building ||--o{ Floor : contains
+    Floor ||--o{ Area : contains
+    Floor ||--o{ Device : "has installed"
+    Department ||--o| Employee : "managed by"
+    Employee }o--|| Department : "belongs to"
+    Employee }o--|| Shift : "assigned to"
+    Employee ||--o{ AttendanceEvent : triggers
+    Device ||--o{ AttendanceEvent : captures
+    Employee ||--o{ PresenceSession : tracked
+    Area ||--o{ PresenceSession : "session in"
+    User ||--|| Employee : "login for"
+```
+
+### PostgreSQL Migrations (9 files)
+
+| Migration | Purpose |
+|---|---|
+| [001_init_auth.sql](file:///c:/Yash/FRS/backend/src/db/migrations/001_init_auth.sql) | Users, roles, refresh tokens, memberships, tenants |
+| [002_domain_live_data.sql](file:///c:/Yash/FRS/backend/src/db/migrations/002_domain_live_data.sql) | Employees, departments, shifts, attendance, presence sessions |
+| [003_add_keycloak_identity.sql](file:///c:/Yash/FRS/backend/src/db/migrations/003_add_keycloak_identity.sql) | Keycloak subject ID column |
+| [003_keycloak_migration.sql](file:///c:/Yash/FRS/backend/src/db/migrations/003_keycloak_migration.sql) | Keycloak-specific auth columns |
+| [004_add_pgvector.sql](file:///c:/Yash/FRS/backend/src/db/migrations/004_add_pgvector.sql) | Vector extension for face embeddings |
+| [005_create_devices_table.sql](file:///c:/Yash/FRS/backend/src/db/migrations/005_create_devices_table.sql) | Edge device registry |
+| [006_create_device_events_table.sql](file:///c:/Yash/FRS/backend/src/db/migrations/006_create_device_events_table.sql) | Device telemetry events |
+| [007_create_attendance_events_table.sql](file:///c:/Yash/FRS/backend/src/db/migrations/007_create_attendance_events_table.sql) | Face recognition attendance logs |
+| [008_create_employee_faces_table.sql](file:///c:/Yash/FRS/backend/src/db/migrations/008_create_employee_faces_table.sql) | Enrolled face data storage |
+
+---
+
+## 7. Event System & Real-Time Streams
+
+### 4 Event Types
+
+| Event | Source | Trigger |
+|---|---|---|
+| **AttendanceEvent** | Device | Camera validates a face at entry/exit |
+| **DeviceStatusChanged** | System | Heartbeat missed or restored |
+| **PresenceSessionStarted** | System | Employee enters a tracked zone |
+| **AlertTriggered** | System | Rule violation or system error |
+
+### 4 Real-Time Channels
+
+| Channel | Protocol | Subscribers |
+|---|---|---|
+| Device Health Stream | **WebSocket** | Device Management, Admin Panel |
+| Live Attendance Feed | **WebSocket** | Attendance, HR Panel |
+| System Alerts Channel | **SSE** | Admin Panel, HR Panel |
+| Zone Occupancy Stream | **WebSocket** | Presence Monitoring, Facility Intelligence |
+
+### Kafka Subsystem (`backend/src/core/kafka/`)
+
+| File | Role |
+|---|---|
+| `KafkaConfig.js` | Broker connection, topic definitions |
+| `KafkaProducer.js` | Publishes events to Kafka topics |
+| `KafkaConsumer.js` | Subscribes to and processes Kafka messages |
+| `KafkaEventService.js` | Orchestrates event routing between Kafka and the rules engine |
+
+Kafka topics (from `env.js`): `raw-frames`, `detections`, `events`, `alerts`, `smart-search`, `smart-search-results`, `system-metrics`, `snapshots`.
+
+---
+
+## 8. Business Rules
+
+| Rule | Description | Parameter |
+|---|---|---|
+| **Check-in Grace Period** | Employees within X min of shift start = ON TIME | `graceMinutes: 15` |
+| **Face Match Confidence** | Events below Y confidence → manual review | `minConfidenceScore: 0.85` |
+| **Auto-Checkout Timeout** | No EXIT event by shift end + 4hrs → auto-generate EXIT | `autoCheckoutDelayHours: 4` |
+| **Consecutive Absence Alert** | N days absent without leave → HR alert | `consecutiveDaysTrigger: 3` |
+| **Device Offline Heartbeat** | Missed ping for M seconds → mark Offline | `missedHeartbeatSeconds: 60` |
+
+---
+
+## 9. AI Models & Rules Engine
+
+### AI Models (`backend/models/`)
+
+| Folder | Model Files | Purpose |
+|---|---|---|
+| `Face/` | `face.xml`, `face.bin`, `face.mapping`, `face.yaml` | Face detection |
+| `Fv/` | `fv.xml`, `fv.bin`, `fv.mapping` | Person/Vehicle detection |
+| `Landmarks/` | `landmarks.xml`, `landmarks.bin` | Facial landmarks |
+
+Managed by `ModelManager.js` which loads, warms up, and exposes these models for inference.
+
+### Rules Engine (`backend/src/core/rules/`)
+
+| Rule File | Example Rules |
+|---|---|
+| `SecurityRules.js` | BackdoorEntryViolation, CameraTemper, CameraAngleChange |
+| `SafetyRules.js` | HelmetWeapon, FallDown |
+| `DemographicsRules.js` | AgeGenderClassify, GenderDemographics |
+| `TrafficAndTransitRules.js` | TrainArrivalDeparture, TrainIntrusion, VehicleZoneIntrusion |
+| `OccupancyAndPresenceRules.js` | OverCrowding, SmartOccupancy, Loitering |
+| `RetailAndBankingRules.js` | ATMSafeOrHoodOpen, VaultPersonDwellTime |
+| `DeviceManagementRules.js` | PmsRuleEnableOnPi, Pms |
+| `MiscellaneousRules.js` | AnimalCounting, Cleanliness, InsectPresence, PetWithoutPerson |
+
+All rules extend `BaseRule.js` and implement an `evaluate()` method.
+
+---
+
+## 10. Backend Architecture (Express.js)
+
+```
+backend/src/
+├── config/          # env.js, loaders.js (config management)
+├── controllers/     # 6 controllers (Attendance, Dashboard, Employee, Face, Report, Search)
+├── core/
+│   ├── db/          # SQLite face DB
+│   ├── infra/       # Infrastructure utilities
+│   ├── kafka/       # 4 Kafka files (Config, Consumer, Producer, EventService)
+│   ├── managers/    # ModelManager (AI model lifecycle)
+│   ├── rules/       # 10 rule files (BaseRule + 8 category files + index)
+│   ├── services/    # 6 core services (Inference, EventPush, Snapshot, Validation, etc.)
+│   ├── util/        # 7 utility files
+│   └── workers/     # Background workers
+├── db/
+│   ├── migrations/  # 9 SQL migration files
+│   └── pool.js      # PostgreSQL connection pool
+├── middleware/       # 9 middleware files (auth, authz, Keycloak, rate-limit, scope, upload)
+├── repositories/    # 5 data access files (auth, device, event, live, scopeSql)
+├── routes/          # 11 route files
+├── services/
+│   ├── business/    # 6 business services (Attendance, Dashboard, Employee, Live, Report, Search)
+│   ├── authService.js
+│   ├── tokenService.js
+│   ├── identityMappingService.js
+│   └── provisionUser.js
+├── validators/      # Input validation (Joi/Zod)
+├── websocket/       # WebSocket handlers for realtime push
+└── server.js        # Express app entry point
+```
+
+---
+
+## 11. Frontend Architecture (React + Vite + Tailwind)
+
+```
+src/
+├── app/
+│   ├── App.tsx           # Root component
+│   ├── components/       # 96 UI components
+│   ├── config/           # Frontend configuration
+│   ├── contexts/         # React contexts (Auth, Theme)
+│   ├── data/             # Mock data providers
+│   ├── engine/           # Client-side processing engine
+│   ├── hooks/            # Custom React hooks
+│   ├── services/         # 10 API service modules
+│   ├── types/            # TypeScript type definitions
+│   └── utils/            # Utility functions
+├── styles/               # Global CSS
+└── theme/                # Theme configuration
+```
+
+The frontend uses `VITE_AUTH_MODE` (mock vs api) to switch between development mock data and the live backend.
+
+---
+
+## 12. Infrastructure & Deployment
+
+### Docker Compose Files
+
+| File | Services |
+|---|---|
+| `docker-compose.yml` | Keycloak standalone (dev) |
+| `docker-compose.keycloak.yml` | Full stack: Keycloak + Keycloak-DB (Postgres) + App Postgres + Backend |
+
+### Key Environment Variables (from `.env.example`)
+- **Auth**: `AUTH_MODE`, `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_ISSUER`, `KEYCLOAK_JWKS_URI`
+- **Database**: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+- **Kafka**: `KAFKA_BROKERS`, `KAFKA_CLIENT_ID`, `KAFKA_GROUP_ID`, plus 8 topic configs
+- **AI**: `MODEL_PATH`, `INFERENCE_THREADS`, `MAX_HEAP_MEMORY_PERCENT`
+- **Frontend**: `VITE_AUTH_MODE`, `VITE_API_BASE_URL`
+
+---
+
+## 13. End-to-End Data Flow
+
+```mermaid
+sequenceDiagram
+    participant Cam as Smart Camera
+    participant Kafka as Kafka Bus
+    participant API as Express Backend
+    participant Rules as Rules Engine
+    participant PG as PostgreSQL
+    participant WS as WebSocket
+    participant UI as React Frontend
+    participant KC as Keycloak
+
+    Cam->>Kafka: Publish AttendanceEvent (face detected)
+    Kafka->>API: Consume event from topic
+    API->>Rules: Evaluate (confidence check, security rules)
+    Rules-->>API: Event validated
+    API->>PG: INSERT attendance_event + UPDATE presence_session
+    API->>WS: Push real-time update
+    UI->>KC: Verify JWT token
+    KC-->>UI: Token valid (role: hr)
+    WS->>UI: attendance.updated event
+    UI->>UI: Dashboard updates live count
+```
+
+---
+
+## 14. Integration Readiness Summary
+
+| Component | Status | Evidence |
+|---|---|---|
+| **Keycloak** ✅ | Fully integrated | `keycloakJwtMiddleware.js`, `keycloakVerifier.js`, `docker-compose.keycloak.yml`, `003_add_keycloak_identity.sql` |
+| **PostgreSQL** ✅ | Fully integrated | `pool.js`, 9 migration files, 5 repository files, `docker-compose.keycloak.yml` |
+| **Kafka** ✅ | Fully integrated | `KafkaConfig.js`, `KafkaConsumer.js`, `KafkaProducer.js`, `KafkaEventService.js`, 8 topic configs in `env.js` |
+| **AI Models** ✅ | Integrated | `Face/`, `Fv/`, `Landmarks/` in `backend/models/`, `ModelManager.js`, `model_config.json` |
+| **Rules Engine** ✅ | Implemented | 10 rule files covering Security, Safety, Demographics, Traffic, Occupancy, Retail/Banking |

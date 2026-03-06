@@ -11,7 +11,7 @@ class ValidationService extends EventEmitter {
     this.activeCameras = new Set();
     this.frameCounters = new Map(); // for motion skipping
     this.processingStats = new Map();
-    
+
     // Initialize from config
     this.initialize();
   }
@@ -20,14 +20,14 @@ class ValidationService extends EventEmitter {
     try {
       // Load camera configurations from rule_config.json
       const ruleConfig = await configLoaders.loadRuleConfig();
-      
+
       // Create queues for each camera that has rules enabled
       for (const [cameraId, rules] of Object.entries(ruleConfig)) {
         if (rules && rules.length > 0) {
           this.registerCamera(cameraId, rules);
         }
       }
-      
+
       console.log(`[ValidationService] Initialized with ${this.activeCameras.size} cameras`);
     } catch (error) {
       console.error('[ValidationService] Initialization error:', error);
@@ -42,7 +42,7 @@ class ValidationService extends EventEmitter {
 
     // Create queue in shutdown manager
     const queue = shutdownManager.createCameraQueue(
-      cameraId, 
+      cameraId,
       env.analytics.frameQueueSize
     );
 
@@ -68,7 +68,7 @@ class ValidationService extends EventEmitter {
     });
 
     console.log(`[ValidationService] Registered camera: ${cameraId} with ${rules.length} rules`);
-    
+
     this.emit('cameraRegistered', {
       cameraId,
       rules: rules.length,
@@ -85,10 +85,15 @@ class ValidationService extends EventEmitter {
       throw new Error('System is shutting down');
     }
 
-    // Check if camera is registered and enabled
-    const cameraConfig = this.cameraConfigs.get(cameraId);
-    if (!cameraConfig || !cameraConfig.enabled) {
-      throw new Error(`Camera ${cameraId} not registered or disabled`);
+    // Check if camera is registered — auto-register if unknown (plug-and-play)
+    let cameraConfig = this.cameraConfigs.get(cameraId);
+    if (!cameraConfig) {
+      console.log(`[ValidationService] Auto-registering unknown camera: ${cameraId}`);
+      this.registerCamera(cameraId, [], {});
+      cameraConfig = this.cameraConfigs.get(cameraId);
+    }
+    if (!cameraConfig.enabled) {
+      throw new Error(`Camera ${cameraId} is disabled`);
     }
 
     // Update stats
@@ -111,8 +116,8 @@ class ValidationService extends EventEmitter {
 
     // Step 2: Motion-based frame skipping (like RuleEngineUtils.motionSkip)
     if (this.shouldSkipFrame(cameraId, metadata)) {
-      return { 
-        queued: false, 
+      return {
+        queued: false,
         reason: 'motion_skip',
         skipCount: this.frameCounters.get(cameraId)
       };
@@ -140,7 +145,7 @@ class ValidationService extends EventEmitter {
     try {
       const queueSize = shutdownManager.addToCameraQueue(cameraId, enrichedFrame);
       stats.framesQueued++;
-      
+
       this.emit('frameQueued', {
         cameraId,
         frameId: enrichedFrame.id,
@@ -156,7 +161,7 @@ class ValidationService extends EventEmitter {
       };
     } catch (error) {
       stats.framesDropped++;
-      
+
       this.emit('frameQueueFailed', {
         cameraId,
         error: error.message,
@@ -217,7 +222,7 @@ class ValidationService extends EventEmitter {
 
     // Get current skip counter
     let counter = this.frameCounters.get(cameraId) || 0;
-    
+
     // Check if we should process this frame
     if (counter === 0) {
       // Process this frame, reset counter
@@ -245,13 +250,13 @@ class ValidationService extends EventEmitter {
     if (config) {
       config.enabled = enabled;
       console.log(`[ValidationService] Camera ${cameraId} ${enabled ? 'enabled' : 'disabled'}`);
-      
+
       this.emit('cameraStatusChanged', {
         cameraId,
         enabled,
         timestamp: new Date().toISOString()
       });
-      
+
       return true;
     }
     return false;
@@ -261,7 +266,7 @@ class ValidationService extends EventEmitter {
   getCameraStats(cameraId) {
     const stats = this.processingStats.get(cameraId);
     const config = this.cameraConfigs.get(cameraId);
-    
+
     if (!stats || !config) {
       return null;
     }

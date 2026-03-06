@@ -21,7 +21,7 @@ class ModelManager extends EventEmitter {
     try {
       // Load model configuration
       const modelConfig = await configLoaders.loadModelConfig();
-      
+
       // Initialize model paths
       for (const [modelId, config] of Object.entries(modelConfig)) {
         this.modelConfigs.set(modelId, {
@@ -33,10 +33,10 @@ class ModelManager extends EventEmitter {
 
       console.log(`[ModelManager] Initialized with ${this.modelConfigs.size} model configurations`);
       this.initialized = true;
-      
+
       // Start loading essential models
       await this.loadEssentialModels();
-      
+
     } catch (error) {
       console.error('[ModelManager] Initialization error:', error);
       throw error;
@@ -45,7 +45,7 @@ class ModelManager extends EventEmitter {
 
   async loadEssentialModels() {
     const essentialModels = ['person', 'vehicle', 'face']; // Adjust based on your needs
-    
+
     const loadPromises = essentialModels.map(async (modelType) => {
       try {
         await this.loadModel(modelType);
@@ -76,13 +76,13 @@ class ModelManager extends EventEmitter {
       const model = await loadPromise;
       this.models.set(modelId, model);
       console.log(`[ModelManager] Loaded model: ${modelId}`);
-      
+
       this.emit('modelLoaded', {
         modelId,
         config: config,
         timestamp: new Date().toISOString()
       });
-      
+
       return model;
     } catch (error) {
       console.error(`[ModelManager] Failed to load model ${modelId}:`, error);
@@ -95,11 +95,12 @@ class ModelManager extends EventEmitter {
   async _loadModelInternal(modelId, config) {
     // This is where you'd implement actual OpenVINO model loading
     // For now, we'll create a mock implementation
-    
+
     // Check if model files exist
-    const modelXmlPath = path.join(config.path, `${modelId}.xml`);
-    const modelBinPath = path.join(config.path, `${modelId}.bin`);
-    
+    const fileName = config.filename || modelId;
+    const modelXmlPath = path.join(config.path, `${fileName}.xml`);
+    const modelBinPath = path.join(config.path, `${fileName}.bin`);
+
     try {
       await fs.access(modelXmlPath);
       await fs.access(modelBinPath);
@@ -157,7 +158,7 @@ class ModelManager extends EventEmitter {
       // Cleanup logic here
       this.models.delete(modelId);
       console.log(`[ModelManager] Unloaded model: ${modelId}`);
-      
+
       this.emit('modelUnloaded', {
         modelId,
         timestamp: new Date().toISOString()
@@ -169,7 +170,7 @@ class ModelManager extends EventEmitter {
   getModelMetadata(modelId) {
     const config = this.modelConfigs.get(modelId);
     const model = this.models.get(modelId);
-    
+
     return {
       config,
       loaded: !!model,
@@ -183,27 +184,27 @@ class ModelManager extends EventEmitter {
     if (!validDevices.includes(device)) {
       throw new Error(`Invalid device: ${device}`);
     }
-    
+
     this.device = device;
     console.log(`[ModelManager] Device set to: ${device}`);
-    
+
     // Reload models with new device
     this.reloadAllModels();
   }
 
   async reloadAllModels() {
     const modelIds = Array.from(this.models.keys());
-    
+
     // Unload all models
     await Promise.all(Array.from(this.models.keys()).map(id => this.unloadModel(id)));
-    
+
     // Reload essential models
     await this.loadEssentialModels();
-    
+
     // Reload previously loaded models
     for (const modelId of modelIds) {
       if (!this.models.has(modelId)) {
-        await this.loadModel(modelId).catch(err => 
+        await this.loadModel(modelId).catch(err =>
           console.warn(`[ModelManager] Failed to reload ${modelId}:`, err)
         );
       }

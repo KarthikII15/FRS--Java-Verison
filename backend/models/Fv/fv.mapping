@@ -1,0 +1,1651 @@
+<?xml version="1.0" ?>
+<mapping>
+	<map>
+		<framework name="stage3_unit7_conv2_weight" out_port_id="stage3_unit7_conv2_weight"/>
+		<IR name="stage3_unit7_bn3/mean/Fused_Mul__copy" out_port_id="0" id="367"/>
+	</map>
+	<map>
+		<framework name="stage2_unit11_conv1_weight" out_port_id="stage2_unit11_conv1_weight"/>
+		<IR name="stage2_unit11_bn2/mean/Fused_Mul__copy" out_port_id="0" id="225"/>
+	</map>
+	<map>
+		<framework name="stage2_unit2_bn2" out_port_id="stage2_unit2_bn2"/>
+		<IR name="stage2_unit2_bn2/variance/Fused_Add_" out_port_id="2" id="92"/>
+	</map>
+	<map>
+		<framework name="stage3_unit3_bn1" out_port_id="stage3_unit3_bn1"/>
+		<IR name="stage3_unit3_bn1/variance/Fused_Add_" out_port_id="2" id="301"/>
+	</map>
+	<map>
+		<framework name="slope663" out_port_id="slope663"/>
+		<IR name="slope663" out_port_id="0" id="455"/>
+	</map>
+	<map>
+		<framework name="slope238" out_port_id="slope238"/>
+		<IR name="slope238" out_port_id="0" id="168"/>
+	</map>
+	<map>
+		<framework name="stage3_unit13_bn3" out_port_id="stage3_unit13_bn3"/>
+		<IR name="stage3_unit13_bn3/variance/Fused_Add_" out_port_id="2" id="459"/>
+	</map>
+	<map>
+		<framework name="stage3_unit11_conv1_weight" out_port_id="stage3_unit11_conv1_weight"/>
+		<IR name="stage3_unit11_bn2/mean/Fused_Mul__copy" out_port_id="0" id="422"/>
+	</map>
+	<map>
+		<framework name="bn0" out_port_id="bn0"/>
+		<IR name="bn0/variance/Fused_Add_" out_port_id="2" id="17"/>
+	</map>
+	<map>
+		<framework name="stage3_unit3_conv1_weight" out_port_id="stage3_unit3_conv1_weight"/>
+		<IR name="stage3_unit3_bn2/mean/Fused_Mul__copy" out_port_id="0" id="302"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_bn3" out_port_id="stage4_unit1_bn3"/>
+		<IR name="stage4_unit1_bn3/variance/Fused_Add_" out_port_id="2" id="727"/>
+	</map>
+	<map>
+		<framework name="slope370" out_port_id="slope370"/>
+		<IR name="slope370" out_port_id="0" id="258"/>
+	</map>
+	<map>
+		<framework name="stage3_unit20_bn3" out_port_id="stage3_unit20_bn3"/>
+		<IR name="stage3_unit20_bn3/variance/Fused_Add_" out_port_id="2" id="564"/>
+	</map>
+	<map>
+		<framework name="_plus5" out_port_id="_plus5"/>
+		<IR name="_plus5" out_port_id="2" id="113"/>
+	</map>
+	<map>
+		<framework name="stage3_unit28_relu1" out_port_id="stage3_unit28_relu1"/>
+		<IR name="stage3_unit28_relu1" out_port_id="2" id="681"/>
+	</map>
+	<map>
+		<framework name="stage3_unit15_bn3" out_port_id="stage3_unit15_bn3"/>
+		<IR name="stage3_unit15_bn3/variance/Fused_Add_" out_port_id="2" id="489"/>
+	</map>
+	<map>
+		<framework name="stage3_unit5_conv1_weight" out_port_id="stage3_unit5_conv1_weight"/>
+		<IR name="stage3_unit5_bn2/mean/Fused_Mul__copy" out_port_id="0" id="332"/>
+	</map>
+	<map>
+		<framework name="stage3_unit22_bn2" out_port_id="stage3_unit22_bn2"/>
+		<IR name="stage3_unit22_bn2/variance/Fused_Add_" out_port_id="2" id="589"/>
+	</map>
+	<map>
+		<framework name="_plus13" out_port_id="_plus13"/>
+		<IR name="_plus13" out_port_id="2" id="233"/>
+	</map>
+	<map>
+		<framework name="stage4_unit3_bn3" out_port_id="stage4_unit3_bn3"/>
+		<IR name="stage4_unit3_bn3/variance/Fused_Add_" out_port_id="2" id="761"/>
+	</map>
+	<map>
+		<framework name="stage3_unit27_relu1" out_port_id="stage3_unit27_relu1"/>
+		<IR name="stage3_unit27_relu1" out_port_id="2" id="666"/>
+	</map>
+	<map>
+		<framework name="stage3_unit29_bn2" out_port_id="stage3_unit29_bn2"/>
+		<IR name="stage3_unit29_bn2/variance/Fused_Add_" out_port_id="2" id="694"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_conv2_weight" out_port_id="stage2_unit1_conv2_weight"/>
+		<IR name="stage2_unit1_bn3/mean/Fused_Mul__copy" out_port_id="0" id="76"/>
+	</map>
+	<map>
+		<framework name="slope597" out_port_id="slope597"/>
+		<IR name="slope597" out_port_id="0" id="410"/>
+	</map>
+	<map>
+		<framework name="stage2_unit5_conv1_weight" out_port_id="stage2_unit5_conv1_weight"/>
+		<IR name="stage2_unit5_bn2/mean/Fused_Mul__copy" out_port_id="0" id="135"/>
+	</map>
+	<map>
+		<framework name="stage2_unit9_bn2" out_port_id="stage2_unit9_bn2"/>
+		<IR name="stage2_unit9_bn2/variance/Fused_Add_" out_port_id="2" id="197"/>
+	</map>
+	<map>
+		<framework name="stage3_unit14_bn2" out_port_id="stage3_unit14_bn2"/>
+		<IR name="stage3_unit14_bn2/variance/Fused_Add_" out_port_id="2" id="469"/>
+	</map>
+	<map>
+		<framework name="_plus42" out_port_id="_plus42"/>
+		<IR name="_plus42" out_port_id="2" id="670"/>
+	</map>
+	<map>
+		<framework name="slope575" out_port_id="slope575"/>
+		<IR name="slope575" out_port_id="0" id="395"/>
+	</map>
+	<map>
+		<framework name="_plus22" out_port_id="_plus22"/>
+		<IR name="_plus22" out_port_id="2" id="370"/>
+	</map>
+	<map>
+		<framework name="_plus16" out_port_id="_plus16"/>
+		<IR name="_plus16" out_port_id="2" id="280"/>
+	</map>
+	<map>
+		<framework name="stage3_unit24_relu1" out_port_id="stage3_unit24_relu1"/>
+		<IR name="stage3_unit24_relu1" out_port_id="2" id="621"/>
+	</map>
+	<map>
+		<framework name="stage3_unit2_relu1" out_port_id="stage3_unit2_relu1"/>
+		<IR name="stage3_unit2_relu1" out_port_id="2" id="291"/>
+	</map>
+	<map>
+		<framework name="stage3_unit12_relu1" out_port_id="stage3_unit12_relu1"/>
+		<IR name="stage3_unit12_relu1" out_port_id="2" id="441"/>
+	</map>
+	<map>
+		<framework name="fc1" out_port_id="fc1"/>
+		<IR name="fc1" out_port_id="2" id="771"/>
+	</map>
+	<map>
+		<framework name="_plus39" out_port_id="_plus39"/>
+		<IR name="_plus39" out_port_id="2" id="625"/>
+	</map>
+	<map>
+		<framework name="stage2_unit4_conv2_weight" out_port_id="stage2_unit4_conv2_weight"/>
+		<IR name="stage2_unit4_bn3/mean/Fused_Mul__copy" out_port_id="0" id="125"/>
+	</map>
+	<map>
+		<framework name="stage2_unit11_bn3" out_port_id="stage2_unit11_bn3"/>
+		<IR name="stage2_unit11_bn3/variance/Fused_Add_" out_port_id="2" id="232"/>
+	</map>
+	<map>
+		<framework name="stage3_unit16_bn1" out_port_id="stage3_unit16_bn1"/>
+		<IR name="stage3_unit16_bn1/variance/Fused_Add_" out_port_id="2" id="496"/>
+	</map>
+	<map>
+		<framework name="stage3_unit25_bn2" out_port_id="stage3_unit25_bn2"/>
+		<IR name="stage3_unit25_bn2/variance/Fused_Add_" out_port_id="2" id="634"/>
+	</map>
+	<map>
+		<framework name="stage3_unit30_bn3" out_port_id="stage3_unit30_bn3"/>
+		<IR name="stage3_unit30_bn3/variance/Fused_Add_" out_port_id="2" id="714"/>
+	</map>
+	<map>
+		<framework name="_plus47" out_port_id="_plus47"/>
+		<IR name="_plus47" out_port_id="2" id="747"/>
+	</map>
+	<map>
+		<framework name="stage3_unit26_bn3" out_port_id="stage3_unit26_bn3"/>
+		<IR name="stage3_unit26_bn3/variance/Fused_Add_" out_port_id="2" id="654"/>
+	</map>
+	<map>
+		<framework name="stage2_unit9_conv1_weight" out_port_id="stage2_unit9_conv1_weight"/>
+		<IR name="stage2_unit9_bn2/mean/Fused_Mul__copy" out_port_id="0" id="195"/>
+	</map>
+	<map>
+		<framework name="slope729" out_port_id="slope729"/>
+		<IR name="slope729" out_port_id="0" id="500"/>
+	</map>
+	<map>
+		<framework name="stage2_unit8_conv1_weight" out_port_id="stage2_unit8_conv1_weight"/>
+		<IR name="stage2_unit8_bn2/mean/Fused_Mul__copy" out_port_id="0" id="180"/>
+	</map>
+	<map>
+		<framework name="stage3_unit12_bn3" out_port_id="stage3_unit12_bn3"/>
+		<IR name="stage3_unit12_bn3/variance/Fused_Add_" out_port_id="2" id="444"/>
+	</map>
+	<map>
+		<framework name="stage3_unit14_relu1" out_port_id="stage3_unit14_relu1"/>
+		<IR name="stage3_unit14_relu1" out_port_id="2" id="471"/>
+	</map>
+	<map>
+		<framework name="stage4_unit2_bn2" out_port_id="stage4_unit2_bn2"/>
+		<IR name="stage4_unit2_bn2/variance/Fused_Add_" out_port_id="2" id="741"/>
+	</map>
+	<map>
+		<framework name="_plus0" out_port_id="_plus0"/>
+		<IR name="_plus0" out_port_id="2" id="36"/>
+	</map>
+	<map>
+		<framework name="stage3_unit10_bn3" out_port_id="stage3_unit10_bn3"/>
+		<IR name="stage3_unit10_bn3/variance/Fused_Add_" out_port_id="2" id="414"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_bn2" out_port_id="stage1_unit1_bn2"/>
+		<IR name="stage1_unit1_bn2/variance/Fused_Add_" out_port_id="2" id="26"/>
+	</map>
+	<map>
+		<framework name="stage3_unit11_bn3" out_port_id="stage3_unit11_bn3"/>
+		<IR name="stage3_unit11_bn3/variance/Fused_Add_" out_port_id="2" id="429"/>
+	</map>
+	<map>
+		<framework name="stage3_unit21_bn3" out_port_id="stage3_unit21_bn3"/>
+		<IR name="stage3_unit21_bn3/variance/Fused_Add_" out_port_id="2" id="579"/>
+	</map>
+	<map>
+		<framework name="stage3_unit9_bn3" out_port_id="stage3_unit9_bn3"/>
+		<IR name="stage3_unit9_bn3/variance/Fused_Add_" out_port_id="2" id="399"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_conv1sc_weight" out_port_id="stage3_unit1_conv1sc_weight"/>
+		<IR name="stage3_unit1_sc/mean/Fused_Mul__copy" out_port_id="0" id="277"/>
+	</map>
+	<map>
+		<framework name="stage3_unit19_conv1_weight" out_port_id="stage3_unit19_conv1_weight"/>
+		<IR name="stage3_unit19_bn2/mean/Fused_Mul__copy" out_port_id="0" id="542"/>
+	</map>
+	<map>
+		<framework name="stage3_unit20_bn2" out_port_id="stage3_unit20_bn2"/>
+		<IR name="stage3_unit20_bn2/variance/Fused_Add_" out_port_id="2" id="559"/>
+	</map>
+	<map>
+		<framework name="stage1_unit2_relu1" out_port_id="stage1_unit2_relu1"/>
+		<IR name="stage1_unit2_relu1" out_port_id="2" id="47"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_conv1_weight" out_port_id="stage1_unit1_conv1_weight"/>
+		<IR name="stage1_unit1_bn2/mean/Fused_Mul__copy" out_port_id="0" id="24"/>
+	</map>
+	<map>
+		<framework name="stage1_unit2_conv2_weight" out_port_id="stage1_unit2_conv2_weight"/>
+		<IR name="stage1_unit2_bn3/mean/Fused_Mul__copy" out_port_id="0" id="48"/>
+	</map>
+	<map>
+		<framework name="stage3_unit9_conv2_weight" out_port_id="stage3_unit9_conv2_weight"/>
+		<IR name="stage3_unit9_bn3/mean/Fused_Mul__copy" out_port_id="0" id="397"/>
+	</map>
+	<map>
+		<framework name="stage2_unit5_relu1" out_port_id="stage2_unit5_relu1"/>
+		<IR name="stage2_unit5_relu1" out_port_id="2" id="139"/>
+	</map>
+	<map>
+		<framework name="stage3_unit14_conv2_weight" out_port_id="stage3_unit14_conv2_weight"/>
+		<IR name="stage3_unit14_bn3/mean/Fused_Mul__copy" out_port_id="0" id="472"/>
+	</map>
+	<map>
+		<framework name="stage2_unit3_bn3" out_port_id="stage2_unit3_bn3"/>
+		<IR name="stage2_unit3_bn3/variance/Fused_Add_" out_port_id="2" id="112"/>
+	</map>
+	<map>
+		<framework name="slope1059" out_port_id="slope1059"/>
+		<IR name="slope1059" out_port_id="0" id="723"/>
+	</map>
+	<map>
+		<framework name="stage3_unit24_bn2" out_port_id="stage3_unit24_bn2"/>
+		<IR name="stage3_unit24_bn2/variance/Fused_Add_" out_port_id="2" id="619"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_relu1" out_port_id="stage3_unit1_relu1"/>
+		<IR name="stage3_unit1_relu1" out_port_id="2" id="272"/>
+	</map>
+	<map>
+		<framework name="stage2_unit8_relu1" out_port_id="stage2_unit8_relu1"/>
+		<IR name="stage2_unit8_relu1" out_port_id="2" id="184"/>
+	</map>
+	<map>
+		<framework name="stage3_unit19_bn3" out_port_id="stage3_unit19_bn3"/>
+		<IR name="stage3_unit19_bn3/variance/Fused_Add_" out_port_id="2" id="549"/>
+	</map>
+	<map>
+		<framework name="stage2_unit13_relu1" out_port_id="stage2_unit13_relu1"/>
+		<IR name="stage2_unit13_relu1" out_port_id="2" id="259"/>
+	</map>
+	<map>
+		<framework name="stage1_unit2_bn3" out_port_id="stage1_unit2_bn3"/>
+		<IR name="stage1_unit2_bn3/variance/Fused_Add_" out_port_id="2" id="50"/>
+	</map>
+	<map>
+		<framework name="_plus20" out_port_id="_plus20"/>
+		<IR name="_plus20" out_port_id="2" id="340"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_relu1" out_port_id="stage2_unit1_relu1"/>
+		<IR name="stage2_unit1_relu1" out_port_id="2" id="75"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_bn2" out_port_id="stage2_unit1_bn2"/>
+		<IR name="stage2_unit1_bn2/variance/Fused_Add_" out_port_id="2" id="73"/>
+	</map>
+	<map>
+		<framework name="stage2_unit9_bn3" out_port_id="stage2_unit9_bn3"/>
+		<IR name="stage2_unit9_bn3/variance/Fused_Add_" out_port_id="2" id="202"/>
+	</map>
+	<map>
+		<framework name="_plus36" out_port_id="_plus36"/>
+		<IR name="_plus36" out_port_id="2" id="580"/>
+	</map>
+	<map>
+		<framework name="stage2_unit13_bn3" out_port_id="stage2_unit13_bn3"/>
+		<IR name="stage2_unit13_bn3/variance/Fused_Add_" out_port_id="2" id="262"/>
+	</map>
+	<map>
+		<framework name="stage2_unit7_conv2_weight" out_port_id="stage2_unit7_conv2_weight"/>
+		<IR name="stage2_unit7_bn3/mean/Fused_Mul__copy" out_port_id="0" id="170"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_sc" out_port_id="stage2_unit1_sc"/>
+		<IR name="stage2_unit1_sc/variance/Fused_Add_" out_port_id="2" id="82"/>
+	</map>
+	<map>
+		<framework name="stage2_unit6_bn2" out_port_id="stage2_unit6_bn2"/>
+		<IR name="stage2_unit6_bn2/variance/Fused_Add_" out_port_id="2" id="152"/>
+	</map>
+	<map>
+		<framework name="stage3_unit20_relu1" out_port_id="stage3_unit20_relu1"/>
+		<IR name="stage3_unit20_relu1" out_port_id="2" id="561"/>
+	</map>
+	<map>
+		<framework name="_plus35" out_port_id="_plus35"/>
+		<IR name="_plus35" out_port_id="2" id="565"/>
+	</map>
+	<map>
+		<framework name="stage3_unit15_conv2_weight" out_port_id="stage3_unit15_conv2_weight"/>
+		<IR name="stage3_unit15_bn3/mean/Fused_Mul__copy" out_port_id="0" id="487"/>
+	</map>
+	<map>
+		<framework name="_plus43" out_port_id="_plus43"/>
+		<IR name="_plus43" out_port_id="2" id="685"/>
+	</map>
+	<map>
+		<framework name="stage2_unit12_conv2_weight" out_port_id="stage2_unit12_conv2_weight"/>
+		<IR name="stage2_unit12_bn3/mean/Fused_Mul__copy" out_port_id="0" id="245"/>
+	</map>
+	<map>
+		<framework name="_plus24" out_port_id="_plus24"/>
+		<IR name="_plus24" out_port_id="2" id="400"/>
+	</map>
+	<map>
+		<framework name="slope421" out_port_id="slope421"/>
+		<IR name="slope421" out_port_id="0" id="290"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_bn1" out_port_id="stage1_unit1_bn1"/>
+		<IR name="stage1_unit1_bn1/variance/Fused_Add_" out_port_id="2" id="23"/>
+	</map>
+	<map>
+		<framework name="stage1_unit3_conv1_weight" out_port_id="stage1_unit3_conv1_weight"/>
+		<IR name="stage1_unit3_bn2/mean/Fused_Mul__copy" out_port_id="0" id="58"/>
+	</map>
+	<map>
+		<framework name="stage3_unit11_relu1" out_port_id="stage3_unit11_relu1"/>
+		<IR name="stage3_unit11_relu1" out_port_id="2" id="426"/>
+	</map>
+	<map>
+		<framework name="stage3_unit12_conv2_weight" out_port_id="stage3_unit12_conv2_weight"/>
+		<IR name="stage3_unit12_bn3/mean/Fused_Mul__copy" out_port_id="0" id="442"/>
+	</map>
+	<map>
+		<framework name="_plus33" out_port_id="_plus33"/>
+		<IR name="_plus33" out_port_id="2" id="535"/>
+	</map>
+	<map>
+		<framework name="stage3_unit28_bn2" out_port_id="stage3_unit28_bn2"/>
+		<IR name="stage3_unit28_bn2/variance/Fused_Add_" out_port_id="2" id="679"/>
+	</map>
+	<map>
+		<framework name="_plus4" out_port_id="_plus4"/>
+		<IR name="_plus4" out_port_id="2" id="98"/>
+	</map>
+	<map>
+		<framework name="slope443" out_port_id="slope443"/>
+		<IR name="slope443" out_port_id="0" id="305"/>
+	</map>
+	<map>
+		<framework name="stage2_unit13_conv1_weight" out_port_id="stage2_unit13_conv1_weight"/>
+		<IR name="stage2_unit13_bn2/mean/Fused_Mul__copy" out_port_id="0" id="255"/>
+	</map>
+	<map>
+		<framework name="stage3_unit15_relu1" out_port_id="stage3_unit15_relu1"/>
+		<IR name="stage3_unit15_relu1" out_port_id="2" id="486"/>
+	</map>
+	<map>
+		<framework name="stage1_unit2_bn1" out_port_id="stage1_unit2_bn1"/>
+		<IR name="stage1_unit2_bn1/variance/Fused_Add_" out_port_id="2" id="42"/>
+	</map>
+	<map>
+		<framework name="stage2_unit13_bn2" out_port_id="stage2_unit13_bn2"/>
+		<IR name="stage2_unit13_bn2/variance/Fused_Add_" out_port_id="2" id="257"/>
+	</map>
+	<map>
+		<framework name="stage2_unit9_bn1" out_port_id="stage2_unit9_bn1"/>
+		<IR name="stage2_unit9_bn1/variance/Fused_Add_" out_port_id="2" id="194"/>
+	</map>
+	<map>
+		<framework name="stage3_unit4_bn2" out_port_id="stage3_unit4_bn2"/>
+		<IR name="stage3_unit4_bn2/variance/Fused_Add_" out_port_id="2" id="319"/>
+	</map>
+	<map>
+		<framework name="_plus3" out_port_id="_plus3"/>
+		<IR name="_plus3" out_port_id="2" id="83"/>
+	</map>
+	<map>
+		<framework name="stage3_unit16_bn3" out_port_id="stage3_unit16_bn3"/>
+		<IR name="stage3_unit16_bn3/variance/Fused_Add_" out_port_id="2" id="504"/>
+	</map>
+	<map>
+		<framework name="stage3_unit7_bn2" out_port_id="stage3_unit7_bn2"/>
+		<IR name="stage3_unit7_bn2/variance/Fused_Add_" out_port_id="2" id="364"/>
+	</map>
+	<map>
+		<framework name="stage3_unit5_bn3" out_port_id="stage3_unit5_bn3"/>
+		<IR name="stage3_unit5_bn3/variance/Fused_Add_" out_port_id="2" id="339"/>
+	</map>
+	<map>
+		<framework name="stage3_unit11_bn1" out_port_id="stage3_unit11_bn1"/>
+		<IR name="stage3_unit11_bn1/variance/Fused_Add_" out_port_id="2" id="421"/>
+	</map>
+	<map>
+		<framework name="slope1110" out_port_id="slope1110"/>
+		<IR name="slope1110" out_port_id="0" id="757"/>
+	</map>
+	<map>
+		<framework name="slope55" out_port_id="slope55"/>
+		<IR name="slope55" out_port_id="0" id="46"/>
+	</map>
+	<map>
+		<framework name="stage3_unit25_bn1" out_port_id="stage3_unit25_bn1"/>
+		<IR name="stage3_unit25_bn1/variance/Fused_Add_" out_port_id="2" id="631"/>
+	</map>
+	<map>
+		<framework name="stage3_unit28_bn3" out_port_id="stage3_unit28_bn3"/>
+		<IR name="stage3_unit28_bn3/variance/Fused_Add_" out_port_id="2" id="684"/>
+	</map>
+	<map>
+		<framework name="stage3_unit5_conv2_weight" out_port_id="stage3_unit5_conv2_weight"/>
+		<IR name="stage3_unit5_bn3/mean/Fused_Mul__copy" out_port_id="0" id="337"/>
+	</map>
+	<map>
+		<framework name="_plus27" out_port_id="_plus27"/>
+		<IR name="_plus27" out_port_id="2" id="445"/>
+	</map>
+	<map>
+		<framework name="slope348" out_port_id="slope348"/>
+		<IR name="slope348" out_port_id="0" id="243"/>
+	</map>
+	<map>
+		<framework name="stage3_unit26_relu1" out_port_id="stage3_unit26_relu1"/>
+		<IR name="stage3_unit26_relu1" out_port_id="2" id="651"/>
+	</map>
+	<map>
+		<framework name="stage3_unit30_conv2_weight" out_port_id="stage3_unit30_conv2_weight"/>
+		<IR name="stage3_unit30_bn3/mean/Fused_Mul__copy" out_port_id="0" id="712"/>
+	</map>
+	<map>
+		<framework name="slope1015" out_port_id="slope1015"/>
+		<IR name="slope1015" out_port_id="0" id="695"/>
+	</map>
+	<map>
+		<framework name="stage3_unit2_bn2" out_port_id="stage3_unit2_bn2"/>
+		<IR name="stage3_unit2_bn2/variance/Fused_Add_" out_port_id="2" id="289"/>
+	</map>
+	<map>
+		<framework name="slope172" out_port_id="slope172"/>
+		<IR name="slope172" out_port_id="0" id="123"/>
+	</map>
+	<map>
+		<framework name="stage3_unit16_bn2" out_port_id="stage3_unit16_bn2"/>
+		<IR name="stage3_unit16_bn2/variance/Fused_Add_" out_port_id="2" id="499"/>
+	</map>
+	<map>
+		<framework name="_plus29" out_port_id="_plus29"/>
+		<IR name="_plus29" out_port_id="2" id="475"/>
+	</map>
+	<map>
+		<framework name="stage3_unit10_bn2" out_port_id="stage3_unit10_bn2"/>
+		<IR name="stage3_unit10_bn2/variance/Fused_Add_" out_port_id="2" id="409"/>
+	</map>
+	<map>
+		<framework name="stage3_unit10_conv2_weight" out_port_id="stage3_unit10_conv2_weight"/>
+		<IR name="stage3_unit10_bn3/mean/Fused_Mul__copy" out_port_id="0" id="412"/>
+	</map>
+	<map>
+		<framework name="slope861" out_port_id="slope861"/>
+		<IR name="slope861" out_port_id="0" id="590"/>
+	</map>
+	<map>
+		<framework name="stage2_unit5_bn1" out_port_id="stage2_unit5_bn1"/>
+		<IR name="stage2_unit5_bn1/variance/Fused_Add_" out_port_id="2" id="134"/>
+	</map>
+	<map>
+		<framework name="stage2_unit10_bn1" out_port_id="stage2_unit10_bn1"/>
+		<IR name="stage2_unit10_bn1/variance/Fused_Add_" out_port_id="2" id="209"/>
+	</map>
+	<map>
+		<framework name="stage3_unit4_relu1" out_port_id="stage3_unit4_relu1"/>
+		<IR name="stage3_unit4_relu1" out_port_id="2" id="321"/>
+	</map>
+	<map>
+		<framework name="stage3_unit14_bn3" out_port_id="stage3_unit14_bn3"/>
+		<IR name="stage3_unit14_bn3/variance/Fused_Add_" out_port_id="2" id="474"/>
+	</map>
+	<map>
+		<framework name="pre_fc1_weight" out_port_id="pre_fc1_weight"/>
+		<IR name="fc11237/mean/Fused_Mul__copy" out_port_id="0" id="769"/>
+	</map>
+	<map>
+		<framework name="stage3_unit6_conv1_weight" out_port_id="stage3_unit6_conv1_weight"/>
+		<IR name="stage3_unit6_bn2/mean/Fused_Mul__copy" out_port_id="0" id="347"/>
+	</map>
+	<map>
+		<framework name="stage3_unit30_bn1" out_port_id="stage3_unit30_bn1"/>
+		<IR name="stage3_unit30_bn1/variance/Fused_Add_" out_port_id="2" id="706"/>
+	</map>
+	<map>
+		<framework name="stage3_unit17_bn2" out_port_id="stage3_unit17_bn2"/>
+		<IR name="stage3_unit17_bn2/variance/Fused_Add_" out_port_id="2" id="514"/>
+	</map>
+	<map>
+		<framework name="stage2_unit6_bn1" out_port_id="stage2_unit6_bn1"/>
+		<IR name="stage2_unit6_bn1/variance/Fused_Add_" out_port_id="2" id="149"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_bn3" out_port_id="stage2_unit1_bn3"/>
+		<IR name="stage2_unit1_bn3/variance/Fused_Add_" out_port_id="2" id="78"/>
+	</map>
+	<map>
+		<framework name="stage3_unit27_conv2_weight" out_port_id="stage3_unit27_conv2_weight"/>
+		<IR name="stage3_unit27_bn3/mean/Fused_Mul__copy" out_port_id="0" id="667"/>
+	</map>
+	<map>
+		<framework name="stage3_unit18_bn1" out_port_id="stage3_unit18_bn1"/>
+		<IR name="stage3_unit18_bn1/variance/Fused_Add_" out_port_id="2" id="526"/>
+	</map>
+	<map>
+		<framework name="stage1_unit3_conv2_weight" out_port_id="stage1_unit3_conv2_weight"/>
+		<IR name="stage1_unit3_bn3/mean/Fused_Mul__copy" out_port_id="0" id="63"/>
+	</map>
+	<map>
+		<framework name="stage2_unit7_bn2" out_port_id="stage2_unit7_bn2"/>
+		<IR name="stage2_unit7_bn2/variance/Fused_Add_" out_port_id="2" id="167"/>
+	</map>
+	<map>
+		<framework name="stage3_unit17_bn1" out_port_id="stage3_unit17_bn1"/>
+		<IR name="stage3_unit17_bn1/variance/Fused_Add_" out_port_id="2" id="511"/>
+	</map>
+	<map>
+		<framework name="stage3_unit23_relu1" out_port_id="stage3_unit23_relu1"/>
+		<IR name="stage3_unit23_relu1" out_port_id="2" id="606"/>
+	</map>
+	<map>
+		<framework name="stage3_unit24_conv2_weight" out_port_id="stage3_unit24_conv2_weight"/>
+		<IR name="stage3_unit24_bn3/mean/Fused_Mul__copy" out_port_id="0" id="622"/>
+	</map>
+	<map>
+		<framework name="stage3_unit21_relu1" out_port_id="stage3_unit21_relu1"/>
+		<IR name="stage3_unit21_relu1" out_port_id="2" id="576"/>
+	</map>
+	<map>
+		<framework name="stage3_unit9_relu1" out_port_id="stage3_unit9_relu1"/>
+		<IR name="stage3_unit9_relu1" out_port_id="2" id="396"/>
+	</map>
+	<map>
+		<framework name="stage4_unit2_conv2_weight" out_port_id="stage4_unit2_conv2_weight"/>
+		<IR name="stage4_unit2_bn3/mean/Fused_Mul__copy" out_port_id="0" id="744"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_conv2_weight" out_port_id="stage1_unit1_conv2_weight"/>
+		<IR name="stage1_unit1_bn3/mean/Fused_Mul__copy" out_port_id="0" id="29"/>
+	</map>
+	<map>
+		<framework name="stage3_unit28_conv1_weight" out_port_id="stage3_unit28_conv1_weight"/>
+		<IR name="stage3_unit28_bn2/mean/Fused_Mul__copy" out_port_id="0" id="677"/>
+	</map>
+	<map>
+		<framework name="stage3_unit12_bn1" out_port_id="stage3_unit12_bn1"/>
+		<IR name="stage3_unit12_bn1/variance/Fused_Add_" out_port_id="2" id="436"/>
+	</map>
+	<map>
+		<framework name="stage2_unit5_bn2" out_port_id="stage2_unit5_bn2"/>
+		<IR name="stage2_unit5_bn2/variance/Fused_Add_" out_port_id="2" id="137"/>
+	</map>
+	<map>
+		<framework name="stage3_unit29_bn1" out_port_id="stage3_unit29_bn1"/>
+		<IR name="stage3_unit29_bn1/variance/Fused_Add_" out_port_id="2" id="691"/>
+	</map>
+	<map>
+		<framework name="_plus45" out_port_id="_plus45"/>
+		<IR name="_plus45" out_port_id="2" id="715"/>
+	</map>
+	<map>
+		<framework name="stage3_unit28_conv2_weight" out_port_id="stage3_unit28_conv2_weight"/>
+		<IR name="stage3_unit28_bn3/mean/Fused_Mul__copy" out_port_id="0" id="682"/>
+	</map>
+	<map>
+		<framework name="stage4_unit3_conv2_weight" out_port_id="stage4_unit3_conv2_weight"/>
+		<IR name="stage4_unit3_bn3/mean/Fused_Mul__copy" out_port_id="0" id="759"/>
+	</map>
+	<map>
+		<framework name="stage3_unit7_bn1" out_port_id="stage3_unit7_bn1"/>
+		<IR name="stage3_unit7_bn1/variance/Fused_Add_" out_port_id="2" id="361"/>
+	</map>
+	<map>
+		<framework name="stage2_unit6_conv1_weight" out_port_id="stage2_unit6_conv1_weight"/>
+		<IR name="stage2_unit6_bn2/mean/Fused_Mul__copy" out_port_id="0" id="150"/>
+	</map>
+	<map>
+		<framework name="_plus17" out_port_id="_plus17"/>
+		<IR name="_plus17" out_port_id="2" id="295"/>
+	</map>
+	<map>
+		<framework name="stage3_unit2_bn3" out_port_id="stage3_unit2_bn3"/>
+		<IR name="stage3_unit2_bn3/variance/Fused_Add_" out_port_id="2" id="294"/>
+	</map>
+	<map>
+		<framework name="stage2_unit12_conv1_weight" out_port_id="stage2_unit12_conv1_weight"/>
+		<IR name="stage2_unit12_bn2/mean/Fused_Mul__copy" out_port_id="0" id="240"/>
+	</map>
+	<map>
+		<framework name="stage3_unit18_conv2_weight" out_port_id="stage3_unit18_conv2_weight"/>
+		<IR name="stage3_unit18_bn3/mean/Fused_Mul__copy" out_port_id="0" id="532"/>
+	</map>
+	<map>
+		<framework name="stage2_unit12_bn2" out_port_id="stage2_unit12_bn2"/>
+		<IR name="stage2_unit12_bn2/variance/Fused_Add_" out_port_id="2" id="242"/>
+	</map>
+	<map>
+		<framework name="stage3_unit22_relu1" out_port_id="stage3_unit22_relu1"/>
+		<IR name="stage3_unit22_relu1" out_port_id="2" id="591"/>
+	</map>
+	<map>
+		<framework name="stage3_unit3_conv2_weight" out_port_id="stage3_unit3_conv2_weight"/>
+		<IR name="stage3_unit3_bn3/mean/Fused_Mul__copy" out_port_id="0" id="307"/>
+	</map>
+	<map>
+		<framework name="_plus34" out_port_id="_plus34"/>
+		<IR name="_plus34" out_port_id="2" id="550"/>
+	</map>
+	<map>
+		<framework name="stage3_unit19_conv2_weight" out_port_id="stage3_unit19_conv2_weight"/>
+		<IR name="stage3_unit19_bn3/mean/Fused_Mul__copy" out_port_id="0" id="547"/>
+	</map>
+	<map>
+		<framework name="stage3_unit24_bn1" out_port_id="stage3_unit24_bn1"/>
+		<IR name="stage3_unit24_bn1/variance/Fused_Add_" out_port_id="2" id="616"/>
+	</map>
+	<map>
+		<framework name="stage3_unit13_conv1_weight" out_port_id="stage3_unit13_conv1_weight"/>
+		<IR name="stage3_unit13_bn2/mean/Fused_Mul__copy" out_port_id="0" id="452"/>
+	</map>
+	<map>
+		<framework name="slope487" out_port_id="slope487"/>
+		<IR name="slope487" out_port_id="0" id="335"/>
+	</map>
+	<map>
+		<framework name="stage2_unit2_relu1" out_port_id="stage2_unit2_relu1"/>
+		<IR name="stage2_unit2_relu1" out_port_id="2" id="94"/>
+	</map>
+	<map>
+		<framework name="stage4_unit2_bn3" out_port_id="stage4_unit2_bn3"/>
+		<IR name="stage4_unit2_bn3/variance/Fused_Add_" out_port_id="2" id="746"/>
+	</map>
+	<map>
+		<framework name="slope216" out_port_id="slope216"/>
+		<IR name="slope216" out_port_id="0" id="153"/>
+	</map>
+	<map>
+		<framework name="slope641" out_port_id="slope641"/>
+		<IR name="slope641" out_port_id="0" id="440"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_bn3" out_port_id="stage3_unit1_bn3"/>
+		<IR name="stage3_unit1_bn3/variance/Fused_Add_" out_port_id="2" id="275"/>
+	</map>
+	<map>
+		<framework name="slope326" out_port_id="slope326"/>
+		<IR name="slope326" out_port_id="0" id="228"/>
+	</map>
+	<map>
+		<framework name="flatten_1127" out_port_id="flatten_1127"/>
+		<IR name="flatten_1127/Reshape" out_port_id="2" id="768"/>
+	</map>
+	<map>
+		<framework name="stage3_unit30_conv1_weight" out_port_id="stage3_unit30_conv1_weight"/>
+		<IR name="stage3_unit30_bn2/mean/Fused_Mul__copy" out_port_id="0" id="707"/>
+	</map>
+	<map>
+		<framework name="stage3_unit18_relu1" out_port_id="stage3_unit18_relu1"/>
+		<IR name="stage3_unit18_relu1" out_port_id="2" id="531"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_conv1_weight" out_port_id="stage2_unit1_conv1_weight"/>
+		<IR name="stage2_unit1_bn2/mean/Fused_Mul__copy" out_port_id="0" id="71"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_conv1sc_weight" out_port_id="stage1_unit1_conv1sc_weight"/>
+		<IR name="stage1_unit1_sc/mean/Fused_Mul__copy" out_port_id="0" id="33"/>
+	</map>
+	<map>
+		<framework name="stage1_unit3_bn1" out_port_id="stage1_unit3_bn1"/>
+		<IR name="stage1_unit3_bn1/variance/Fused_Add_" out_port_id="2" id="57"/>
+	</map>
+	<map>
+		<framework name="slope751" out_port_id="slope751"/>
+		<IR name="slope751" out_port_id="0" id="515"/>
+	</map>
+	<map>
+		<framework name="stage3_unit20_bn1" out_port_id="stage3_unit20_bn1"/>
+		<IR name="stage3_unit20_bn1/variance/Fused_Add_" out_port_id="2" id="556"/>
+	</map>
+	<map>
+		<framework name="stage4_unit3_bn2" out_port_id="stage4_unit3_bn2"/>
+		<IR name="stage4_unit3_bn2/variance/Fused_Add_" out_port_id="2" id="756"/>
+	</map>
+	<map>
+		<framework name="stage2_unit2_conv1_weight" out_port_id="stage2_unit2_conv1_weight"/>
+		<IR name="stage2_unit2_bn2/mean/Fused_Mul__copy" out_port_id="0" id="90"/>
+	</map>
+	<map>
+		<framework name="stage2_unit11_bn2" out_port_id="stage2_unit11_bn2"/>
+		<IR name="stage2_unit11_bn2/variance/Fused_Add_" out_port_id="2" id="227"/>
+	</map>
+	<map>
+		<framework name="stage3_unit27_bn2" out_port_id="stage3_unit27_bn2"/>
+		<IR name="stage3_unit27_bn2/variance/Fused_Add_" out_port_id="2" id="664"/>
+	</map>
+	<map>
+		<framework name="stage2_unit13_conv2_weight" out_port_id="stage2_unit13_conv2_weight"/>
+		<IR name="stage2_unit13_bn3/mean/Fused_Mul__copy" out_port_id="0" id="260"/>
+	</map>
+	<map>
+		<framework name="stage3_unit2_bn1" out_port_id="stage3_unit2_bn1"/>
+		<IR name="stage3_unit2_bn1/variance/Fused_Add_" out_port_id="2" id="286"/>
+	</map>
+	<map>
+		<framework name="stage3_unit8_bn3" out_port_id="stage3_unit8_bn3"/>
+		<IR name="stage3_unit8_bn3/variance/Fused_Add_" out_port_id="2" id="384"/>
+	</map>
+	<map>
+		<framework name="slope1088" out_port_id="slope1088"/>
+		<IR name="slope1088" out_port_id="0" id="742"/>
+	</map>
+	<map>
+		<framework name="_plus8" out_port_id="_plus8"/>
+		<IR name="_plus8" out_port_id="2" id="158"/>
+	</map>
+	<map>
+		<framework name="stage3_unit4_conv1_weight" out_port_id="stage3_unit4_conv1_weight"/>
+		<IR name="stage3_unit4_bn2/mean/Fused_Mul__copy" out_port_id="0" id="317"/>
+	</map>
+	<map>
+		<framework name="slope509" out_port_id="slope509"/>
+		<IR name="slope509" out_port_id="0" id="350"/>
+	</map>
+	<map>
+		<framework name="stage3_unit3_bn2" out_port_id="stage3_unit3_bn2"/>
+		<IR name="stage3_unit3_bn2/variance/Fused_Add_" out_port_id="2" id="304"/>
+	</map>
+	<map>
+		<framework name="slope77" out_port_id="slope77"/>
+		<IR name="slope77" out_port_id="0" id="61"/>
+	</map>
+	<map>
+		<framework name="stage3_unit30_relu1" out_port_id="stage3_unit30_relu1"/>
+		<IR name="stage3_unit30_relu1" out_port_id="2" id="711"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_bn3" out_port_id="stage1_unit1_bn3"/>
+		<IR name="stage1_unit1_bn3/variance/Fused_Add_" out_port_id="2" id="31"/>
+	</map>
+	<map>
+		<framework name="stage3_unit5_bn1" out_port_id="stage3_unit5_bn1"/>
+		<IR name="stage3_unit5_bn1/variance/Fused_Add_" out_port_id="2" id="331"/>
+	</map>
+	<map>
+		<framework name="stage3_unit12_conv1_weight" out_port_id="stage3_unit12_conv1_weight"/>
+		<IR name="stage3_unit12_bn2/mean/Fused_Mul__copy" out_port_id="0" id="437"/>
+	</map>
+	<map>
+		<framework name="_plus25" out_port_id="_plus25"/>
+		<IR name="_plus25" out_port_id="2" id="415"/>
+	</map>
+	<map>
+		<framework name="stage3_unit9_conv1_weight" out_port_id="stage3_unit9_conv1_weight"/>
+		<IR name="stage3_unit9_bn2/mean/Fused_Mul__copy" out_port_id="0" id="392"/>
+	</map>
+	<map>
+		<framework name="stage3_unit16_relu1" out_port_id="stage3_unit16_relu1"/>
+		<IR name="stage3_unit16_relu1" out_port_id="2" id="501"/>
+	</map>
+	<map>
+		<framework name="slope531" out_port_id="slope531"/>
+		<IR name="slope531" out_port_id="0" id="365"/>
+	</map>
+	<map>
+		<framework name="stage2_unit9_conv2_weight" out_port_id="stage2_unit9_conv2_weight"/>
+		<IR name="stage2_unit9_bn3/mean/Fused_Mul__copy" out_port_id="0" id="200"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_relu1" out_port_id="stage4_unit1_relu1"/>
+		<IR name="stage4_unit1_relu1" out_port_id="2" id="724"/>
+	</map>
+	<map>
+		<framework name="stage2_unit4_relu1" out_port_id="stage2_unit4_relu1"/>
+		<IR name="stage2_unit4_relu1" out_port_id="2" id="124"/>
+	</map>
+	<map>
+		<framework name="slope150" out_port_id="slope150"/>
+		<IR name="slope150" out_port_id="0" id="108"/>
+	</map>
+	<map>
+		<framework name="stage2_unit3_relu1" out_port_id="stage2_unit3_relu1"/>
+		<IR name="stage2_unit3_relu1" out_port_id="2" id="109"/>
+	</map>
+	<map>
+		<framework name="stage2_unit12_relu1" out_port_id="stage2_unit12_relu1"/>
+		<IR name="stage2_unit12_relu1" out_port_id="2" id="244"/>
+	</map>
+	<map>
+		<framework name="stage3_unit2_conv2_weight" out_port_id="stage3_unit2_conv2_weight"/>
+		<IR name="stage3_unit2_bn3/mean/Fused_Mul__copy" out_port_id="0" id="292"/>
+	</map>
+	<map>
+		<framework name="slope304" out_port_id="slope304"/>
+		<IR name="slope304" out_port_id="0" id="213"/>
+	</map>
+	<map>
+		<framework name="slope26" out_port_id="slope26"/>
+		<IR name="slope26" out_port_id="0" id="27"/>
+	</map>
+	<map>
+		<framework name="stage3_unit18_bn2" out_port_id="stage3_unit18_bn2"/>
+		<IR name="stage3_unit18_bn2/variance/Fused_Add_" out_port_id="2" id="529"/>
+	</map>
+	<map>
+		<framework name="_plus30" out_port_id="_plus30"/>
+		<IR name="_plus30" out_port_id="2" id="490"/>
+	</map>
+	<map>
+		<framework name="_plus9" out_port_id="_plus9"/>
+		<IR name="_plus9" out_port_id="2" id="173"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_relu1" out_port_id="stage1_unit1_relu1"/>
+		<IR name="stage1_unit1_relu1" out_port_id="2" id="28"/>
+	</map>
+	<map>
+		<framework name="slope817" out_port_id="slope817"/>
+		<IR name="slope817" out_port_id="0" id="560"/>
+	</map>
+	<map>
+		<framework name="stage3_unit22_conv2_weight" out_port_id="stage3_unit22_conv2_weight"/>
+		<IR name="stage3_unit22_bn3/mean/Fused_Mul__copy" out_port_id="0" id="592"/>
+	</map>
+	<map>
+		<framework name="stage1_unit3_bn2" out_port_id="stage1_unit3_bn2"/>
+		<IR name="stage1_unit3_bn2/variance/Fused_Add_" out_port_id="2" id="60"/>
+	</map>
+	<map>
+		<framework name="stage2_unit11_relu1" out_port_id="stage2_unit11_relu1"/>
+		<IR name="stage2_unit11_relu1" out_port_id="2" id="229"/>
+	</map>
+	<map>
+		<framework name="stage4_unit3_conv1_weight" out_port_id="stage4_unit3_conv1_weight"/>
+		<IR name="stage4_unit3_bn2/mean/Fused_Mul__copy" out_port_id="0" id="754"/>
+	</map>
+	<map>
+		<framework name="stage3_unit10_relu1" out_port_id="stage3_unit10_relu1"/>
+		<IR name="stage3_unit10_relu1" out_port_id="2" id="411"/>
+	</map>
+	<map>
+		<framework name="slope927" out_port_id="slope927"/>
+		<IR name="slope927" out_port_id="0" id="635"/>
+	</map>
+	<map>
+		<framework name="_plus23" out_port_id="_plus23"/>
+		<IR name="_plus23" out_port_id="2" id="385"/>
+	</map>
+	<map>
+		<framework name="slope773" out_port_id="slope773"/>
+		<IR name="slope773" out_port_id="0" id="530"/>
+	</map>
+	<map>
+		<framework name="stage3_unit26_bn1" out_port_id="stage3_unit26_bn1"/>
+		<IR name="stage3_unit26_bn1/variance/Fused_Add_" out_port_id="2" id="646"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_conv2_weight" out_port_id="stage4_unit1_conv2_weight"/>
+		<IR name="stage4_unit1_bn3/mean/Fused_Mul__copy" out_port_id="0" id="725"/>
+	</map>
+	<map>
+		<framework name="stage2_unit8_conv2_weight" out_port_id="stage2_unit8_conv2_weight"/>
+		<IR name="stage2_unit8_bn3/mean/Fused_Mul__copy" out_port_id="0" id="185"/>
+	</map>
+	<map>
+		<framework name="slope12" out_port_id="slope12"/>
+		<IR name="slope12" out_port_id="0" id="18"/>
+	</map>
+	<map>
+		<framework name="_plus21" out_port_id="_plus21"/>
+		<IR name="_plus21" out_port_id="2" id="355"/>
+	</map>
+	<map>
+		<framework name="stage3_unit22_conv1_weight" out_port_id="stage3_unit22_conv1_weight"/>
+		<IR name="stage3_unit22_bn2/mean/Fused_Mul__copy" out_port_id="0" id="587"/>
+	</map>
+	<map>
+		<framework name="stage1_unit3_relu1" out_port_id="stage1_unit3_relu1"/>
+		<IR name="stage1_unit3_relu1" out_port_id="2" id="62"/>
+	</map>
+	<map>
+		<framework name="stage2_unit7_bn1" out_port_id="stage2_unit7_bn1"/>
+		<IR name="stage2_unit7_bn1/variance/Fused_Add_" out_port_id="2" id="164"/>
+	</map>
+	<map>
+		<framework name="stage3_unit22_bn3" out_port_id="stage3_unit22_bn3"/>
+		<IR name="stage3_unit22_bn3/variance/Fused_Add_" out_port_id="2" id="594"/>
+	</map>
+	<map>
+		<framework name="stage2_unit4_bn2" out_port_id="stage2_unit4_bn2"/>
+		<IR name="stage2_unit4_bn2/variance/Fused_Add_" out_port_id="2" id="122"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_conv2_weight" out_port_id="stage3_unit1_conv2_weight"/>
+		<IR name="stage3_unit1_bn3/mean/Fused_Mul__copy" out_port_id="0" id="273"/>
+	</map>
+	<map>
+		<framework name="stage3_unit20_conv1_weight" out_port_id="stage3_unit20_conv1_weight"/>
+		<IR name="stage3_unit20_bn2/mean/Fused_Mul__copy" out_port_id="0" id="557"/>
+	</map>
+	<map>
+		<framework name="stage4_unit3_relu1" out_port_id="stage4_unit3_relu1"/>
+		<IR name="stage4_unit3_relu1" out_port_id="2" id="758"/>
+	</map>
+	<map>
+		<framework name="stage3_unit13_bn1" out_port_id="stage3_unit13_bn1"/>
+		<IR name="stage3_unit13_bn1/variance/Fused_Add_" out_port_id="2" id="451"/>
+	</map>
+	<map>
+		<framework name="stage3_unit23_bn1" out_port_id="stage3_unit23_bn1"/>
+		<IR name="stage3_unit23_bn1/variance/Fused_Add_" out_port_id="2" id="601"/>
+	</map>
+	<map>
+		<framework name="stage2_unit4_bn1" out_port_id="stage2_unit4_bn1"/>
+		<IR name="stage2_unit4_bn1/variance/Fused_Add_" out_port_id="2" id="119"/>
+	</map>
+	<map>
+		<framework name="stage2_unit2_bn1" out_port_id="stage2_unit2_bn1"/>
+		<IR name="stage2_unit2_bn1/variance/Fused_Add_" out_port_id="2" id="89"/>
+	</map>
+	<map>
+		<framework name="stage2_unit7_conv1_weight" out_port_id="stage2_unit7_conv1_weight"/>
+		<IR name="stage2_unit7_bn2/mean/Fused_Mul__copy" out_port_id="0" id="165"/>
+	</map>
+	<map>
+		<framework name="stage3_unit18_bn3" out_port_id="stage3_unit18_bn3"/>
+		<IR name="stage3_unit18_bn3/variance/Fused_Add_" out_port_id="2" id="534"/>
+	</map>
+	<map>
+		<framework name="stage3_unit21_conv2_weight" out_port_id="stage3_unit21_conv2_weight"/>
+		<IR name="stage3_unit21_bn3/mean/Fused_Mul__copy" out_port_id="0" id="577"/>
+	</map>
+	<map>
+		<framework name="stage2_unit8_bn3" out_port_id="stage2_unit8_bn3"/>
+		<IR name="stage2_unit8_bn3/variance/Fused_Add_" out_port_id="2" id="187"/>
+	</map>
+	<map>
+		<framework name="stage2_unit9_relu1" out_port_id="stage2_unit9_relu1"/>
+		<IR name="stage2_unit9_relu1" out_port_id="2" id="199"/>
+	</map>
+	<map>
+		<framework name="_plus15" out_port_id="_plus15"/>
+		<IR name="_plus15" out_port_id="2" id="263"/>
+	</map>
+	<map>
+		<framework name="stage3_unit7_bn3" out_port_id="stage3_unit7_bn3"/>
+		<IR name="stage3_unit7_bn3/variance/Fused_Add_" out_port_id="2" id="369"/>
+	</map>
+	<map>
+		<framework name="stage3_unit8_relu1" out_port_id="stage3_unit8_relu1"/>
+		<IR name="stage3_unit8_relu1" out_port_id="2" id="381"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_conv1_weight" out_port_id="stage4_unit1_conv1_weight"/>
+		<IR name="stage4_unit1_bn2/mean/Fused_Mul__copy" out_port_id="0" id="720"/>
+	</map>
+	<map>
+		<framework name="stage3_unit7_conv1_weight" out_port_id="stage3_unit7_conv1_weight"/>
+		<IR name="stage3_unit7_bn2/mean/Fused_Mul__copy" out_port_id="0" id="362"/>
+	</map>
+	<map>
+		<framework name="stage3_unit27_conv1_weight" out_port_id="stage3_unit27_conv1_weight"/>
+		<IR name="stage3_unit27_bn2/mean/Fused_Mul__copy" out_port_id="0" id="662"/>
+	</map>
+	<map>
+		<framework name="stage3_unit24_bn3" out_port_id="stage3_unit24_bn3"/>
+		<IR name="stage3_unit24_bn3/variance/Fused_Add_" out_port_id="2" id="624"/>
+	</map>
+	<map>
+		<framework name="stage2_unit7_bn3" out_port_id="stage2_unit7_bn3"/>
+		<IR name="stage2_unit7_bn3/variance/Fused_Add_" out_port_id="2" id="172"/>
+	</map>
+	<map>
+		<framework name="_mulscalar0" out_port_id="_mulscalar0"/>
+		<IR name="_minusscalar0/Fused_Add_" out_port_id="2" id="14"/>
+	</map>
+	<map>
+		<framework name="_plus38" out_port_id="_plus38"/>
+		<IR name="_plus38" out_port_id="2" id="610"/>
+	</map>
+	<map>
+		<framework name="stage2_unit12_bn3" out_port_id="stage2_unit12_bn3"/>
+		<IR name="stage2_unit12_bn3/variance/Fused_Add_" out_port_id="2" id="247"/>
+	</map>
+	<map>
+		<framework name="slope282" out_port_id="slope282"/>
+		<IR name="slope282" out_port_id="0" id="198"/>
+	</map>
+	<map>
+		<framework name="_plus19" out_port_id="_plus19"/>
+		<IR name="_plus19" out_port_id="2" id="325"/>
+	</map>
+	<map>
+		<framework name="stage2_unit6_relu1" out_port_id="stage2_unit6_relu1"/>
+		<IR name="stage2_unit6_relu1" out_port_id="2" id="154"/>
+	</map>
+	<map>
+		<framework name="slope619" out_port_id="slope619"/>
+		<IR name="slope619" out_port_id="0" id="425"/>
+	</map>
+	<map>
+		<framework name="stage3_unit17_bn3" out_port_id="stage3_unit17_bn3"/>
+		<IR name="stage3_unit17_bn3/variance/Fused_Add_" out_port_id="2" id="519"/>
+	</map>
+	<map>
+		<framework name="stage2_unit2_bn3" out_port_id="stage2_unit2_bn3"/>
+		<IR name="stage2_unit2_bn3/variance/Fused_Add_" out_port_id="2" id="97"/>
+	</map>
+	<map>
+		<framework name="_plus46" out_port_id="_plus46"/>
+		<IR name="_plus46" out_port_id="2" id="732"/>
+	</map>
+	<map>
+		<framework name="id" out_port_id="id"/>
+		<IR name="data" out_port_id="0" id="12"/>
+	</map>
+	<map>
+		<framework name="data" out_port_id="data"/>
+		<IR name="data" out_port_id="0" id="12"/>
+	</map>
+	<map>
+		<framework name="stage3_unit25_conv1_weight" out_port_id="stage3_unit25_conv1_weight"/>
+		<IR name="stage3_unit25_bn2/mean/Fused_Mul__copy" out_port_id="0" id="632"/>
+	</map>
+	<map>
+		<framework name="stage3_unit21_bn2" out_port_id="stage3_unit21_bn2"/>
+		<IR name="stage3_unit21_bn2/variance/Fused_Add_" out_port_id="2" id="574"/>
+	</map>
+	<map>
+		<framework name="stage3_unit16_conv2_weight" out_port_id="stage3_unit16_conv2_weight"/>
+		<IR name="stage3_unit16_bn3/mean/Fused_Mul__copy" out_port_id="0" id="502"/>
+	</map>
+	<map>
+		<framework name="stage3_unit23_conv2_weight" out_port_id="stage3_unit23_conv2_weight"/>
+		<IR name="stage3_unit23_bn3/mean/Fused_Mul__copy" out_port_id="0" id="607"/>
+	</map>
+	<map>
+		<framework name="stage3_unit14_conv1_weight" out_port_id="stage3_unit14_conv1_weight"/>
+		<IR name="stage3_unit14_bn2/mean/Fused_Mul__copy" out_port_id="0" id="467"/>
+	</map>
+	<map>
+		<framework name="stage3_unit8_conv2_weight" out_port_id="stage3_unit8_conv2_weight"/>
+		<IR name="stage3_unit8_bn3/mean/Fused_Mul__copy" out_port_id="0" id="382"/>
+	</map>
+	<map>
+		<framework name="stage3_unit26_bn2" out_port_id="stage3_unit26_bn2"/>
+		<IR name="stage3_unit26_bn2/variance/Fused_Add_" out_port_id="2" id="649"/>
+	</map>
+	<map>
+		<framework name="stage3_unit25_conv2_weight" out_port_id="stage3_unit25_conv2_weight"/>
+		<IR name="stage3_unit25_bn3/mean/Fused_Mul__copy" out_port_id="0" id="637"/>
+	</map>
+	<map>
+		<framework name="slope128" out_port_id="slope128"/>
+		<IR name="slope128" out_port_id="0" id="93"/>
+	</map>
+	<map>
+		<framework name="stage3_unit9_bn1" out_port_id="stage3_unit9_bn1"/>
+		<IR name="stage3_unit9_bn1/variance/Fused_Add_" out_port_id="2" id="391"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_bn1" out_port_id="stage2_unit1_bn1"/>
+		<IR name="stage2_unit1_bn1/variance/Fused_Add_" out_port_id="2" id="70"/>
+	</map>
+	<map>
+		<framework name="stage2_unit3_bn1" out_port_id="stage2_unit3_bn1"/>
+		<IR name="stage2_unit3_bn1/variance/Fused_Add_" out_port_id="2" id="104"/>
+	</map>
+	<map>
+		<framework name="_plus40" out_port_id="_plus40"/>
+		<IR name="_plus40" out_port_id="2" id="640"/>
+	</map>
+	<map>
+		<framework name="stage2_unit1_conv1sc_weight" out_port_id="stage2_unit1_conv1sc_weight"/>
+		<IR name="stage2_unit1_sc/mean/Fused_Mul__copy" out_port_id="0" id="80"/>
+	</map>
+	<map>
+		<framework name="stage3_unit22_bn1" out_port_id="stage3_unit22_bn1"/>
+		<IR name="stage3_unit22_bn1/variance/Fused_Add_" out_port_id="2" id="586"/>
+	</map>
+	<map>
+		<framework name="_plus37" out_port_id="_plus37"/>
+		<IR name="_plus37" out_port_id="2" id="595"/>
+	</map>
+	<map>
+		<framework name="stage3_unit20_conv2_weight" out_port_id="stage3_unit20_conv2_weight"/>
+		<IR name="stage3_unit20_bn3/mean/Fused_Mul__copy" out_port_id="0" id="562"/>
+	</map>
+	<map>
+		<framework name="stage2_unit6_conv2_weight" out_port_id="stage2_unit6_conv2_weight"/>
+		<IR name="stage2_unit6_bn3/mean/Fused_Mul__copy" out_port_id="0" id="155"/>
+	</map>
+	<map>
+		<framework name="stage3_unit15_bn2" out_port_id="stage3_unit15_bn2"/>
+		<IR name="stage3_unit15_bn2/variance/Fused_Add_" out_port_id="2" id="484"/>
+	</map>
+	<map>
+		<framework name="stage3_unit4_bn1" out_port_id="stage3_unit4_bn1"/>
+		<IR name="stage3_unit4_bn1/variance/Fused_Add_" out_port_id="2" id="316"/>
+	</map>
+	<map>
+		<framework name="stage3_unit8_bn1" out_port_id="stage3_unit8_bn1"/>
+		<IR name="stage3_unit8_bn1/variance/Fused_Add_" out_port_id="2" id="376"/>
+	</map>
+	<map>
+		<framework name="stage3_unit6_bn2" out_port_id="stage3_unit6_bn2"/>
+		<IR name="stage3_unit6_bn2/variance/Fused_Add_" out_port_id="2" id="349"/>
+	</map>
+	<map>
+		<framework name="stage3_unit3_bn3" out_port_id="stage3_unit3_bn3"/>
+		<IR name="stage3_unit3_bn3/variance/Fused_Add_" out_port_id="2" id="309"/>
+	</map>
+	<map>
+		<framework name="stage3_unit19_relu1" out_port_id="stage3_unit19_relu1"/>
+		<IR name="stage3_unit19_relu1" out_port_id="2" id="546"/>
+	</map>
+	<map>
+		<framework name="stage3_unit27_bn1" out_port_id="stage3_unit27_bn1"/>
+		<IR name="stage3_unit27_bn1/variance/Fused_Add_" out_port_id="2" id="661"/>
+	</map>
+	<map>
+		<framework name="_plus18" out_port_id="_plus18"/>
+		<IR name="_plus18" out_port_id="2" id="310"/>
+	</map>
+	<map>
+		<framework name="stage3_unit14_bn1" out_port_id="stage3_unit14_bn1"/>
+		<IR name="stage3_unit14_bn1/variance/Fused_Add_" out_port_id="2" id="466"/>
+	</map>
+	<map>
+		<framework name="stage3_unit4_bn3" out_port_id="stage3_unit4_bn3"/>
+		<IR name="stage3_unit4_bn3/variance/Fused_Add_" out_port_id="2" id="324"/>
+	</map>
+	<map>
+		<framework name="stage3_unit13_bn2" out_port_id="stage3_unit13_bn2"/>
+		<IR name="stage3_unit13_bn2/variance/Fused_Add_" out_port_id="2" id="454"/>
+	</map>
+	<map>
+		<framework name="stage3_unit26_conv1_weight" out_port_id="stage3_unit26_conv1_weight"/>
+		<IR name="stage3_unit26_bn2/mean/Fused_Mul__copy" out_port_id="0" id="647"/>
+	</map>
+	<map>
+		<framework name="stage2_unit8_bn1" out_port_id="stage2_unit8_bn1"/>
+		<IR name="stage2_unit8_bn1/variance/Fused_Add_" out_port_id="2" id="179"/>
+	</map>
+	<map>
+		<framework name="stage3_unit2_conv1_weight" out_port_id="stage3_unit2_conv1_weight"/>
+		<IR name="stage3_unit2_bn2/mean/Fused_Mul__copy" out_port_id="0" id="287"/>
+	</map>
+	<map>
+		<framework name="stage1_unit2_conv1_weight" out_port_id="stage1_unit2_conv1_weight"/>
+		<IR name="stage1_unit2_bn2/mean/Fused_Mul__copy" out_port_id="0" id="43"/>
+	</map>
+	<map>
+		<framework name="slope1037" out_port_id="slope1037"/>
+		<IR name="slope1037" out_port_id="0" id="710"/>
+	</map>
+	<map>
+		<framework name="stage3_unit23_bn2" out_port_id="stage3_unit23_bn2"/>
+		<IR name="stage3_unit23_bn2/variance/Fused_Add_" out_port_id="2" id="604"/>
+	</map>
+	<map>
+		<framework name="stage3_unit15_conv1_weight" out_port_id="stage3_unit15_conv1_weight"/>
+		<IR name="stage3_unit15_bn2/mean/Fused_Mul__copy" out_port_id="0" id="482"/>
+	</map>
+	<map>
+		<framework name="stage3_unit21_bn1" out_port_id="stage3_unit21_bn1"/>
+		<IR name="stage3_unit21_bn1/variance/Fused_Add_" out_port_id="2" id="571"/>
+	</map>
+	<map>
+		<framework name="slope260" out_port_id="slope260"/>
+		<IR name="slope260" out_port_id="0" id="183"/>
+	</map>
+	<map>
+		<framework name="stage3_unit18_conv1_weight" out_port_id="stage3_unit18_conv1_weight"/>
+		<IR name="stage3_unit18_bn2/mean/Fused_Mul__copy" out_port_id="0" id="527"/>
+	</map>
+	<map>
+		<framework name="slope194" out_port_id="slope194"/>
+		<IR name="slope194" out_port_id="0" id="138"/>
+	</map>
+	<map>
+		<framework name="stage3_unit9_bn2" out_port_id="stage3_unit9_bn2"/>
+		<IR name="stage3_unit9_bn2/variance/Fused_Add_" out_port_id="2" id="394"/>
+	</map>
+	<map>
+		<framework name="stage3_unit26_conv2_weight" out_port_id="stage3_unit26_conv2_weight"/>
+		<IR name="stage3_unit26_bn3/mean/Fused_Mul__copy" out_port_id="0" id="652"/>
+	</map>
+	<map>
+		<framework name="slope839" out_port_id="slope839"/>
+		<IR name="slope839" out_port_id="0" id="575"/>
+	</map>
+	<map>
+		<framework name="_plus44" out_port_id="_plus44"/>
+		<IR name="_plus44" out_port_id="2" id="700"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_bn2" out_port_id="stage4_unit1_bn2"/>
+		<IR name="stage4_unit1_bn2/variance/Fused_Add_" out_port_id="2" id="722"/>
+	</map>
+	<map>
+		<framework name="stage3_unit19_bn1" out_port_id="stage3_unit19_bn1"/>
+		<IR name="stage3_unit19_bn1/variance/Fused_Add_" out_port_id="2" id="541"/>
+	</map>
+	<map>
+		<framework name="_plus26" out_port_id="_plus26"/>
+		<IR name="_plus26" out_port_id="2" id="430"/>
+	</map>
+	<map>
+		<framework name="slope685" out_port_id="slope685"/>
+		<IR name="slope685" out_port_id="0" id="470"/>
+	</map>
+	<map>
+		<framework name="slope905" out_port_id="slope905"/>
+		<IR name="slope905" out_port_id="0" id="620"/>
+	</map>
+	<map>
+		<framework name="slope465" out_port_id="slope465"/>
+		<IR name="slope465" out_port_id="0" id="320"/>
+	</map>
+	<map>
+		<framework name="stage4_unit2_bn1" out_port_id="stage4_unit2_bn1"/>
+		<IR name="stage4_unit2_bn1/variance/Fused_Add_" out_port_id="2" id="738"/>
+	</map>
+	<map>
+		<framework name="stage3_unit5_relu1" out_port_id="stage3_unit5_relu1"/>
+		<IR name="stage3_unit5_relu1" out_port_id="2" id="336"/>
+	</map>
+	<map>
+		<framework name="stage3_unit19_bn2" out_port_id="stage3_unit19_bn2"/>
+		<IR name="stage3_unit19_bn2/variance/Fused_Add_" out_port_id="2" id="544"/>
+	</map>
+	<map>
+		<framework name="stage3_unit6_conv2_weight" out_port_id="stage3_unit6_conv2_weight"/>
+		<IR name="stage3_unit6_bn3/mean/Fused_Mul__copy" out_port_id="0" id="352"/>
+	</map>
+	<map>
+		<framework name="stage3_unit10_bn1" out_port_id="stage3_unit10_bn1"/>
+		<IR name="stage3_unit10_bn1/variance/Fused_Add_" out_port_id="2" id="406"/>
+	</map>
+	<map>
+		<framework name="stage2_unit3_bn2" out_port_id="stage2_unit3_bn2"/>
+		<IR name="stage2_unit3_bn2/variance/Fused_Add_" out_port_id="2" id="107"/>
+	</map>
+	<map>
+		<framework name="stage3_unit29_relu1" out_port_id="stage3_unit29_relu1"/>
+		<IR name="stage3_unit29_relu1" out_port_id="2" id="696"/>
+	</map>
+	<map>
+		<framework name="stage2_unit10_relu1" out_port_id="stage2_unit10_relu1"/>
+		<IR name="stage2_unit10_relu1" out_port_id="2" id="214"/>
+	</map>
+	<map>
+		<framework name="stage3_unit3_relu1" out_port_id="stage3_unit3_relu1"/>
+		<IR name="stage3_unit3_relu1" out_port_id="2" id="306"/>
+	</map>
+	<map>
+		<framework name="stage3_unit23_conv1_weight" out_port_id="stage3_unit23_conv1_weight"/>
+		<IR name="stage3_unit23_bn2/mean/Fused_Mul__copy" out_port_id="0" id="602"/>
+	</map>
+	<map>
+		<framework name="slope553" out_port_id="slope553"/>
+		<IR name="slope553" out_port_id="0" id="380"/>
+	</map>
+	<map>
+		<framework name="_plus1" out_port_id="_plus1"/>
+		<IR name="_plus1" out_port_id="2" id="51"/>
+	</map>
+	<map>
+		<framework name="stage1_unit2_bn2" out_port_id="stage1_unit2_bn2"/>
+		<IR name="stage1_unit2_bn2/variance/Fused_Add_" out_port_id="2" id="45"/>
+	</map>
+	<map>
+		<framework name="stage2_unit5_conv2_weight" out_port_id="stage2_unit5_conv2_weight"/>
+		<IR name="stage2_unit5_bn3/mean/Fused_Mul__copy" out_port_id="0" id="140"/>
+	</map>
+	<map>
+		<framework name="stage3_unit7_relu1" out_port_id="stage3_unit7_relu1"/>
+		<IR name="stage3_unit7_relu1" out_port_id="2" id="366"/>
+	</map>
+	<map>
+		<framework name="stage3_unit8_bn2" out_port_id="stage3_unit8_bn2"/>
+		<IR name="stage3_unit8_bn2/variance/Fused_Add_" out_port_id="2" id="379"/>
+	</map>
+	<map>
+		<framework name="stage3_unit30_bn2" out_port_id="stage3_unit30_bn2"/>
+		<IR name="stage3_unit30_bn2/variance/Fused_Add_" out_port_id="2" id="709"/>
+	</map>
+	<map>
+		<framework name="_plus31" out_port_id="_plus31"/>
+		<IR name="_plus31" out_port_id="2" id="505"/>
+	</map>
+	<map>
+		<framework name="stage3_unit13_conv2_weight" out_port_id="stage3_unit13_conv2_weight"/>
+		<IR name="stage3_unit13_bn3/mean/Fused_Mul__copy" out_port_id="0" id="457"/>
+	</map>
+	<map>
+		<framework name="stage3_unit29_conv1_weight" out_port_id="stage3_unit29_conv1_weight"/>
+		<IR name="stage3_unit29_bn2/mean/Fused_Mul__copy" out_port_id="0" id="692"/>
+	</map>
+	<map>
+		<framework name="stage3_unit8_conv1_weight" out_port_id="stage3_unit8_conv1_weight"/>
+		<IR name="stage3_unit8_bn2/mean/Fused_Mul__copy" out_port_id="0" id="377"/>
+	</map>
+	<map>
+		<framework name="_plus10" out_port_id="_plus10"/>
+		<IR name="_plus10" out_port_id="2" id="188"/>
+	</map>
+	<map>
+		<framework name="stage2_unit10_bn3" out_port_id="stage2_unit10_bn3"/>
+		<IR name="stage2_unit10_bn3/variance/Fused_Add_" out_port_id="2" id="217"/>
+	</map>
+	<map>
+		<framework name="stage2_unit11_conv2_weight" out_port_id="stage2_unit11_conv2_weight"/>
+		<IR name="stage2_unit11_bn3/mean/Fused_Mul__copy" out_port_id="0" id="230"/>
+	</map>
+	<map>
+		<framework name="slope392" out_port_id="slope392"/>
+		<IR name="slope392" out_port_id="0" id="271"/>
+	</map>
+	<map>
+		<framework name="slope993" out_port_id="slope993"/>
+		<IR name="slope993" out_port_id="0" id="680"/>
+	</map>
+	<map>
+		<framework name="stage3_unit13_relu1" out_port_id="stage3_unit13_relu1"/>
+		<IR name="stage3_unit13_relu1" out_port_id="2" id="456"/>
+	</map>
+	<map>
+		<framework name="stage2_unit8_bn2" out_port_id="stage2_unit8_bn2"/>
+		<IR name="stage2_unit8_bn2/variance/Fused_Add_" out_port_id="2" id="182"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_bn1" out_port_id="stage4_unit1_bn1"/>
+		<IR name="stage4_unit1_bn1/variance/Fused_Add_" out_port_id="2" id="719"/>
+	</map>
+	<map>
+		<framework name="dropout0" out_port_id="dropout0"/>
+		<IR name="bn1/variance/Fused_Add_" out_port_id="2" id="766"/>
+	</map>
+	<map>
+		<framework name="bn1" out_port_id="bn1"/>
+		<IR name="bn1/variance/Fused_Add_" out_port_id="2" id="766"/>
+	</map>
+	<map>
+		<framework name="stage3_unit24_conv1_weight" out_port_id="stage3_unit24_conv1_weight"/>
+		<IR name="stage3_unit24_bn2/mean/Fused_Mul__copy" out_port_id="0" id="617"/>
+	</map>
+	<map>
+		<framework name="stage3_unit5_bn2" out_port_id="stage3_unit5_bn2"/>
+		<IR name="stage3_unit5_bn2/variance/Fused_Add_" out_port_id="2" id="334"/>
+	</map>
+	<map>
+		<framework name="stage3_unit11_bn2" out_port_id="stage3_unit11_bn2"/>
+		<IR name="stage3_unit11_bn2/variance/Fused_Add_" out_port_id="2" id="424"/>
+	</map>
+	<map>
+		<framework name="stage2_unit2_conv2_weight" out_port_id="stage2_unit2_conv2_weight"/>
+		<IR name="stage2_unit2_bn3/mean/Fused_Mul__copy" out_port_id="0" id="95"/>
+	</map>
+	<map>
+		<framework name="stage2_unit11_bn1" out_port_id="stage2_unit11_bn1"/>
+		<IR name="stage2_unit11_bn1/variance/Fused_Add_" out_port_id="2" id="224"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_conv1sc_weight" out_port_id="stage4_unit1_conv1sc_weight"/>
+		<IR name="stage4_unit1_sc/mean/Fused_Mul__copy" out_port_id="0" id="729"/>
+	</map>
+	<map>
+		<framework name="_plus7" out_port_id="_plus7"/>
+		<IR name="_plus7" out_port_id="2" id="143"/>
+	</map>
+	<map>
+		<framework name="stage2_unit12_bn1" out_port_id="stage2_unit12_bn1"/>
+		<IR name="stage2_unit12_bn1/variance/Fused_Add_" out_port_id="2" id="239"/>
+	</map>
+	<map>
+		<framework name="slope99" out_port_id="slope99"/>
+		<IR name="slope99" out_port_id="0" id="74"/>
+	</map>
+	<map>
+		<framework name="stage4_unit1_sc" out_port_id="stage4_unit1_sc"/>
+		<IR name="stage4_unit1_sc/variance/Fused_Add_" out_port_id="2" id="731"/>
+	</map>
+	<map>
+		<framework name="stage3_unit6_relu1" out_port_id="stage3_unit6_relu1"/>
+		<IR name="stage3_unit6_relu1" out_port_id="2" id="351"/>
+	</map>
+	<map>
+		<framework name="slope949" out_port_id="slope949"/>
+		<IR name="slope949" out_port_id="0" id="650"/>
+	</map>
+	<map>
+		<framework name="slope795" out_port_id="slope795"/>
+		<IR name="slope795" out_port_id="0" id="545"/>
+	</map>
+	<map>
+		<framework name="stage4_unit3_bn1" out_port_id="stage4_unit3_bn1"/>
+		<IR name="stage4_unit3_bn1/variance/Fused_Add_" out_port_id="2" id="753"/>
+	</map>
+	<map>
+		<framework name="_plus14" out_port_id="_plus14"/>
+		<IR name="_plus14" out_port_id="2" id="248"/>
+	</map>
+	<map>
+		<framework name="stage4_unit2_conv1_weight" out_port_id="stage4_unit2_conv1_weight"/>
+		<IR name="stage4_unit2_bn2/mean/Fused_Mul__copy" out_port_id="0" id="739"/>
+	</map>
+	<map>
+		<framework name="stage1_unit3_bn3" out_port_id="stage1_unit3_bn3"/>
+		<IR name="stage1_unit3_bn3/variance/Fused_Add_" out_port_id="2" id="65"/>
+	</map>
+	<map>
+		<framework name="_plus11" out_port_id="_plus11"/>
+		<IR name="_plus11" out_port_id="2" id="203"/>
+	</map>
+	<map>
+		<framework name="stage3_unit11_conv2_weight" out_port_id="stage3_unit11_conv2_weight"/>
+		<IR name="stage3_unit11_bn3/mean/Fused_Mul__copy" out_port_id="0" id="427"/>
+	</map>
+	<map>
+		<framework name="stage2_unit13_bn1" out_port_id="stage2_unit13_bn1"/>
+		<IR name="stage2_unit13_bn1/variance/Fused_Add_" out_port_id="2" id="254"/>
+	</map>
+	<map>
+		<framework name="stage2_unit10_conv1_weight" out_port_id="stage2_unit10_conv1_weight"/>
+		<IR name="stage2_unit10_bn2/mean/Fused_Mul__copy" out_port_id="0" id="210"/>
+	</map>
+	<map>
+		<framework name="conv0_weight" out_port_id="conv0_weight"/>
+		<IR name="bn0/mean/Fused_Mul__copy" out_port_id="0" id="15"/>
+	</map>
+	<map>
+		<framework name="_plus28" out_port_id="_plus28"/>
+		<IR name="_plus28" out_port_id="2" id="460"/>
+	</map>
+	<map>
+		<framework name="stage3_unit17_conv1_weight" out_port_id="stage3_unit17_conv1_weight"/>
+		<IR name="stage3_unit17_bn2/mean/Fused_Mul__copy" out_port_id="0" id="512"/>
+	</map>
+	<map>
+		<framework name="slope971" out_port_id="slope971"/>
+		<IR name="slope971" out_port_id="0" id="665"/>
+	</map>
+	<map>
+		<framework name="_plus41" out_port_id="_plus41"/>
+		<IR name="_plus41" out_port_id="2" id="655"/>
+	</map>
+	<map>
+		<framework name="stage3_unit17_conv2_weight" out_port_id="stage3_unit17_conv2_weight"/>
+		<IR name="stage3_unit17_bn3/mean/Fused_Mul__copy" out_port_id="0" id="517"/>
+	</map>
+	<map>
+		<framework name="stage2_unit7_relu1" out_port_id="stage2_unit7_relu1"/>
+		<IR name="stage2_unit7_relu1" out_port_id="2" id="169"/>
+	</map>
+	<map>
+		<framework name="stage2_unit4_bn3" out_port_id="stage2_unit4_bn3"/>
+		<IR name="stage2_unit4_bn3/variance/Fused_Add_" out_port_id="2" id="127"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_conv1_weight" out_port_id="stage3_unit1_conv1_weight"/>
+		<IR name="stage3_unit1_bn2/mean/Fused_Mul__copy" out_port_id="0" id="268"/>
+	</map>
+	<map>
+		<framework name="_plus6" out_port_id="_plus6"/>
+		<IR name="_plus6" out_port_id="2" id="128"/>
+	</map>
+	<map>
+		<framework name="stage2_unit3_conv1_weight" out_port_id="stage2_unit3_conv1_weight"/>
+		<IR name="stage2_unit3_bn2/mean/Fused_Mul__copy" out_port_id="0" id="105"/>
+	</map>
+	<map>
+		<framework name="stage3_unit4_conv2_weight" out_port_id="stage3_unit4_conv2_weight"/>
+		<IR name="stage3_unit4_bn3/mean/Fused_Mul__copy" out_port_id="0" id="322"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_sc" out_port_id="stage3_unit1_sc"/>
+		<IR name="stage3_unit1_sc/variance/Fused_Add_" out_port_id="2" id="279"/>
+	</map>
+	<map>
+		<framework name="stage3_unit10_conv1_weight" out_port_id="stage3_unit10_conv1_weight"/>
+		<IR name="stage3_unit10_bn2/mean/Fused_Mul__copy" out_port_id="0" id="407"/>
+	</map>
+	<map>
+		<framework name="stage3_unit12_bn2" out_port_id="stage3_unit12_bn2"/>
+		<IR name="stage3_unit12_bn2/variance/Fused_Add_" out_port_id="2" id="439"/>
+	</map>
+	<map>
+		<framework name="slope707" out_port_id="slope707"/>
+		<IR name="slope707" out_port_id="0" id="485"/>
+	</map>
+	<map>
+		<framework name="stage2_unit10_bn2" out_port_id="stage2_unit10_bn2"/>
+		<IR name="stage2_unit10_bn2/variance/Fused_Add_" out_port_id="2" id="212"/>
+	</map>
+	<map>
+		<framework name="stage3_unit25_bn3" out_port_id="stage3_unit25_bn3"/>
+		<IR name="stage3_unit25_bn3/variance/Fused_Add_" out_port_id="2" id="639"/>
+	</map>
+	<map>
+		<framework name="stage3_unit28_bn1" out_port_id="stage3_unit28_bn1"/>
+		<IR name="stage3_unit28_bn1/variance/Fused_Add_" out_port_id="2" id="676"/>
+	</map>
+	<map>
+		<framework name="stage3_unit25_relu1" out_port_id="stage3_unit25_relu1"/>
+		<IR name="stage3_unit25_relu1" out_port_id="2" id="636"/>
+	</map>
+	<map>
+		<framework name="stage3_unit16_conv1_weight" out_port_id="stage3_unit16_conv1_weight"/>
+		<IR name="stage3_unit16_bn2/mean/Fused_Mul__copy" out_port_id="0" id="497"/>
+	</map>
+	<map>
+		<framework name="stage3_unit17_relu1" out_port_id="stage3_unit17_relu1"/>
+		<IR name="stage3_unit17_relu1" out_port_id="2" id="516"/>
+	</map>
+	<map>
+		<framework name="stage3_unit29_bn3" out_port_id="stage3_unit29_bn3"/>
+		<IR name="stage3_unit29_bn3/variance/Fused_Add_" out_port_id="2" id="699"/>
+	</map>
+	<map>
+		<framework name="stage3_unit21_conv1_weight" out_port_id="stage3_unit21_conv1_weight"/>
+		<IR name="stage3_unit21_bn2/mean/Fused_Mul__copy" out_port_id="0" id="572"/>
+	</map>
+	<map>
+		<framework name="slope883" out_port_id="slope883"/>
+		<IR name="slope883" out_port_id="0" id="605"/>
+	</map>
+	<map>
+		<framework name="stage2_unit6_bn3" out_port_id="stage2_unit6_bn3"/>
+		<IR name="stage2_unit6_bn3/variance/Fused_Add_" out_port_id="2" id="157"/>
+	</map>
+	<map>
+		<framework name="_plus32" out_port_id="_plus32"/>
+		<IR name="_plus32" out_port_id="2" id="520"/>
+	</map>
+	<map>
+		<framework name="_plus12" out_port_id="_plus12"/>
+		<IR name="_plus12" out_port_id="2" id="218"/>
+	</map>
+	<map>
+		<framework name="stage3_unit23_bn3" out_port_id="stage3_unit23_bn3"/>
+		<IR name="stage3_unit23_bn3/variance/Fused_Add_" out_port_id="2" id="609"/>
+	</map>
+	<map>
+		<framework name="stage2_unit10_conv2_weight" out_port_id="stage2_unit10_conv2_weight"/>
+		<IR name="stage2_unit10_bn3/mean/Fused_Mul__copy" out_port_id="0" id="215"/>
+	</map>
+	<map>
+		<framework name="stage3_unit27_bn3" out_port_id="stage3_unit27_bn3"/>
+		<IR name="stage3_unit27_bn3/variance/Fused_Add_" out_port_id="2" id="669"/>
+	</map>
+	<map>
+		<framework name="stage3_unit15_bn1" out_port_id="stage3_unit15_bn1"/>
+		<IR name="stage3_unit15_bn1/variance/Fused_Add_" out_port_id="2" id="481"/>
+	</map>
+	<map>
+		<framework name="_plus2" out_port_id="_plus2"/>
+		<IR name="_plus2" out_port_id="2" id="66"/>
+	</map>
+	<map>
+		<framework name="stage3_unit29_conv2_weight" out_port_id="stage3_unit29_conv2_weight"/>
+		<IR name="stage3_unit29_bn3/mean/Fused_Mul__copy" out_port_id="0" id="697"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_bn2" out_port_id="stage3_unit1_bn2"/>
+		<IR name="stage3_unit1_bn2/variance/Fused_Add_" out_port_id="2" id="270"/>
+	</map>
+	<map>
+		<framework name="relu0" out_port_id="relu0"/>
+		<IR name="relu0" out_port_id="2" id="19"/>
+	</map>
+	<map>
+		<framework name="stage3_unit6_bn3" out_port_id="stage3_unit6_bn3"/>
+		<IR name="stage3_unit6_bn3/variance/Fused_Add_" out_port_id="2" id="354"/>
+	</map>
+	<map>
+		<framework name="stage2_unit4_conv1_weight" out_port_id="stage2_unit4_conv1_weight"/>
+		<IR name="stage2_unit4_bn2/mean/Fused_Mul__copy" out_port_id="0" id="120"/>
+	</map>
+	<map>
+		<framework name="stage3_unit6_bn1" out_port_id="stage3_unit6_bn1"/>
+		<IR name="stage3_unit6_bn1/variance/Fused_Add_" out_port_id="2" id="346"/>
+	</map>
+	<map>
+		<framework name="stage1_unit1_sc" out_port_id="stage1_unit1_sc"/>
+		<IR name="stage1_unit1_sc/variance/Fused_Add_" out_port_id="2" id="35"/>
+	</map>
+	<map>
+		<framework name="stage3_unit1_bn1" out_port_id="stage3_unit1_bn1"/>
+		<IR name="stage3_unit1_bn1/variance/Fused_Add_" out_port_id="2" id="267"/>
+	</map>
+	<map>
+		<framework name="stage2_unit3_conv2_weight" out_port_id="stage2_unit3_conv2_weight"/>
+		<IR name="stage2_unit3_bn3/mean/Fused_Mul__copy" out_port_id="0" id="110"/>
+	</map>
+	<map>
+		<framework name="stage2_unit5_bn3" out_port_id="stage2_unit5_bn3"/>
+		<IR name="stage2_unit5_bn3/variance/Fused_Add_" out_port_id="2" id="142"/>
+	</map>
+	<map>
+		<framework name="_plus48" out_port_id="_plus48"/>
+		<IR name="_plus48" out_port_id="2" id="762"/>
+	</map>
+	<map>
+		<framework name="stage4_unit2_relu1" out_port_id="stage4_unit2_relu1"/>
+		<IR name="stage4_unit2_relu1" out_port_id="2" id="743"/>
+	</map>
+</mapping>

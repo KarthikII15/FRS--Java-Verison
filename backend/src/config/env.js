@@ -23,7 +23,7 @@ export const env = {
   port: toNumber(process.env.PORT, 8080),
   nodeEnv: process.env.NODE_ENV || 'development',
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
-  
+
   analytics: {
     frameQueueSize: toNumber(process.env.FRAME_QUEUE_SIZE, 100),
     eventQueueSize: toNumber(process.env.EVENT_QUEUE_SIZE, 1000),
@@ -43,6 +43,13 @@ export const env = {
     enableFaceRecognition: toBoolean(process.env.ENABLE_FACE_RECOGNITION, false),
     enableAlpr: toBoolean(process.env.ENABLE_ALPR, false),
     enableReId: toBoolean(process.env.ENABLE_REID, false),
+
+    // Device Abstraction Layer config
+    deviceMode: process.env.DEVICE_MODE || 'webcam',         // 'webcam' | 'rtsp' | 'nuc'
+    webcamEnabled: toBoolean(process.env.WEBCAM_ENABLED, true),
+    webcamDeviceId: process.env.WEBCAM_DEVICE_ID || 'webcam-01',
+    webcamFps: toNumber(process.env.WEBCAM_FPS, 5),
+    webcamCameraIndex: toNumber(process.env.WEBCAM_CAMERA_INDEX, 0),
   },
 
   kafka: {
@@ -58,7 +65,7 @@ export const env = {
     rebalanceTimeout: toNumber(process.env.KAFKA_CONSUMER_REBALANCE_TIMEOUT, 60000),
     numPartitions: toNumber(process.env.KAFKA_NUM_PARTITIONS, 3),
     replicationFactor: toNumber(process.env.KAFKA_REPLICATION_FACTOR, 1),
-    
+
     topics: {
       rawFrames: process.env.KAFKA_TOPIC_RAW_FRAMES || 'scanalitix.raw-frames',
       detections: process.env.KAFKA_TOPIC_DETECTIONS || 'scanalitix.detections',
@@ -95,14 +102,14 @@ export const env = {
     idleTimeoutMillis: toNumber(process.env.DB_IDLE_TIMEOUT_MS, 30000),
     connectionTimeoutMillis: toNumber(process.env.DB_CONNECTION_TIMEOUT_MS, 5000),
   },
-  
+
   token: {
     accessTokenTtlMinutes: toNumber(process.env.ACCESS_TOKEN_TTL_MINUTES, 30),
     refreshTokenTtlDays: toNumber(process.env.REFRESH_TOKEN_TTL_DAYS, 7),
   },
-  
+
   authMode: process.env.AUTH_MODE || 'api',
-  
+
   keycloak: {
     url: process.env.KEYCLOAK_URL || 'http://localhost:9090',
     realm: process.env.KEYCLOAK_REALM || 'attendance',

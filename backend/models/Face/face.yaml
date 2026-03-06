@@ -1,0 +1,7 @@
+stride: 32
+names:
+  0: good_Face
+  1: rotate_Face
+  2: close_Eye
+  3: blur_Face
+  4: side_Face
