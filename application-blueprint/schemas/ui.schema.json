@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "description": "Page or component identifier"
+            },
+            "name": {
+                "type": "string",
+                "description": "Display name"
+            },
+            "route": {
+                "type": "string",
+                "description": "Logical URL path"
+            },
+            "module": {
+                "type": "string",
+                "description": "Module this UI element belongs to"
+            },
+            "roles": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "Roles that can view this"
+            },
+            "components": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "Component IDs used on this page"
+            },
+            "description": {
+                "type": "string",
+                "description": "Purpose of the page or component"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "module",
+            "roles",
+            "description"
+        ]
+    }
+}

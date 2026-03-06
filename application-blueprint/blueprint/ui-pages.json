@@ -1,0 +1,92 @@
+[
+    {
+        "id": "admin_dashboard",
+        "name": "Admin Dashboard",
+        "route": "/admin",
+        "module": "adminPanel",
+        "roles": [
+            "superAdmin",
+            "admin"
+        ],
+        "components": [
+            "SystemHealth",
+            "DeviceCommandCenter",
+            "AuditLogs"
+        ],
+        "description": "High level IT operations view"
+    },
+    {
+        "id": "hr_dashboard",
+        "name": "HR Dashboard",
+        "route": "/hr",
+        "module": "hrPanel",
+        "roles": [
+            "superAdmin",
+            "hr"
+        ],
+        "components": [
+            "AttendanceStatusDashboard",
+            "AnalyticsCharts",
+            "AIInsightsPanel"
+        ],
+        "description": "High level workforce metrics view"
+    },
+    {
+        "id": "device_console",
+        "name": "Operations Console",
+        "route": "/admin/operations",
+        "module": "deviceManagement",
+        "roles": [
+            "admin"
+        ],
+        "components": [
+            "OperationsConsole",
+            "DeviceAlertsPanel"
+        ],
+        "description": "Real-time edge device monitoring"
+    },
+    {
+        "id": "facility_console",
+        "name": "Facility Console",
+        "route": "/admin/facility",
+        "module": "facilityIntelligence",
+        "roles": [
+            "admin",
+            "hr"
+        ],
+        "components": [
+            "FacilityIntelligenceDashboard",
+            "FacilityConfiguration"
+        ],
+        "description": "Building and floor overview"
+    },
+    {
+        "id": "presence_monitor",
+        "name": "Live Presence Monitor",
+        "route": "/hr/presence",
+        "module": "presenceMonitoring",
+        "roles": [
+            "hr"
+        ],
+        "components": [
+            "PresenceMonitor",
+            "LiveOfficeIntelligence"
+        ],
+        "description": "Intraday personnel tracking"
+    },
+    {
+        "id": "employee_profile",
+        "name": "Employee Profile",
+        "route": "/hr/employees/{id}",
+        "module": "employeeManagement",
+        "roles": [
+            "hr",
+            "admin"
+        ],
+        "components": [
+            "EmployeeProfileDashboard",
+            "MultiEmployeeAnalysis"
+        ],
+        "description": "Individual 360-degree worker view"
+    }
+]

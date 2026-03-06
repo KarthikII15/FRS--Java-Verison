@@ -1,0 +1,425 @@
+[
+    {
+        "id": "Employee",
+        "name": "Employee",
+        "description": "A worker recorded in the system",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Full name"
+            },
+            {
+                "name": "email",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Work email address"
+            },
+            {
+                "name": "department_id",
+                "type": "reference",
+                "referenceTo": "Department",
+                "primaryKey": false,
+                "required": false,
+                "description": "Associated department"
+            },
+            {
+                "name": "shift_id",
+                "type": "reference",
+                "referenceTo": "Shift",
+                "primaryKey": false,
+                "required": false,
+                "description": "Assigned working shift"
+            },
+            {
+                "name": "status",
+                "type": "enum",
+                "enumValues": [
+                    "Active",
+                    "OnLeave",
+                    "Terminated"
+                ],
+                "primaryKey": false,
+                "required": true,
+                "description": "Employment status"
+            },
+            {
+                "name": "face_enrollment_status",
+                "type": "boolean",
+                "primaryKey": false,
+                "required": true,
+                "description": "Has face data been enrolled"
+            }
+        ]
+    },
+    {
+        "id": "Device",
+        "name": "Device",
+        "description": "An edge computing camera or sensory device",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Admin friendly name"
+            },
+            {
+                "name": "ip_address",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Network loopback address"
+            },
+            {
+                "name": "floor_id",
+                "type": "reference",
+                "referenceTo": "Floor",
+                "primaryKey": false,
+                "required": true,
+                "description": "Where it is installed"
+            },
+            {
+                "name": "status",
+                "type": "enum",
+                "enumValues": [
+                    "Online",
+                    "Offline",
+                    "Error"
+                ],
+                "primaryKey": false,
+                "required": true,
+                "description": "Connectivity status"
+            },
+            {
+                "name": "accuracy_rate",
+                "type": "float",
+                "primaryKey": false,
+                "required": true,
+                "description": "Historical AI accuracy"
+            }
+        ]
+    },
+    {
+        "id": "Building",
+        "name": "Building",
+        "description": "Highest level facility division",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Building name"
+            },
+            {
+                "name": "address",
+                "type": "string",
+                "primaryKey": false,
+                "required": false,
+                "description": "Physical address"
+            }
+        ]
+    },
+    {
+        "id": "Floor",
+        "name": "Floor",
+        "description": "Level in a building",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "building_id",
+                "type": "reference",
+                "referenceTo": "Building",
+                "primaryKey": false,
+                "required": true,
+                "description": "Parent building"
+            },
+            {
+                "name": "level_name",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Display name (e.g., Ground, L1)"
+            },
+            {
+                "name": "has_map",
+                "type": "boolean",
+                "primaryKey": false,
+                "required": true,
+                "description": "Floor plan graphic available"
+            }
+        ]
+    },
+    {
+        "id": "Area",
+        "name": "Area",
+        "description": "Defined zone within a floor",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "floor_id",
+                "type": "reference",
+                "referenceTo": "Floor",
+                "primaryKey": false,
+                "required": true,
+                "description": "Parent floor"
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Zone name"
+            },
+            {
+                "name": "capacity",
+                "type": "integer",
+                "primaryKey": false,
+                "required": false,
+                "description": "Maximum people limit"
+            }
+        ]
+    },
+    {
+        "id": "AttendanceEvent",
+        "name": "Attendance Event",
+        "description": "Inbound edge ping from device recognition",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "employee_id",
+                "type": "reference",
+                "referenceTo": "Employee",
+                "primaryKey": false,
+                "required": true,
+                "description": "Recognized worker"
+            },
+            {
+                "name": "device_id",
+                "type": "reference",
+                "referenceTo": "Device",
+                "primaryKey": false,
+                "required": true,
+                "description": "Capturing camera"
+            },
+            {
+                "name": "event_type",
+                "type": "enum",
+                "enumValues": [
+                    "ENTRY",
+                    "EXIT"
+                ],
+                "primaryKey": false,
+                "required": true,
+                "description": "Direction of travel"
+            },
+            {
+                "name": "timestamp",
+                "type": "datetime",
+                "primaryKey": false,
+                "required": true,
+                "description": "When it occurred"
+            },
+            {
+                "name": "confidence_score",
+                "type": "float",
+                "primaryKey": false,
+                "required": true,
+                "description": "AI certainty"
+            }
+        ]
+    },
+    {
+        "id": "PresenceSession",
+        "name": "Presence Session",
+        "description": "Calculated timeframe spent in an area",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "employee_id",
+                "type": "reference",
+                "referenceTo": "Employee",
+                "primaryKey": false,
+                "required": true,
+                "description": "Tracked worker"
+            },
+            {
+                "name": "area_id",
+                "type": "reference",
+                "referenceTo": "Area",
+                "primaryKey": false,
+                "required": true,
+                "description": "Zone occupied"
+            },
+            {
+                "name": "start_time",
+                "type": "datetime",
+                "primaryKey": false,
+                "required": true,
+                "description": "Entered zone"
+            },
+            {
+                "name": "end_time",
+                "type": "datetime",
+                "primaryKey": false,
+                "required": false,
+                "description": "Left zone (null if current)"
+            }
+        ]
+    },
+    {
+        "id": "Shift",
+        "name": "Shift",
+        "description": "Working hours definition",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Display name"
+            },
+            {
+                "name": "start_time",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Expected check in (HH:mm)"
+            },
+            {
+                "name": "end_time",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Expected check out (HH:mm)"
+            },
+            {
+                "name": "grace_period_minutes",
+                "type": "integer",
+                "primaryKey": false,
+                "required": true,
+                "description": "Leniency window"
+            }
+        ]
+    },
+    {
+        "id": "Department",
+        "name": "Department",
+        "description": "Organizational unit",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Display name"
+            },
+            {
+                "name": "manager_id",
+                "type": "reference",
+                "referenceTo": "Employee",
+                "primaryKey": false,
+                "required": false,
+                "description": "Head of department"
+            }
+        ]
+    },
+    {
+        "id": "User",
+        "name": "User",
+        "description": "System account for login",
+        "fields": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "primaryKey": true,
+                "required": true,
+                "description": "Unique identifier"
+            },
+            {
+                "name": "email",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "Login email"
+            },
+            {
+                "name": "role",
+                "type": "string",
+                "primaryKey": false,
+                "required": true,
+                "description": "RBAC role mapping"
+            },
+            {
+                "name": "is_active",
+                "type": "boolean",
+                "primaryKey": false,
+                "required": true,
+                "description": "Account activated"
+            }
+        ]
+    }
+]

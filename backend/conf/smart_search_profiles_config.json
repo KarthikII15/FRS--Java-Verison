@@ -1,0 +1,35 @@
+{
+  "profiles": [
+    {
+      "id": "face_search_high",
+      "name": "High Confidence Face Search",
+      "type": "face",
+      "parameters": {
+        "threshold": 0.75,
+        "maxResults": 10,
+        "includeMetadata": true
+      }
+    },
+    {
+      "id": "vehicle_black",
+      "name": "Black Vehicle Search",
+      "type": "vehicle",
+      "parameters": {
+        "color": "black",
+        "vehicleTypes": ["car", "suv"],
+        "minConfidence": 0.6
+      }
+    },
+    {
+      "id": "appearance_red_shirt",
+      "name": "Person with Red Shirt",
+      "type": "appearance",
+      "parameters": {
+        "clothingColor": "red",
+        "objectType": "person",
+        "minConfidence": 0.5
+      }
+    }
+  ]
+}
+

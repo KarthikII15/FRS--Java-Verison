@@ -1,0 +1,58 @@
+[
+    {
+        "id": "superAdmin",
+        "name": "Super Administrator",
+        "description": "Full multi-tenant system control",
+        "permissions": [
+            "tenant:create",
+            "tenant:update",
+            "tenant:delete",
+            "admin:create",
+            "admin:view",
+            "system:config"
+        ]
+    },
+    {
+        "id": "admin",
+        "name": "Administrator",
+        "description": "IT and operations management",
+        "permissions": [
+            "user:create",
+            "user:update",
+            "user:delete",
+            "device:create",
+            "device:update",
+            "device:delete",
+            "device:command",
+            "facility:manage",
+            "audit:read",
+            "report:generate"
+        ]
+    },
+    {
+        "id": "hr",
+        "name": "HR Manager",
+        "description": "Human resources and analytics",
+        "permissions": [
+            "employee:create",
+            "employee:update",
+            "employee:view",
+            "attendance:read",
+            "attendance:modify",
+            "shift:manage",
+            "report:generate",
+            "insights:view"
+        ]
+    },
+    {
+        "id": "employee",
+        "name": "Employee",
+        "description": "Standard worker portal access",
+        "permissions": [
+            "profile:read",
+            "profile:update",
+            "attendance:own_read",
+            "leave:request"
+        ]
+    }
+]

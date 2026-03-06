@@ -1,0 +1,42 @@
+[
+    {
+        "id": "br_001",
+        "name": "Check-in Grace Period",
+        "description": "Employees checking in within X minutes of shift start are marked ON TIME.",
+        "parameters": {
+            "graceMinutes": 15
+        }
+    },
+    {
+        "id": "br_002",
+        "name": "Face Match Confidence Threshold",
+        "description": "Events from cameras must have a confidence score above Y to be verified. Lower scores are flagged for manual review.",
+        "parameters": {
+            "minConfidenceScore": 0.85
+        }
+    },
+    {
+        "id": "br_003",
+        "name": "Auto-Checkout Timeout",
+        "description": "If no EXIT event is recorded by end of shift + 4 hours, system auto-generates a presumed EXIT event based on last known presence.",
+        "parameters": {
+            "autoCheckoutDelayHours": 4
+        }
+    },
+    {
+        "id": "br_004",
+        "name": "Consecutive Absence Alert",
+        "description": "Trigger medium severity alert to HR if employee is absent without leave for N consecutive days.",
+        "parameters": {
+            "consecutiveDaysTrigger": 3
+        }
+    },
+    {
+        "id": "br_005",
+        "name": "Device Offline Heartbeat",
+        "description": "Device is marked Offline if ping is missed for M seconds.",
+        "parameters": {
+            "missedHeartbeatSeconds": 60
+        }
+    }
+]

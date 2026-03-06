@@ -1,0 +1,24 @@
+{
+    "name": "Attendance Intelligence Platform",
+    "version": "1.0.0",
+    "domain": "workforce-intelligence",
+    "description": "Enterprise computer vision attendance and workforce analytics platform",
+    "multiTenant": true,
+    "roles": [
+        "superAdmin",
+        "admin",
+        "hr",
+        "employee"
+    ],
+    "modules": [
+        "authentication",
+        "deviceManagement",
+        "facilityIntelligence",
+        "floorMapping",
+        "employeeManagement",
+        "attendance",
+        "presenceMonitoring",
+        "adminPanel",
+        "hrPanel"
+    ]
+}

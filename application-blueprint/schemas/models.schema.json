@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "description": "Unique model identifier"
+            },
+            "name": {
+                "type": "string",
+                "description": "Display name"
+            },
+            "description": {
+                "type": "string",
+                "description": "What this entity represents"
+            },
+            "fields": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "string",
+                                "integer",
+                                "float",
+                                "boolean",
+                                "datetime",
+                                "uuid",
+                                "enum",
+                                "reference",
+                                "json"
+                            ]
+                        },
+                        "primaryKey": {
+                            "type": "boolean"
+                        },
+                        "required": {
+                            "type": "boolean"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "enumValues": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "referenceTo": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "type",
+                        "description"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "description",
+            "fields"
+        ]
+    }
+}

@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "description": "Unique module identifier (camelCase)"
+            },
+            "name": {
+                "type": "string",
+                "description": "Human-readable name"
+            },
+            "description": {
+                "type": "string",
+                "description": "Purpose statement"
+            },
+            "roles": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "Roles authorized to access this module"
+            },
+            "features": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "High-level feature list"
+            },
+            "dependsOn": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "IDs of module dependencies"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "description",
+            "roles",
+            "features"
+        ]
+    }
+}

@@ -1,0 +1,62 @@
+[
+    {
+        "sourceEntity": "Employee",
+        "targetEntity": "Department",
+        "type": "many-to-one",
+        "description": "An employee belongs to one department"
+    },
+    {
+        "sourceEntity": "Employee",
+        "targetEntity": "Shift",
+        "type": "many-to-one",
+        "description": "An employee is assigned one shift"
+    },
+    {
+        "sourceEntity": "Device",
+        "targetEntity": "Floor",
+        "type": "many-to-one",
+        "description": "A device is installed on a floor"
+    },
+    {
+        "sourceEntity": "Floor",
+        "targetEntity": "Building",
+        "type": "many-to-one",
+        "description": "A floor belongs to a building"
+    },
+    {
+        "sourceEntity": "Area",
+        "targetEntity": "Floor",
+        "type": "many-to-one",
+        "description": "An area is part of a floor"
+    },
+    {
+        "sourceEntity": "AttendanceEvent",
+        "targetEntity": "Employee",
+        "type": "many-to-one",
+        "description": "Event is triggered by an employee"
+    },
+    {
+        "sourceEntity": "AttendanceEvent",
+        "targetEntity": "Device",
+        "type": "many-to-one",
+        "description": "Event is captured by a device"
+    },
+    {
+        "sourceEntity": "PresenceSession",
+        "targetEntity": "Employee",
+        "type": "many-to-one",
+        "description": "Session belongs to an employee"
+    },
+    {
+        "sourceEntity": "PresenceSession",
+        "targetEntity": "Area",
+        "type": "many-to-one",
+        "description": "Session is in a specific area"
+    },
+    {
+        "sourceEntity": "Department",
+        "targetEntity": "Employee",
+        "type": "one-to-one",
+        "description": "A department has one manager"
+    }
+]

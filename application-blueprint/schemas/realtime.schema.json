@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "description": "Channel identifier"
+            },
+            "name": {
+                "type": "string",
+                "description": "Display name"
+            },
+            "description": {
+                "type": "string",
+                "description": "Purpose of the channel"
+            },
+            "eventTypes": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "Events published to this channel"
+            },
+            "subscribers": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "description": "Roles or modules that subscribe"
+            },
+            "protocol": {
+                "type": "string",
+                "enum": [
+                    "websocket",
+                    "sse",
+                    "polling"
+                ],
+                "description": "Logical protocol"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "description",
+            "eventTypes",
+            "subscribers",
+            "protocol"
+        ]
+    }
+}

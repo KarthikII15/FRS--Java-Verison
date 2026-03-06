@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Application display name"
+        },
+        "version": {
+            "type": "string",
+            "description": "Semantic versioning string (e.g. 1.0.0)"
+        },
+        "domain": {
+            "type": "string",
+            "description": "Business domain identifier"
+        },
+        "description": {
+            "type": "string",
+            "description": "One-line operational purpose statement"
+        },
+        "multiTenant": {
+            "type": "boolean",
+            "description": "Whether the application supports multi-tenancy"
+        },
+        "roles": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Global role identifiers"
+        },
+        "modules": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Included module identifier names"
+        }
+    },
+    "required": [
+        "name",
+        "version",
+        "domain",
+        "description",
+        "multiTenant",
+        "roles",
+        "modules"
+    ],
+    "additionalProperties": false
+}

@@ -1,0 +1,54 @@
+[
+    {
+        "id": "device_status",
+        "name": "Device Health Stream",
+        "description": "Pushes status changes (Online -> Offline)",
+        "eventTypes": [
+            "DeviceStatusChanged"
+        ],
+        "subscribers": [
+            "deviceManagement",
+            "adminPanel"
+        ],
+        "protocol": "websocket"
+    },
+    {
+        "id": "attendance_events",
+        "name": "Live Attendance Feed",
+        "description": "Fires immediately on face validation at turnstiles",
+        "eventTypes": [
+            "AttendanceEvent"
+        ],
+        "subscribers": [
+            "attendance",
+            "hrPanel"
+        ],
+        "protocol": "websocket"
+    },
+    {
+        "id": "alerts",
+        "name": "System Alerts Channel",
+        "description": "High priority notifications for operations",
+        "eventTypes": [
+            "AlertTriggered"
+        ],
+        "subscribers": [
+            "adminPanel",
+            "hrPanel"
+        ],
+        "protocol": "sse"
+    },
+    {
+        "id": "presence_updates",
+        "name": "Zone Occupancy Stream",
+        "description": "High frequency state changes as people move through areas",
+        "eventTypes": [
+            "PresenceSessionStarted"
+        ],
+        "subscribers": [
+            "presenceMonitoring",
+            "facilityIntelligence"
+        ],
+        "protocol": "websocket"
+    }
+]

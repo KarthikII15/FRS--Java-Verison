@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "description": "Entity identifier"
+            },
+            "name": {
+                "type": "string",
+                "description": "Display name"
+            },
+            "description": {
+                "type": "string",
+                "description": "Purpose"
+            },
+            "type": {
+                "type": "string",
+                "enum": [
+                    "building",
+                    "floor",
+                    "area",
+                    "camera"
+                ],
+                "description": "Entity type"
+            },
+            "parentId": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "description": "Reference to parent entity ID (null if top level)"
+            },
+            "metadata": {
+                "type": "object",
+                "description": "Optional key-value metadata"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "description",
+            "type",
+            "parentId"
+        ]
+    }
+}
