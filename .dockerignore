@@ -1,0 +1,16 @@
+node_modules
+**/node_modules
+dist
+.git
+.gitignore
+*.log
+Dockerfile*
+docker-compose*.yml
+*.env
+*.local
+**/.vite
+**/.cache
+**/.turbo
+**/.next
+**/.DS_Store
+**/coverage

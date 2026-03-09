@@ -25,6 +25,7 @@ import inferenceProcessor from "./core/services/InferenceProcessorCore.js";
 import { configLoaders } from "./config/loaders.js";
 import wsManager from "./websocket/index.js";
 import attendanceService from "./services/business/AttendanceService.js";
+import uploadSnapshotPushService from "./core/services/UploadSnapshotPushService.js";
 import livePresenceService from "./services/business/LivePresenceService.js";
 
 const app = express();
@@ -180,6 +181,14 @@ async function startServer() {
       console.warn('⚠️ Memory pressure detected:', memoryInfo);
       // Could implement circuit breaker here
     });
+
+    // Initialize snapshot uploader
+    try {
+      await uploadSnapshotPushService.initialize();
+      console.log('✅ Snapshot uploader initialized');
+    } catch (e) {
+      console.warn('Snapshot uploader init failed:', e.message);
+    }
 
     // Start server
     const server = app.listen(env.port, () => {

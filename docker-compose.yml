@@ -1,11 +1,107 @@
 services:
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.1.4
-    container_name: attendance-keycloak
+  postgres:
+    image: postgres:15-alpine
+    container_name: attendance-postgres
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      POSTGRES_DB: attendance_intelligence
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "9090:8080"
-    command: start-dev
-    restart: unless-stopped
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d attendance_intelligence"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - attendance-network
+
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: attendance-zookeeper
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper-data:/bitnami/zookeeper
+    networks:
+      - attendance-network
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: attendance-kafka
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/bitnami/kafka
+    networks:
+      - attendance-network
+
+  backend:
+    build: ./backend
+    container_name: attendance-backend
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+      CLIENT_ORIGIN: http://localhost:5173
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: attendance_intelligence
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_SSL: "false"
+      AUTH_MODE: api
+      KAFKA_BROKERS: kafka:9092
+      FACE_DB_PATH: /app/data/face_db.sqlite
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend-data:/app/data
+      - backend-temp:/app/temp
+    networks:
+      - attendance-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: attendance-frontend
+    environment:
+      VITE_AUTH_MODE: api
+      VITE_API_BASE_URL: http://localhost:8080/api
+      VITE_KEYCLOAK_URL: http://localhost:9090
+      VITE_KEYCLOAK_REALM: attendance
+      VITE_KEYCLOAK_CLIENT_ID: attendance-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    networks:
+      - attendance-network
+
+networks:
+  attendance-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  kafka-data:
+  zookeeper-data:
+  backend-data:
+  backend-temp:
