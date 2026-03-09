@@ -20,6 +20,7 @@ const HR_PERMISSIONS = [
   "attendance.read",
   "attendance.manage",
   "analytics.read",
+  "devices.read",
   "facility.read",
   "aiinsights.read",
 ];
