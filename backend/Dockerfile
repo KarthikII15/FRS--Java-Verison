@@ -6,7 +6,7 @@ ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 

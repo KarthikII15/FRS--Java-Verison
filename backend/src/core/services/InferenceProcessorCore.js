@@ -1,6 +1,3 @@
-import { Worker } from 'worker_threads';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import EventEmitter from 'events';
 import shutdownManager from '../managers/ShutdownManager.js';
 import modelManager from '../managers/ModelManager.js';
@@ -8,9 +5,8 @@ import { env } from '../../config/env.js';
 import { configLoaders } from '../../config/loaders.js';
 import { getRuleClassByType } from '../rules/index.js';
 import kafkaEventService from '../kafka/KafkaEventService.js';
+import edgeAIClient from '../clients/EdgeAIClient.js';
 import { v4 as uuidv4 } from 'uuid';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 class InferenceProcessorCore extends EventEmitter {
   constructor() {
@@ -28,38 +24,7 @@ class InferenceProcessorCore extends EventEmitter {
     this.initializeWorkerPool();
   }
 
-  initializeWorkerPool() {
-    const poolSize = env.analytics.inferenceThreads || 4;
-    
-    for (let i = 0; i < poolSize; i++) {
-      const worker = new Worker(path.join(__dirname, '../workers/InferenceWorker.js'));
-      
-      worker.on('message', (message) => {
-        this.handleWorkerMessage(message);
-      });
-      
-      worker.on('error', (error) => {
-        console.error(`[InferenceProcessor] Worker ${i} error:`, error);
-        this.restartWorker(i);
-      });
-      
-      worker.on('exit', (code) => {
-        if (code !== 0) {
-          console.warn(`[InferenceProcessor] Worker ${i} exited with code ${code}`);
-          this.restartWorker(i);
-        }
-      });
-      
-      this.workerPool.push({
-        id: i,
-        worker,
-        busy: false,
-        currentTask: null
-      });
-    }
-    
-    console.log(`[InferenceProcessor] Initialized ${poolSize} inference workers`);
-  }
+  initializeWorkerPool() {}
 
   async initialize() {
     try {
@@ -131,109 +96,35 @@ class InferenceProcessorCore extends EventEmitter {
       if (queue.frames.length === 0) {
         continue;
       }
-
-      // Get available worker
-      const worker = this.getAvailableWorker();
-      if (!worker) {
-        // No workers available, skip for now
-        continue;
-      }
-
       // Get next frame
       const frame = shutdownManager.getNextFrame(cameraId);
       if (!frame) {
         continue;
       }
-
-      // Submit to worker
-      this.submitToWorker(worker, frame, cameraId);
-    }
-  }
-
-  getAvailableWorker() {
-    // Round-robin worker selection
-    for (let i = 0; i < this.workerPool.length; i++) {
-      const index = (this.nextWorkerIndex + i) % this.workerPool.length;
-      const worker = this.workerPool[index];
-      if (!worker.busy) {
-        this.nextWorkerIndex = (index + 1) % this.workerPool.length;
-        return worker;
-      }
-    }
-    return null;
-  }
-
-  submitToWorker(worker, frame, cameraId) {
-    const taskId = uuidv4();
-    
-    worker.busy = true;
-    worker.currentTask = {
-      id: taskId,
-      frameId: frame.id,
-      cameraId,
-      submittedAt: Date.now()
-    };
-
-    this.activeInferences.add(taskId);
-
-    // Update stats
-    if (!this.processingStats.has(cameraId)) {
-      this.processingStats.set(cameraId, {
-        processed: 0,
-        failed: 0,
-        avgProcessingTime: 0,
-        lastProcessedAt: null
+      this.processFrameExternal(cameraId, frame).catch((e) => {
+        this.handleInferenceError('external', e);
       });
     }
-
-    // Send to worker
-    worker.worker.postMessage({
-      type: 'inference',
-      taskId,
-      frame,
-      cameraId,
-      rules: this.getRulesForCamera(cameraId),
-      models: this.getRequiredModelsForRules(frame.rules)
-    });
-
-    this.emit('inferenceStarted', {
-      taskId,
-      cameraId,
-      frameId: frame.id,
-      timestamp: new Date().toISOString()
-    });
   }
 
-  handleWorkerMessage(message) {
-    const { type, taskId, result, error, workerId } = message;
-
-    // Find worker
-    const worker = this.workerPool.find(w => w.id === workerId);
-    if (!worker) {
-      console.error(`[InferenceProcessor] Unknown worker: ${workerId}`);
-      return;
-    }
-
-    // Mark worker as available
-    worker.busy = false;
-    
-    if (taskId) {
-      this.activeInferences.delete(taskId);
-    }
-
-    switch (type) {
-      case 'inferenceResult':
-        this.handleInferenceResult(taskId, result);
-        break;
-      case 'inferenceError':
-        this.handleInferenceError(taskId, error);
-        break;
-      case 'workerReady':
-        console.log(`[InferenceProcessor] Worker ${workerId} ready`);
-        break;
-      default:
-        console.warn(`[InferenceProcessor] Unknown message type: ${type}`);
-    }
+  async processFrameExternal(cameraId, frame) {
+    const taskId = uuidv4();
+    const startTime = Date.now();
+    this.activeInferences.add(taskId);
+    const rules = this.getRulesForCamera(cameraId);
+    const aiRes = await edgeAIClient.recognizeImageBuffer(
+      Buffer.isBuffer(frame.data) ? frame.data : Buffer.from(frame.data, 'binary'),
+      { cameraId, timestamp: frame.metadata?.timestamp }
+    );
+    const detections = aiRes?.detections || [];
+    const processingTime = Date.now() - startTime;
+    this.handleInferenceResult(taskId, {
+      cameraId,
+      frameId: frame.id,
+      detections,
+      processingTime,
+      metadata: { ...frame.metadata, modelsUsed: ['edge-ai'] },
+    });
   }
 
   handleInferenceResult(taskId, result) {
@@ -389,31 +280,7 @@ class InferenceProcessorCore extends EventEmitter {
     return getRuleClassByType(ruleType);
   }
 
-  restartWorker(index) {
-    console.log(`[InferenceProcessor] Restarting worker ${index}`);
-    
-    const oldWorker = this.workerPool[index];
-    if (oldWorker) {
-      oldWorker.worker.terminate();
-    }
-
-    const newWorker = new Worker(path.join(__dirname, '../workers/InferenceWorker.js'));
-    
-    newWorker.on('message', (message) => {
-      this.handleWorkerMessage({ ...message, workerId: index });
-    });
-    
-    newWorker.on('error', (error) => {
-      console.error(`[InferenceProcessor] Restarted worker ${index} error:`, error);
-    });
-    
-    this.workerPool[index] = {
-      id: index,
-      worker: newWorker,
-      busy: false,
-      currentTask: null
-    };
-  }
+  restartWorker() {}
 
   async shutdown() {
     console.log('[InferenceProcessor] Shutting down...');
@@ -433,11 +300,6 @@ class InferenceProcessorCore extends EventEmitter {
         break;
       }
       await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // Terminate all workers
-    for (const worker of this.workerPool) {
-      await worker.worker.terminate();
     }
 
     console.log('[InferenceProcessor] Shutdown complete');

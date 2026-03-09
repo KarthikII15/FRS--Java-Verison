@@ -24,6 +24,18 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   
+  http: {
+    timeoutMs: toNumber(process.env.HTTP_TIMEOUT_MS, 15000),
+  },
+  
+  services: {
+    apiGateway: process.env.API_GATEWAY || 'http://ivis-cloud-gateway',
+    edgeAIService: process.env.EDGE_AI_SERVICE || 'ivis-scanalitix-edge-ai',
+    rtspService: process.env.RTSP_SERVICE || 'ivis-rtsp-service',
+    customerService: process.env.CUSTOMER_SERVICE || 'ivis-customer-sitemgmt',
+    operationsService: process.env.OPERATIONS_SERVICE || 'ivis-scanalitix-operations-service',
+  },
+  
   analytics: {
     frameQueueSize: toNumber(process.env.FRAME_QUEUE_SIZE, 100),
     eventQueueSize: toNumber(process.env.EVENT_QUEUE_SIZE, 1000),

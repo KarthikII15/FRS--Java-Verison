@@ -4,7 +4,7 @@ import visitorDB from "../core/db/VisitorDB.js";
 import attendanceService from "../services/business/AttendanceService.js";
 import kafkaEventService from "../core/kafka/KafkaEventService.js";
 import uploadSnapshotPushService from "../core/services/UploadSnapshotPushService.js";
-import { uploadSingle } from "../middleware/upload.js";
+import edgeAIClient from "../core/clients/EdgeAIClient.js";
 
 const FaceController = {
   async registerFace(req, res) {
@@ -40,22 +40,36 @@ const FaceController = {
     return res.json({ match });
   },
   async recognizeAndMark(req, res) {
-    const parsed = z.object({
-      embedding: z.array(z.number()),
-      deviceId: z.string().optional(),
-      timestamp: z.string().optional(),
-    }).safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: "invalid payload" });
-    const match = await faceDB.findMatch(parsed.data.embedding);
-    if (!match) return res.status(404).json({ message: "no match" });
-    const employeeId = match.metadata?.employeeId || match.metadata?.fk_employee_id || match.metadata?.employee_id;
-    if (!employeeId) {
-      return res.status(422).json({ message: "matched face has no employeeId in metadata" });
+    const hasFile = Boolean(req.file && req.file.buffer);
+    let aiResult = null;
+    if (hasFile) {
+      aiResult = await edgeAIClient.recognizeImageBuffer(req.file.buffer, { source: 'api' });
+    } else {
+      const parsed = z.object({
+        embedding: z.array(z.number()).optional(),
+        imageUrl: z.string().optional(),
+        deviceId: z.string().optional(),
+        timestamp: z.string().optional(),
+      }).safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: "invalid payload" });
+      if (parsed.data.imageUrl) {
+        aiResult = await edgeAIClient.recognizeByUrl(parsed.data.imageUrl, { source: 'api' });
+      } else if (parsed.data.embedding) {
+        const match = await faceDB.findMatch(parsed.data.embedding);
+        if (!match) return res.status(404).json({ message: "no match" });
+        aiResult = { employeeId: match.metadata?.employeeId, confidence: match.similarity, faceId: match.faceId };
+      } else {
+        return res.status(400).json({ message: "image or embedding required" });
+      }
     }
+
+    const employeeId = aiResult?.employeeId;
+    if (!employeeId) return res.status(404).json({ message: "no employee identified" });
+
     const record = await attendanceService.markAttendance({
       employeeId: String(employeeId),
-      deviceId: parsed.data.deviceId,
-      timestamp: parsed.data.timestamp,
+      deviceId: req.body?.deviceId,
+      timestamp: req.body?.timestamp,
       scope: {
         tenantId: String(req.headers["x-tenant-id"] || req.auth?.scope?.tenantId || ""),
         customerId: req.headers["x-customer-id"] ? String(req.headers["x-customer-id"]) : undefined,
@@ -65,13 +79,11 @@ const FaceController = {
     });
     await kafkaEventService.publishEvent({
       type: "FACE_RECOGNIZED",
-      faceId: match.faceId,
       employeeId,
-      similarity: match.similarity,
-      deviceId: parsed.data.deviceId,
+      confidence: aiResult?.confidence,
       timestamp: new Date().toISOString(),
     });
-    return res.json({ match, record });
+    return res.json({ result: aiResult, record });
   },
   async verifyMultipleFaces(req, res) {
     const parsed = z.object({ embeddings: z.array(z.array(z.number())) }).safeParse(req.body);

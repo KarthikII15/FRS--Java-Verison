@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:15-alpine
+    image: ankane/pgvector:latest
     container_name: attendance-postgres
     environment:
       POSTGRES_DB: attendance_intelligence
@@ -19,32 +19,36 @@ services:
       - attendance-network
 
   zookeeper:
-    image: bitnami/zookeeper:3.9
+    image: confluentinc/cp-zookeeper:7.6.0
     container_name: attendance-zookeeper
     environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
-    volumes:
-      - zookeeper-data:/bitnami/zookeeper
     networks:
       - attendance-network
 
   kafka:
-    image: bitnami/kafka:3.7
+    image: confluentinc/cp-kafka:7.6.0
     container_name: attendance-kafka
     environment:
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_BROKER_ID: "1"
     depends_on:
       - zookeeper
     ports:
       - "9092:9092"
-    volumes:
-      - kafka-data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
     networks:
       - attendance-network
 
@@ -55,6 +59,11 @@ services:
       NODE_ENV: development
       PORT: 8080
       CLIENT_ORIGIN: http://localhost:5173
+      API_GATEWAY: http://ivis-cloud-gateway
+      EDGE_AI_SERVICE: ivis-scanalitix-edge-ai
+      RTSP_SERVICE: ivis-rtsp-service
+      CUSTOMER_SERVICE: ivis-customer-sitemgmt
+      OPERATIONS_SERVICE: ivis-scanalitix-operations-service
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: attendance_intelligence
@@ -68,7 +77,7 @@ services:
       postgres:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "8080:8080"
     volumes:
@@ -101,7 +110,5 @@ networks:
 
 volumes:
   postgres-data:
-  kafka-data:
-  zookeeper-data:
   backend-data:
   backend-temp:

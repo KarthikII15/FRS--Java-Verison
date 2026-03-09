@@ -2,6 +2,7 @@ import KafkaConsumer from '../kafka/KafkaConsumer.js';
 import kafkaConfig from '../kafka/KafkaConfig.js';
 import shutdownManager from '../managers/ShutdownManager.js';
 import kafkaEventService from '../kafka/KafkaEventService.js';
+import edgeAIClient from '../clients/EdgeAIClient.js';
 
 /**
  * SnapshotProcessor - consumes snapshot upload requests from Kafka.
@@ -29,12 +30,23 @@ class SnapshotProcessor {
         return;
       }
 
-      // TODO: Integrate with UploadSnapshotPushService to handle payload.data
-      await kafkaEventService.publishEvent({
-        type: 'SNAPSHOT_REQUEST_RECEIVED',
-        timestamp: new Date().toISOString(),
-        data: payload,
-      });
+      const url = payload?.snapshotUrl || payload?.data?.snapshotUrl;
+      if (url) {
+        try {
+          const aiRes = await edgeAIClient.recognizeByUrl(url, { source: 'snapshot' });
+          await kafkaEventService.publishDetection({
+            snapshotUrl: url,
+            detections: aiRes?.detections || [],
+            timestamp: new Date().toISOString(),
+          });
+        } catch (e) {
+          await kafkaEventService.publishEvent({
+            type: 'SNAPSHOT_PROCESSING_FAILED',
+            timestamp: new Date().toISOString(),
+            error: e.message,
+          });
+        }
+      }
     });
   }
 

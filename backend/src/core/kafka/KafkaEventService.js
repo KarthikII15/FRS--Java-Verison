@@ -14,6 +14,8 @@ class KafkaEventService extends EventEmitter {
     this.topics = {
       events: `${this.topicPrefix}events`,
       detections: `${this.topicPrefix}detections`,
+      deviceEvents: `${this.topicPrefix}device-events`,
+      aiDetections: `${this.topicPrefix}ai-detections`,
       alerts: `${this.topicPrefix}alerts`,
       smartSearch: `${this.topicPrefix}smart-search`,
       smartSearchResults: `${this.topicPrefix}smart-search-results`,
@@ -22,6 +24,8 @@ class KafkaEventService extends EventEmitter {
 
     this.eventConsumer = null;
     this.smartSearchConsumer = null;
+    this.deviceEventsConsumer = null;
+    this.aiDetectionsConsumer = null;
 
     shutdownManager.registerShutdownHandler('kafkaEventService', async () => {
       await this.shutdown();
@@ -100,6 +104,36 @@ class KafkaEventService extends EventEmitter {
     });
   }
 
+  async subscribeToDeviceEvents(handler) {
+    if (this.deviceEventsConsumer) return;
+    this.deviceEventsConsumer = new KafkaConsumer(`${kafkaConfig.groupId}-device-events`);
+    await this.deviceEventsConsumer.subscribe([this.topics.deviceEvents]);
+    await this.deviceEventsConsumer.run(async ({ message }) => {
+      try {
+        const value = message.value?.toString() || '{}';
+        const evt = JSON.parse(value);
+        await handler(evt);
+      } catch (err) {
+        console.error('[KafkaEventService] deviceEvents handler error:', err);
+      }
+    });
+  }
+
+  async subscribeToAIDetections(handler) {
+    if (this.aiDetectionsConsumer) return;
+    this.aiDetectionsConsumer = new KafkaConsumer(`${kafkaConfig.groupId}-ai-detections`);
+    await this.aiDetectionsConsumer.subscribe([this.topics.aiDetections]);
+    await this.aiDetectionsConsumer.run(async ({ message }) => {
+      try {
+        const value = message.value?.toString() || '{}';
+        const evt = JSON.parse(value);
+        await handler(evt);
+      } catch (err) {
+        console.error('[KafkaEventService] aiDetections handler error:', err);
+      }
+    });
+  }
+
   async publishSystemMetrics(metrics) {
     await kafkaProducer.sendEvent(this.topics.systemMetrics, metrics);
   }
@@ -108,6 +142,8 @@ class KafkaEventService extends EventEmitter {
     const closers = [];
     if (this.eventConsumer) closers.push(this.eventConsumer.close());
     if (this.smartSearchConsumer) closers.push(this.smartSearchConsumer.close());
+    if (this.deviceEventsConsumer) closers.push(this.deviceEventsConsumer.close());
+    if (this.aiDetectionsConsumer) closers.push(this.aiDetectionsConsumer.close());
     await Promise.allSettled(closers);
   }
 }

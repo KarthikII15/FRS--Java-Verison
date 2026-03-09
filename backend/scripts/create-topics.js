@@ -14,6 +14,8 @@ async function run() {
   const topics = [
     `${kafkaConfig.topicPrefix}events`,
     `${kafkaConfig.topicPrefix}detections`,
+    `${kafkaConfig.topicPrefix}device-events`,
+    `${kafkaConfig.topicPrefix}ai-detections`,
     `${kafkaConfig.topicPrefix}alerts`,
     `${kafkaConfig.topicPrefix}smart-search`,
     `${kafkaConfig.topicPrefix}smart-search-results`,

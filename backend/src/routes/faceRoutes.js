@@ -17,7 +17,7 @@ router.post("/verify", requirePermission("analytics.read"), FaceController.verif
 router.post("/verify/multiple", requirePermission("analytics.read"), FaceController.verifyMultipleFaces);
 router.post("/search", requirePermission("analytics.read"), FaceController.searchFaces);
 router.post("/search/embedding", requirePermission("analytics.read"), FaceController.searchByEmbedding);
-router.post("/recognize", requirePermission("attendance.write"), FaceController.recognizeAndMark);
+router.post("/recognize", requirePermission("attendance.write"), uploadSingle("image"), FaceController.recognizeAndMark);
 router.post("/snapshot", requirePermission("analytics.read"), uploadSingle("snapshot"), FaceController.uploadSnapshot);
 
 router.get("/groups", requirePermission("analytics.read"), FaceController.getFaceGroups);

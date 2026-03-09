@@ -27,6 +27,8 @@ import wsManager from "./websocket/index.js";
 import attendanceService from "./services/business/AttendanceService.js";
 import uploadSnapshotPushService from "./core/services/UploadSnapshotPushService.js";
 import livePresenceService from "./services/business/LivePresenceService.js";
+import rtspClient from "./core/clients/RTSPClient.js";
+import kafkaEventService from "./core/kafka/KafkaEventService.js";
 
 const app = express();
 
@@ -139,6 +141,22 @@ app.post("/api/frames/smart/:cameraId", async (req, res) => {
   }
 });
 
+// RTSP webhook for ivis-rtsp-service to push frames
+app.post("/api/frames/rtsp/webhook", async (req, res) => {
+  try {
+    const { cameraId, imageUrl, timestamp, metadata } = req.body || {};
+    if (!cameraId || !imageUrl) return res.status(400).json({ message: "cameraId and imageUrl required" });
+    const result = await validationService.validateAndQueueFrame(
+      cameraId,
+      imageUrl, // allow URL for external processing
+      { ...(metadata || {}), timestamp: timestamp || new Date().toISOString(), source: 'rtsp_service' }
+    );
+    res.status(202).json(result);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
 // Error handling middleware
 app.use((err, _req, res, _next) => {
   console.error('Unhandled error:', err);
@@ -190,6 +208,17 @@ async function startServer() {
       console.warn('Snapshot uploader init failed:', e.message);
     }
 
+    // Register RTSP webhook
+    try {
+      const callbackUrl = process.env.PUBLIC_BASE_URL
+        ? `${process.env.PUBLIC_BASE_URL.replace(/\/+$/, '')}/api/frames/rtsp/webhook`
+        : `http://attendance-backend:8080/api/frames/rtsp/webhook`;
+      await rtspClient.registerWebhook({ callbackUrl, cameras: [] });
+      console.log('✅ RTSP webhook registered:', callbackUrl);
+    } catch (e) {
+      console.warn('RTSP webhook registration failed:', e.message);
+    }
+
     // Start server
     const server = app.listen(env.port, () => {
       console.log(`🚀 Backend API listening on http://localhost:${env.port}`);
@@ -209,6 +238,19 @@ async function startServer() {
       });
     } catch (e) {
       console.warn("WebSocket disabled:", e.message);
+    }
+
+    // Subscribe to enterprise Kafka topics
+    try {
+      await kafkaEventService.subscribeToDeviceEvents(async (evt) => {
+        wsManager.emitPresenceUpdate({ type: 'device_event', evt });
+      });
+      await kafkaEventService.subscribeToAIDetections(async (evt) => {
+        wsManager.emitAttendanceUpdate({ type: 'ai_detection', evt });
+      });
+      console.log('✅ Subscribed to enterprise Kafka topics');
+    } catch (e) {
+      console.warn('Kafka enterprise subscriptions failed:', e.message);
     }
 
     // Graceful shutdown handler
