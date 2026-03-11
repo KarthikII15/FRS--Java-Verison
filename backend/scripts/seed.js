@@ -17,6 +17,7 @@ const ADMIN_PERMISSIONS = [
 
 const HR_PERMISSIONS = [
   "users.read",
+  "devices.read",
   "attendance.read",
   "attendance.manage",
   "analytics.read",

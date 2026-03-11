@@ -46,6 +46,7 @@ export const env = {
   },
 
   kafka: {
+    enabled: toBoolean(process.env.KAFKA_ENABLED, true),
     brokers: (process.env.KAFKA_BROKERS || 'localhost:9092').split(','),
     clientId: process.env.KAFKA_CLIENT_ID || 'scanalitix-node',
     groupId: process.env.KAFKA_GROUP_ID || 'scanalitix-consumer-group',
@@ -110,5 +111,22 @@ export const env = {
     audience: process.env.KEYCLOAK_AUDIENCE || 'attendance-api',
     jwksUri: process.env.KEYCLOAK_JWKS_URI || 'http://localhost:9090/realms/attendance/protocol/openid-connect/certs',
     clockToleranceSec: Number(process.env.KEYCLOAK_CLOCK_TOLERANCE_SEC || '5'),
+  },
+
+  ivis: {
+    apiBase:      process.env.IVIS_API_BASE      || 'https://iportal-poc.iviscloud.net/api/client-portal',
+    loginUrl:     process.env.IVIS_LOGIN_URL     || 'https://iportal-poc.iviscloud.net/api/auth/login',
+    username:     process.env.IVIS_USERNAME,
+    password:     process.env.IVIS_PASSWORD,
+    serviceUsername: process.env.IVIS_SERVICE_USERNAME || process.env.IVIS_USERNAME,
+    servicePassword: process.env.IVIS_SERVICE_PASSWORD || process.env.IVIS_PASSWORD,
+    customerId:   process.env.IVIS_CUSTOMER_ID   || '445',
+    customerName: process.env.IVIS_CUSTOMER_NAME || 'PMSTEST',
+    customerCode: process.env.IVIS_CUSTOMER_CODE || process.env.IVIS_CUSTOMER_NAME || 'PMSTEST',
+    loginId:      process.env.IVIS_LOGIN_ID      || 'PMSTEST',
+    tenantId:     process.env.IVIS_TENANT_ID     || '1',
+    deviceId:     process.env.IVIS_DEVICE_ID     || 'IVISPMS1001',
+    tlsRejectUnauthorized: toBoolean(process.env.IVIS_TLS_REJECT_UNAUTHORIZED, true),
+    bypassAuth: toBoolean(process.env.IVIS_BYPASS_AUTH, false),
   },
 };

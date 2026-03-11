@@ -3,6 +3,7 @@ import { apiRequest } from '../services/http/apiClient';
 import { Employee, AttendanceRecord, Device } from '../types';
 import { DeviceAlert, mockEmployees, mockDevices, mockAlerts } from '../data/enhancedMockData';
 import { mockAttendanceRecords } from '../utils/mockData';
+import { ivisApi } from '../services/ivisApi';
 import { useAuth } from '../contexts/AuthContext';
 import { useScopeHeaders } from './useScopeHeaders';
 import { authConfig } from '../config/authConfig';
@@ -61,20 +62,75 @@ export function useLiveData() {
                     setData(prev => ({ ...prev, isLoading: true, error: null }));
                 }
 
-                const [employeesRes, attendanceRes, devicesRes, alertsRes] = await Promise.all([
-                    apiRequest<{ data: Employee[] }>('/live/employees', { accessToken, scopeHeaders }),
-                    apiRequest<{ data: AttendanceRecord[] }>('/live/attendance', { accessToken, scopeHeaders }),
-                    apiRequest<{ data: Device[] }>('/live/devices', { accessToken, scopeHeaders }),
-                    apiRequest<{ data: DeviceAlert[] }>('/live/alerts', { accessToken, scopeHeaders }),
+                const today = new Date();
+                const todayStr = today.toISOString().slice(0, 10);
+
+                const [ivisEmployeesRes, ivisAttendanceRes, ivisSitesRes] = await Promise.all([
+                    ivisApi.employees(),
+                    ivisApi.frsEmployeeStats({
+                        toTime: `${todayStr} 23:59:59`,
+                        staffName: '',
+                        siteName: '',
+                        cameraIds: '',
+                    }),
+                    ivisApi.siteDetailsDropdown(),
                 ]);
 
+                const siteNameById = new Map(
+                    (ivisSitesRes?.results ?? []).map((s) => [String(s.siteId), s.siteName])
+                );
+
+                const ivisEmployees = (ivisEmployeesRes?.results ?? []).map((emp) => {
+                    const fullName = `${emp.firstName ?? ''} ${emp.lastName ?? ''}`.trim() || emp.userName || emp.employeeId;
+                    const location = siteNameById.get(String(emp.siteId)) ?? 'IVIS';
+                    return {
+                        id: String(emp.pkUserId),
+                        name: fullName,
+                        email: '',
+                        department: 'IVIS',
+                        position: '—',
+                        employeeId: emp.employeeId ?? String(emp.pkUserId),
+                        shift: 'flexible',
+                        location,
+                        joinDate: new Date(),
+                        avatar: emp.imageUrl ?? undefined,
+                        status: emp.status ? 'active' : 'inactive',
+                    } as Employee;
+                });
+
+                const attendanceByName = new Map(
+                    ivisEmployees.map((e) => [e.name.toLowerCase(), e.employeeId])
+                );
+
+                const ivisAttendance = (ivisAttendanceRes?.results ?? []).map((rec, idx) => {
+                    const nameKey = (rec.eventDate ?? '').toLowerCase();
+                    const employeeId = attendanceByName.get(nameKey) ?? `ivis-${idx}`;
+                    const hasEntry = (rec.entryCount ?? 0) > 0;
+                    const hasExit = (rec.exitCount ?? 0) > 0;
+                    const status = hasEntry ? 'present' : 'absent';
+
+                    return {
+                        id: `${employeeId}-${todayStr}`,
+                        employeeId,
+                        date: new Date(todayStr),
+                        checkIn: hasEntry ? new Date(`${todayStr}T09:00:00`) : undefined,
+                        checkOut: hasExit ? new Date(`${todayStr}T18:00:00`) : undefined,
+                        status,
+                        workingHours: hasEntry ? 8 : 0,
+                        breakDuration: 0,
+                        overtime: 0,
+                        isLate: false,
+                        isEarlyDeparture: false,
+                        recognitionAccuracy: rec.total ?? 0,
+                    } as AttendanceRecord;
+                });
 
                 if (isMounted) {
                     setData({
-                        employees: employeesRes.data || [],
-                        attendance: attendanceRes.data || [],
-                        devices: devicesRes.data || [],
-                        alerts: alertsRes.data || [],
+                        employees: ivisEmployees,
+                        attendance: ivisAttendance,
+                        devices: mockDevices as any,
+                        alerts: mockAlerts as any,
                         isLoading: false,
                         error: null,
                     });

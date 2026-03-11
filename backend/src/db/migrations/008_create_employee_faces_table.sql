@@ -1,7 +1,7 @@
 -- Store employee face embeddings for recognition
 CREATE TABLE IF NOT EXISTS employee_faces (
     pk_face_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    fk_employee_id UUID NOT NULL REFERENCES employees(pk_employee_id) ON DELETE CASCADE,
+    fk_employee_id BIGINT NOT NULL REFERENCES hr_employee(pk_employee_id) ON DELETE CASCADE,
     
     -- Face embedding vector (512 dimensions for ArcFace/FaceNet)
     face_embedding VECTOR(512) NOT NULL,
@@ -34,11 +34,11 @@ CREATE TABLE IF NOT EXISTS employee_faces (
 );
 
 -- Indexes
-CREATE INDEX idx_employee_faces_employee ON employee_faces(fk_employee_id);
-CREATE INDEX idx_employee_faces_active ON employee_faces(is_active) WHERE is_active = true;
-CREATE INDEX idx_employee_faces_embedding ON employee_faces USING ivfflat (face_embedding vector_cosine_ops)
+CREATE INDEX IF NOT EXISTS idx_employee_faces_employee ON employee_faces(fk_employee_id);
+CREATE INDEX IF NOT EXISTS idx_employee_faces_active ON employee_faces(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_employee_faces_embedding ON employee_faces USING ivfflat (face_embedding vector_cosine_ops)
     WITH (lists = 100);
-CREATE INDEX idx_employee_faces_primary ON employee_faces(fk_employee_id, is_primary) WHERE is_primary = true;
+CREATE INDEX IF NOT EXISTS idx_employee_faces_primary ON employee_faces(fk_employee_id, is_primary) WHERE is_primary = true;
 
 -- Trigger: Ensure only one primary face per employee
 CREATE OR REPLACE FUNCTION enforce_single_primary_face()
@@ -54,7 +54,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_single_primary_face
-    BEFORE INSERT OR UPDATE ON employee_faces
-    FOR EACH ROW
-    EXECUTE FUNCTION enforce_single_primary_face();
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_trigger
+        WHERE tgname = 'trigger_single_primary_face'
+    ) THEN
+        CREATE TRIGGER trigger_single_primary_face
+            BEFORE INSERT OR UPDATE ON employee_faces
+            FOR EACH ROW
+            EXECUTE FUNCTION enforce_single_primary_face();
+    END IF;
+END $$;

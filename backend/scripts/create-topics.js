@@ -2,6 +2,11 @@ import { Kafka } from 'kafkajs';
 import kafkaConfig from '../src/core/kafka/KafkaConfig.js';
 
 async function run() {
+  if (!kafkaConfig.enabled) {
+    console.log('[create-topics] Kafka disabled; skipping topic creation.');
+    return;
+  }
+
   const kafka = new Kafka({
     clientId: `${kafkaConfig.clientId}-admin`,
     brokers: kafkaConfig.brokers,

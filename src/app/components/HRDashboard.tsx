@@ -44,6 +44,9 @@ import { FacilityControlDashboard } from './hr/FacilityControlDashboard';
 import { AttendanceStatusDashboard } from './hr/AttendanceStatusDashboard';
 import { LeaveManagement } from './hr/LeaveManagement';
 import { FilterOptions } from '../types';
+import { useIvisData } from '../hooks/useIvisData';
+import { ivisApi } from '../services/ivisApi';
+import type { VisitorStatsHourlyResponse, ProfileCountResponse } from '../types/ivis';
 
 export const HRDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -84,6 +87,33 @@ export const HRDashboard: React.FC = () => {
   }, [employees, attendance]);
 
   const unreadAlerts = alerts.filter(a => !a.read).length;
+
+  // ── IVIS Cloud: visitor stats for today (auto-refreshes every 60s) ────
+  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const { data: visitorStats, loading: visitorLoading } =
+    useIvisData<VisitorStatsHourlyResponse>(
+      () => ivisApi.visitorStatsHourly({
+        toTime: `${today} 23:59:59`,
+        siteName: '',
+        cameraIds: '',
+        staffName: '',
+      }),
+      [today],
+      { refreshInterval: 60_000 }
+    );
+
+  const { data: profileCount, loading: profileLoading } =
+    useIvisData<ProfileCountResponse>(
+      () => ivisApi.profileCount(),
+      [],
+      { refreshInterval: 5 * 60_000 }
+    );
+
+  const ivisTotalVisitors = visitorStats?.results?.reduce((s, h) => s + (h.total ?? 0), 0) ?? null;
+  const ivisTotalEntries = visitorStats?.results?.reduce((s, h) => s + (h.entryCount ?? 0), 0) ?? null;
+  const ivisTotalExits = visitorStats?.results?.reduce((s, h) => s + (h.exitCount ?? 0), 0) ?? null;
+  const ivisProfileTotal =
+    profileCount?.results?.find((r) => r.state === 'Total')?.stateCount ?? null;
 
   const [isExporting, setIsExporting] = useState(false);
 
@@ -158,6 +188,38 @@ export const HRDashboard: React.FC = () => {
                 value={metrics.absentToday}
                 icon={UserX}
                 colorClass="text-rose-500"
+              />
+            </div>
+
+            {/* IVIS Cloud: Real-time visitor counts from camera network */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <MetricCard
+                title="IVIS Visitors Today"
+                value={visitorLoading ? '…' : (ivisTotalVisitors ?? '—')}
+                icon={Map}
+                description="Camera-detected total"
+                colorClass="text-blue-500"
+              />
+              <MetricCard
+                title="IVIS Entries"
+                value={visitorLoading ? '…' : (ivisTotalEntries ?? '—')}
+                icon={UserPlus}
+                description="Entry events today"
+                colorClass="text-emerald-500"
+              />
+              <MetricCard
+                title="IVIS Exits"
+                value={visitorLoading ? '…' : (ivisTotalExits ?? '—')}
+                icon={UserX}
+                description="Exit events today"
+                colorClass="text-rose-500"
+              />
+              <MetricCard
+                title="IVIS Profiles"
+                value={profileLoading ? '…' : (ivisProfileTotal ?? '—')}
+                icon={Users}
+                description="Total registered profiles"
+                colorClass="text-violet-500"
               />
             </div>
 

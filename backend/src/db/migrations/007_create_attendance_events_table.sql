@@ -1,7 +1,7 @@
 -- Final attendance records (after face recognition processing)
 CREATE TABLE IF NOT EXISTS attendance_events (
     pk_attendance_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    fk_employee_id UUID NOT NULL REFERENCES employees(pk_employee_id),
+    fk_employee_id BIGINT NOT NULL REFERENCES hr_employee(pk_employee_id),
     fk_device_id UUID NOT NULL REFERENCES devices(pk_device_id),
     fk_original_event_id UUID REFERENCES device_events(pk_event_id),
     
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS attendance_events (
     entry_exit_direction VARCHAR(20) CHECK (entry_exit_direction IN ('in', 'out', 'unknown')),
     
     -- Shift matching
-    fk_shift_id UUID REFERENCES shifts(pk_shift_id),
+    fk_shift_id BIGINT REFERENCES hr_shift(pk_shift_id),
     is_expected_entry BOOLEAN,
     is_on_time BOOLEAN,
     
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS attendance_events (
 );
 
 -- Indexes
-CREATE INDEX idx_attendance_employee_time ON attendance_events(fk_employee_id, occurred_at DESC);
-CREATE INDEX idx_attendance_device_time ON attendance_events(fk_device_id, occurred_at DESC);
-CREATE INDEX idx_attendance_date ON attendance_events(DATE(occurred_at));
-CREATE INDEX idx_attendance_status ON attendance_events(status);
+CREATE INDEX IF NOT EXISTS idx_attendance_employee_time ON attendance_events(fk_employee_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_attendance_device_time ON attendance_events(fk_device_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_attendance_time ON attendance_events(occurred_at);
+CREATE INDEX IF NOT EXISTS idx_attendance_status ON attendance_events(status);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -14,7 +14,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { mockEmployees, mockLivePresence } from '../../data/enhancedMockData';
+import { useLiveData } from '../../hooks/useLiveData';
 import { cn } from '../ui/utils';
 import { lightTheme } from '../../../theme/lightTheme';
 
@@ -32,6 +32,7 @@ interface StatusEmployee {
 export const AttendanceStatusDashboard: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<AttendanceStatus | 'all'>('all');
   const [isExporting, setIsExporting] = useState(false);
+  const { employees, attendance } = useLiveData();
 
   const handleExport = () => {
     setIsExporting(true);
@@ -41,23 +42,35 @@ export const AttendanceStatusDashboard: React.FC = () => {
     }, 1500);
   };
 
-  // Mock data with enhanced statuses
-  const mockStatusEmployees: StatusEmployee[] = [
-    ...mockLivePresence.map(p => ({
-      id: p.employeeId,
-      name: p.employeeName,
-      department: p.department,
-      status: p.status as AttendanceStatus,
-      checkInTime: p.checkInTime,
-      duration: p.duration,
-    })),
-    { id: 'emp-010', name: 'Anna Martinez', department: 'Finance', status: 'Absent' as AttendanceStatus },
-    { id: 'emp-011', name: 'James Wilson', department: 'Engineering', status: 'On Leave' as AttendanceStatus },
-  ];
+  const statusEmployees: StatusEmployee[] = useMemo(() => {
+    const present = attendance
+      .filter(a => a.status === 'present' || a.status === 'late')
+      .map(a => {
+        const emp = employees.find(e => e.employeeId === a.employeeId);
+        return {
+          id: a.employeeId,
+          name: emp?.name ?? a.employeeId,
+          department: emp?.department ?? 'IVIS',
+          status: (a.status === 'late' ? 'Late' : 'Present') as AttendanceStatus,
+          checkInTime: a.checkIn ? a.checkIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
+        };
+      });
 
-  const getStatusCount = (status: AttendanceStatus) => {
-    return mockStatusEmployees.filter(e => e.status === status).length;
-  };
+    const presentIds = new Set(present.map(p => p.id));
+    const absent = employees
+      .filter(e => !presentIds.has(e.employeeId))
+      .map(e => ({
+        id: e.employeeId,
+        name: e.name,
+        department: e.department,
+        status: 'Absent' as AttendanceStatus,
+      }));
+
+    return [...present, ...absent];
+  }, [attendance, employees]);
+
+  const getStatusCount = (status: AttendanceStatus) =>
+    statusEmployees.filter(e => e.status === status).length;
 
   const presentCount = getStatusCount('Present');
   const absentCount = getStatusCount('Absent');
@@ -67,8 +80,8 @@ export const AttendanceStatusDashboard: React.FC = () => {
   const overtimeCount = getStatusCount('Overtime');
 
   const filteredEmployees = activeFilter === 'all'
-    ? mockStatusEmployees
-    : mockStatusEmployees.filter(e => e.status === activeFilter);
+    ? statusEmployees
+    : statusEmployees.filter(e => e.status === activeFilter);
 
   const getStatusColor = (status: AttendanceStatus) => {
     switch (status) {

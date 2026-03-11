@@ -40,6 +40,9 @@ import {
 } from "../ui/dropdown-menu";
 import { cn } from '../ui/utils';
 import { lightTheme } from '../../../theme/lightTheme';
+import { useIvisData } from '../../hooks/useIvisData';
+import { ivisApi } from '../../services/ivisApi';
+import type { InofficeInsightsResponse } from '../../types/ivis';
 
 interface PresenceMonitorProps {
     role: 'hr' | 'admin';
@@ -54,6 +57,22 @@ export const PresenceMonitor: React.FC<PresenceMonitorProps> = ({ role }) => {
     const [deptFilter, setDeptFilter] = useState('all');
     const [isExporting, setIsExporting] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+
+    // ── IVIS Cloud: live in-office insights (30-second refresh) ───
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: inofficeData, loading: inofficeLoading } =
+        useIvisData<InofficeInsightsResponse>(
+            () => ivisApi.dashboardInofficeInsights({
+                fromTime: `${today} 00:00:00`,
+                siteName: '',
+                cameraIds: '',
+            }),
+            [today],
+            { refreshInterval: 30_000 }
+        );
+    // Total in-office count from IVIS (summary object)
+    const ivisInOfficeCount: number | null =
+        inofficeData?.results?.totalInOffice ?? null;
 
     // Helper: Get behavior category based on duration and checkout
     const getBehaviorCategory = (duration: string, shiftEnd: string, isCheckoutMissing: boolean): BehaviorCategory => {
@@ -168,6 +187,19 @@ export const PresenceMonitor: React.FC<PresenceMonitorProps> = ({ role }) => {
                 <StatCard label="Long Stay" value={stats.long} icon={TrendingUp} color="text-orange-600" bg="bg-orange-50 dark:bg-orange-950/30" />
                 <StatCard label="Missing Checkout" value={stats.missing} icon={AlertCircle} color="text-red-600" bg="bg-red-50 dark:bg-red-950/30" />
             </div>
+
+            {/* IVIS Cloud: In-Office Occupancy (30s refresh) */}
+            {!inofficeLoading && ivisInOfficeCount !== null && (
+                <div className="grid grid-cols-1 gap-4">
+                    <StatCard
+                        label="IVIS In-Office (Camera)"
+                        value={ivisInOfficeCount}
+                        icon={Layers}
+                        color="text-violet-600"
+                        bg="bg-violet-50 dark:bg-violet-950/30"
+                    />
+                </div>
+            )}
 
             {/* Attention Required Panel */}
             {stats.missing > 0 && (

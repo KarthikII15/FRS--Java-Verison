@@ -41,6 +41,8 @@ services:
   backend:
     build: ./backend
     container_name: attendance-backend
+    env_file:
+      - ./backend/.env
     environment:
       PORT: 8080
       AUTH_MODE: keycloak
@@ -51,9 +53,10 @@ services:
       KEYCLOAK_JWKS_URI: http://keycloak:8080/realms/attendance-intelligence/protocol/openid-connect/certs
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: attendance_intelligence
+      DB_NAME: FRS
       DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_PASSWORD: root
+      KAFKA_ENABLED: "false"
     ports:
       - "8080:8080"
     depends_on:
@@ -66,9 +69,9 @@ services:
     image: postgres:15-alpine
     container_name: attendance-postgres
     environment:
-      POSTGRES_DB: attendance_intelligence
+      POSTGRES_DB: FRS
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: root
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./backend/src/db/migrations:/docker-entrypoint-initdb.d:ro

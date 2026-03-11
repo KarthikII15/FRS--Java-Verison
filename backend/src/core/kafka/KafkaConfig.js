@@ -2,6 +2,7 @@ import { env } from '../../config/env.js';
 
 class KafkaConfig {
   constructor() {
+    this.enabled = env.kafka.enabled;
     this.brokers = env.kafka.brokers;
     this.clientId = env.kafka.clientId;
     this.groupId = env.kafka.groupId;

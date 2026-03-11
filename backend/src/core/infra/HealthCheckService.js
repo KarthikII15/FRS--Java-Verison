@@ -20,6 +20,12 @@ class HealthCheckService extends EventEmitter {
    * Check Kafka connectivity by requesting metadata.
    */
   async checkKafka() {
+    if (!kafkaConfig.enabled) {
+      return {
+        status: 'DISABLED',
+        topics: [],
+      };
+    }
     const admin = this.kafka.admin();
     try {
       await admin.connect();

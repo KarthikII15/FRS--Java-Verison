@@ -10,6 +10,9 @@ import { FilterOptions } from '../../types';
 import { departments, locations } from '../../utils/mockData';
 import { cn } from '../ui/utils';
 import { lightTheme } from '../../../theme/lightTheme';
+import { useIvisData } from '../../hooks/useIvisData';
+import { ivisApi } from '../../services/ivisApi';
+import type { SiteDetailsResponse } from '../../types/ivis';
 
 interface FilterPanelProps {
   filters: FilterOptions;
@@ -17,6 +20,13 @@ interface FilterPanelProps {
 }
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFiltersChange }) => {
+  // IVIS live site dropdown (fetched once on mount)
+  const { data: siteData } = useIvisData<SiteDetailsResponse>(
+    () => ivisApi.siteDetailsDropdown(),
+    [] // no deps — fetch once
+  );
+  // Map IVIS results to string labels; fall back to static `locations` if not loaded
+  const ivisSiteLabels: string[] = siteData?.results?.map((s) => s.siteName) ?? [];
   const handleDepartmentToggle = (dept: string) => {
     const newDepts = filters.departments.includes(dept)
       ? filters.departments.filter(d => d !== dept)
@@ -128,10 +138,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFiltersChan
             ))}
           </div>
 
-          {/* Locations */}
+          {/* Locations — live from IVIS site-details-dropdown (falls back to static list) */}
           <div className="space-y-3">
-            <Label>Locations</Label>
-            {locations.map(loc => (
+            <Label>Locations {ivisSiteLabels.length > 0 && <span className="ml-1 text-xs text-emerald-600 font-semibold">(IVIS)</span>}</Label>
+            {(ivisSiteLabels.length > 0 ? ivisSiteLabels : locations).map(loc => (
               <div key={loc} className="flex items-center space-x-2">
                 <Checkbox
                   id={`loc-${loc}`}

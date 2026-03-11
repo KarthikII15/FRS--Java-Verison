@@ -12,13 +12,16 @@ export default class KafkaConsumer extends EventEmitter {
    */
   constructor(groupId = kafkaConfig.groupId) {
     super();
-    this.kafka = new Kafka({
-      brokers: kafkaConfig.brokers,
-      clientId: kafkaConfig.clientId,
-      ssl: kafkaConfig.ssl || undefined,
-      sasl: kafkaConfig.sasl,
-    });
-    this.consumer = this.kafka.consumer({ groupId });
+    this.disabled = !kafkaConfig.enabled;
+    if (!this.disabled) {
+      this.kafka = new Kafka({
+        brokers: kafkaConfig.brokers,
+        clientId: kafkaConfig.clientId,
+        ssl: kafkaConfig.ssl || undefined,
+        sasl: kafkaConfig.sasl,
+      });
+      this.consumer = this.kafka.consumer({ groupId });
+    }
     this.connected = false;
 
     shutdownManager.registerShutdownHandler(`kafkaConsumer:${groupId}`, async () => {
@@ -27,6 +30,7 @@ export default class KafkaConsumer extends EventEmitter {
   }
 
   async connect() {
+    if (this.disabled) return;
     if (this.connected) return;
     await this.consumer.connect();
     this.connected = true;
@@ -39,6 +43,7 @@ export default class KafkaConsumer extends EventEmitter {
    * @param {string[]} topics
    */
   async subscribe(topics) {
+    if (this.disabled) return;
     await this.connect();
     for (const topic of topics) {
       // eslint-disable-next-line no-await-in-loop
@@ -52,6 +57,7 @@ export default class KafkaConsumer extends EventEmitter {
    * @param {(payload:{topic:string,partition:number,message:import('kafkajs').KafkaMessage})=>Promise<void>} handler
    */
   async run(handler) {
+    if (this.disabled) return;
     await this.connect();
     await this.consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
@@ -75,6 +81,7 @@ export default class KafkaConsumer extends EventEmitter {
   }
 
   async pause(topics) {
+    if (this.disabled) return;
     this.consumer.pause(
       topics.map((topic) => ({
         topic,
@@ -83,6 +90,7 @@ export default class KafkaConsumer extends EventEmitter {
   }
 
   async resume(topics) {
+    if (this.disabled) return;
     this.consumer.resume(
       topics.map((topic) => ({
         topic,
@@ -91,6 +99,7 @@ export default class KafkaConsumer extends EventEmitter {
   }
 
   async close() {
+    if (this.disabled) return;
     if (!this.connected) return;
     try {
       await this.consumer.disconnect();

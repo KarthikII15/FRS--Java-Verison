@@ -20,6 +20,9 @@ import { Employee, AttendanceRecord, AnalyticsData } from '../../types';
 import { BarChart3, Users } from 'lucide-react';
 import { cn } from '../ui/utils';
 import { lightTheme } from '../../../theme/lightTheme';
+import { useIvisData } from '../../hooks/useIvisData';
+import { ivisApi } from '../../services/ivisApi';
+import type { VisitorStatsHourlyResponse } from '../../types/ivis';
 
 interface AnalyticsChartsProps {
   analytics: AnalyticsData;
@@ -40,6 +43,23 @@ export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
   selectedEmployees = [],
   onEmployeesChange = () => { },
 }) => {
+  const today = new Date().toISOString().slice(0, 10);
+
+  // IVIS hourly visitor traffic (auto-refreshes every 60 s)
+  const { data: ivisHourly, loading: ivisLoading } =
+    useIvisData<VisitorStatsHourlyResponse>(
+      () => ivisApi.visitorStatsHourly({ toTime: `${today} 23:59:59`, siteName: '', cameraIds: '' }),
+      [today],
+      { refreshInterval: 60_000 }
+    );
+
+  // Transform to Recharts format (hour 0–23)
+  const hourlyChartData = ivisHourly?.results?.map((h) => ({
+    name: `${h.eventDate}:00`,
+    entry: h.entryCount ?? 0,
+    exit: h.exitCount ?? 0,
+    total: h.total ?? 0,
+  })) ?? [];
   return (
     <Tabs defaultValue="dashboard" className="space-y-6">
       <TabsList className={cn("p-1 rounded-xl h-auto border", lightTheme.background.secondary, lightTheme.border.default, "dark:bg-gray-800/60")}>
@@ -50,6 +70,10 @@ export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
         <TabsTrigger value="comparison" className={cn("rounded-lg px-5 py-2 font-bold data-[state=active]:shadow-sm", "data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900")}>
           <Users className="w-4 h-4 mr-2" />
           Employee Comparison
+        </TabsTrigger>
+        <TabsTrigger value="ivis-traffic" className={cn("rounded-lg px-5 py-2 font-bold data-[state=active]:shadow-sm", "data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900")}>
+          <BarChart3 className="w-4 h-4 mr-2" />
+          IVIS Live Traffic
         </TabsTrigger>
       </TabsList>
 
@@ -263,6 +287,36 @@ export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
           selectedEmployees={selectedEmployees}
           onEmployeesChange={onEmployeesChange}
         />
+      </TabsContent>
+
+      {/* ── IVIS Live Traffic tab ── */}
+      <TabsContent value="ivis-traffic" className="outline-none">
+        <Card className={cn(lightTheme.background.card, lightTheme.border.default, "dark:bg-slate-900 dark:border-border")}>
+          <CardHeader>
+            <CardTitle className={cn(lightTheme.text.primary, "dark:text-white")}>
+              IVIS Hourly Entry / Exit Traffic — Today
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {ivisLoading ? (
+              <div className="flex items-center justify-center h-[300px] text-gray-400">Loading IVIS data…</div>
+            ) : hourlyChartData.length === 0 ? (
+              <div className="flex items-center justify-center h-[300px] text-gray-400">No IVIS data available</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={hourlyChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="entry" fill="#10b981" name="Entries" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="exit" fill="#ef4444" name="Exits" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
       </TabsContent>
     </Tabs>
   );

@@ -33,6 +33,7 @@ class KafkaEventService extends EventEmitter {
    * @param {any} event
    */
   async publishEvent(event) {
+    if (!kafkaConfig.enabled) return;
     await kafkaProducer.sendEvent(this.topics.events, event, event.id || undefined);
   }
 
@@ -41,6 +42,7 @@ class KafkaEventService extends EventEmitter {
    * @param {any} detection
    */
   async publishDetection(detection) {
+    if (!kafkaConfig.enabled) return;
     await kafkaProducer.sendEvent(this.topics.detections, detection);
   }
 
@@ -49,6 +51,7 @@ class KafkaEventService extends EventEmitter {
    * @param {any} alert
    */
   async publishAlert(alert) {
+    if (!kafkaConfig.enabled) return;
     await kafkaProducer.sendEvent(this.topics.alerts, alert, alert.id || undefined);
   }
 
@@ -57,6 +60,7 @@ class KafkaEventService extends EventEmitter {
    * @param {any} payload
    */
   async publishSmartSearchResult(payload) {
+    if (!kafkaConfig.enabled) return;
     await kafkaProducer.sendEvent(this.topics.smartSearchResults, payload, payload.id || undefined);
   }
 
@@ -65,6 +69,7 @@ class KafkaEventService extends EventEmitter {
    * @param {(event:any)=>Promise<void>} handler
    */
   async subscribeToEvents(handler) {
+    if (!kafkaConfig.enabled) return;
     if (this.eventConsumer) return;
     this.eventConsumer = new KafkaConsumer(`${kafkaConfig.groupId}-events`);
     await this.eventConsumer.subscribe([this.topics.events]);
@@ -85,6 +90,7 @@ class KafkaEventService extends EventEmitter {
    * @param {(query:any)=>Promise<void>} handler
    */
   async subscribeToSmartSearch(handler) {
+    if (!kafkaConfig.enabled) return;
     if (this.smartSearchConsumer) return;
     this.smartSearchConsumer = new KafkaConsumer(`${kafkaConfig.groupId}-smart-search`);
     await this.smartSearchConsumer.subscribe([this.topics.smartSearch]);
@@ -101,6 +107,7 @@ class KafkaEventService extends EventEmitter {
   }
 
   async publishSystemMetrics(metrics) {
+    if (!kafkaConfig.enabled) return;
     await kafkaProducer.sendEvent(this.topics.systemMetrics, metrics);
   }
 

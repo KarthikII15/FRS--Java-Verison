@@ -10,13 +10,7 @@ import shutdownManager from '../managers/ShutdownManager.js';
 class KafkaProducer extends EventEmitter {
   constructor() {
     super();
-    this.kafka = new Kafka({
-      brokers: kafkaConfig.brokers,
-      clientId: kafkaConfig.clientId,
-      ssl: kafkaConfig.ssl || undefined,
-      sasl: kafkaConfig.sasl,
-    });
-    this.producer = this.kafka.producer();
+    this.disabled = !kafkaConfig.enabled;
     this.connected = false;
 
     this.topicPrefix = kafkaConfig.topicPrefix;
@@ -31,6 +25,16 @@ class KafkaProducer extends EventEmitter {
       systemMetrics: `${this.topicPrefix}system-metrics`,
     };
 
+    if (this.disabled) return;
+
+    this.kafka = new Kafka({
+      brokers: kafkaConfig.brokers,
+      clientId: kafkaConfig.clientId,
+      ssl: kafkaConfig.ssl || undefined,
+      sasl: kafkaConfig.sasl,
+    });
+    this.producer = this.kafka.producer();
+
     shutdownManager.registerShutdownHandler('kafkaProducer', async () => {
       await this.close();
     });
@@ -40,6 +44,7 @@ class KafkaProducer extends EventEmitter {
    * Connect producer (idempotent).
    */
   async connect() {
+    if (this.disabled) return;
     if (this.connected) return;
     await this.producer.connect();
     this.connected = true;
@@ -54,6 +59,7 @@ class KafkaProducer extends EventEmitter {
    * @param {string} [key]
    */
   async sendEvent(topic, event, key = uuidv4()) {
+    if (this.disabled) return;
     await this.connect();
     const payload = {
       key,
@@ -82,6 +88,7 @@ class KafkaProducer extends EventEmitter {
    * @param {Array<{topic:string,event:any,key?:string}>} events
    */
   async sendBatch(events) {
+    if (this.disabled) return;
     if (!events || events.length === 0) return;
     await this.connect();
 
@@ -114,6 +121,7 @@ class KafkaProducer extends EventEmitter {
   }
 
   async routeToDeadLetter(sourceTopic, message, error) {
+    if (this.disabled) return;
     try {
       await this.producer.send({
         topic: this.topics.deadLetter,
@@ -136,6 +144,7 @@ class KafkaProducer extends EventEmitter {
   }
 
   async close() {
+    if (this.disabled) return;
     if (!this.connected) return;
     try {
       await this.producer.disconnect();

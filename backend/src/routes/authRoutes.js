@@ -17,6 +17,7 @@ import { env } from "../config/env.js";
 import { verifyKeycloakToken } from "../middleware/keycloakVerifier.js";
 import { findUserByKeycloakSub, getMembershipsByUserId, getCatalogForTenantIds } from "../repositories/authRepository.js";
 import { provisionKeycloakUser } from "../services/provisionUser.js";
+import { loginToIvis, getIvisToken } from "../services/ivisAuth.js";
 
 const router = express.Router();
 
@@ -50,6 +51,12 @@ if (env.authMode !== "keycloak") {
       if (!session) {
         return res.status(401).json({ message: "invalid credentials" });
       }
+
+      // Fire IVIS login in background (non-blocking)
+      loginToIvis().catch((err) => {
+        console.error('[IVIS] Background login failed (non-fatal):', err.message);
+      });
+
       return res.json(session);
     })
   );
@@ -65,6 +72,12 @@ if (env.authMode !== "keycloak") {
       if (!refreshed) {
         return res.status(401).json({ message: "invalid refresh token" });
       }
+
+      // Proactively ensure IVIS token is still valid (non-blocking)
+      getIvisToken().catch((err) => {
+        console.error('[IVIS] Token refresh check failed (non-fatal):', err.message);
+      });
+
       return res.json(refreshed);
     })
   );
@@ -97,6 +110,11 @@ router.get("/bootstrap", asyncHandler(async (req, res) => {
     if (!user) {
       user = await provisionKeycloakUser(jwtPayload);
     }
+
+    // Fire IVIS login in background for Keycloak mode
+    loginToIvis().catch((err) => {
+      console.error('[IVIS] Background login failed (non-fatal):', err.message);
+    });
 
     const rawMemberships = await getMembershipsByUserId(user.pk_user_id);
     const memberships = rawMemberships.map((row) => ({
