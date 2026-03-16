@@ -4,9 +4,9 @@ import shutdownManager from "../core/managers/ShutdownManager.js";
 class WebSocketManager {
   initialized = false;
 
-  initialize(httpServer) {
+  async initialize(httpServer) {
     if (this.initialized) return;
-    socketServer.initialize(httpServer);
+    await socketServer.initialize(httpServer);
     this.initialized = true;
     shutdownManager.registerShutdownHandler("ws-manager", async () => this.shutdown());
   }

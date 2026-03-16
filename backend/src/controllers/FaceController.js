@@ -36,54 +36,99 @@ const FaceController = {
   async verifyFace(req, res) {
     const parsed = z.object({ embedding: z.array(z.number()) }).safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "invalid payload" });
-    const match = await faceDB.findMatch(parsed.data.embedding);
+    const match = await faceDB.findBestMatch(parsed.data.embedding);
     return res.json({ match });
   },
   async recognizeAndMark(req, res) {
-    const hasFile = Boolean(req.file && req.file.buffer);
-    let aiResult = null;
-    if (hasFile) {
-      aiResult = await edgeAIClient.recognizeImageBuffer(req.file.buffer, { source: 'api' });
-    } else {
-      const parsed = z.object({
-        embedding: z.array(z.number()).optional(),
-        imageUrl: z.string().optional(),
-        deviceId: z.string().optional(),
-        timestamp: z.string().optional(),
-      }).safeParse(req.body);
-      if (!parsed.success) return res.status(400).json({ message: "invalid payload" });
-      if (parsed.data.imageUrl) {
-        aiResult = await edgeAIClient.recognizeByUrl(parsed.data.imageUrl, { source: 'api' });
-      } else if (parsed.data.embedding) {
-        const match = await faceDB.findMatch(parsed.data.embedding);
-        if (!match) return res.status(404).json({ message: "no match" });
-        aiResult = { employeeId: match.metadata?.employeeId, confidence: match.similarity, faceId: match.faceId };
-      } else {
-        return res.status(400).json({ message: "image or embedding required" });
+    let embedding  = null;
+    let confidence = 0;
+    const deviceId  = req.body?.deviceId  || null;
+    const timestamp = req.body?.timestamp || null;
+
+    // ── PATH A: Embedding already in JSON body (sent by Jetson runner.py)
+    // FAST PATH — zero EdgeAI calls. Camera ran YOLO+ArcFace locally.
+    if (Array.isArray(req.body?.embedding) && req.body.embedding.length === 512) {
+      embedding  = req.body.embedding;
+      confidence = Number(req.body.confidence || 0);
+
+    // ── PATH B: Image URL (external webhooks, manual API tests)
+    } else if (req.body?.imageUrl) {
+      let ai;
+      try {
+        ai = await edgeAIClient.recognizeByUrl(req.body.imageUrl, { source: 'webhook' });
+      } catch (e) {
+        return res.status(503).json({ message: 'EdgeAI sidecar unavailable: ' + e.message });
       }
+      if (!ai?.embedding?.length) return res.status(404).json({ message: 'No face detected in image URL' });
+      embedding = ai.embedding; confidence = ai.confidence || 0;
+
+    // ── PATH C: File upload (HR admin test UI only)
+    // WARNING: camera service MUST NOT use this path — causes double inference.
+    } else if (req.file?.buffer) {
+      let ai;
+      try {
+        ai = await edgeAIClient.recognizeImageBuffer(req.file.buffer, { source: 'manual-upload' });
+      } catch (e) {
+        return res.status(503).json({ message: 'EdgeAI sidecar unavailable: ' + e.message });
+      }
+      if (!ai?.embedding?.length) return res.status(404).json({ message: 'No face detected in uploaded image' });
+      embedding = ai.embedding; confidence = ai.confidence || 0;
+
+    } else {
+      return res.status(400).json({
+        message: 'Provide embedding (512-element array), imageUrl (string), or image (multipart file)',
+      });
     }
 
-    const employeeId = aiResult?.employeeId;
-    if (!employeeId) return res.status(404).json({ message: "no employee identified" });
+    // ── DB MATCH: embedding → employee (same for all 3 paths)
+    const match = await faceDB.findBestMatch(embedding);
+    if (!match) {
+      // Publish unknown face event non-fatally
+      kafkaEventService.publishEvent({
+        type: 'UNKNOWN_FACE_DETECTED', deviceId, confidence,
+        timestamp: timestamp || new Date().toISOString(),
+      }).catch(() => {});
+      return res.status(404).json({ message: 'Face not recognised — employee not enrolled or similarity below threshold' });
+    }
 
+    const employeeId = match.metadata?.employeeId;
+    if (!employeeId) {
+      return res.status(404).json({ message: 'Face matched but employee mapping is missing — re-enroll this face' });
+    }
+
+    // ── MARK ATTENDANCE
     const record = await attendanceService.markAttendance({
       employeeId: String(employeeId),
-      deviceId: req.body?.deviceId,
-      timestamp: req.body?.timestamp,
+      deviceId,
+      timestamp,
       scope: {
-        tenantId: String(req.headers["x-tenant-id"] || req.auth?.scope?.tenantId || ""),
-        customerId: req.headers["x-customer-id"] ? String(req.headers["x-customer-id"]) : undefined,
-        siteId: req.headers["x-site-id"] ? String(req.headers["x-site-id"]) : undefined,
-        unitId: req.headers["x-unit-id"] ? String(req.headers["x-unit-id"]) : undefined,
+        tenantId:   String(req.headers['x-tenant-id']   || req.auth?.scope?.tenantId   || ''),
+        customerId: req.headers['x-customer-id'] ? String(req.headers['x-customer-id']) : undefined,
+        siteId:     req.headers['x-site-id']     ? String(req.headers['x-site-id'])     : undefined,
+        unitId:     req.headers['x-unit-id']     ? String(req.headers['x-unit-id'])     : undefined,
       },
     });
-    await kafkaEventService.publishEvent({
-      type: "FACE_RECOGNIZED",
+
+    // ── PUBLISH TO KAFKA (non-fatal)
+    kafkaEventService.publishEvent({
+      type: 'FACE_RECOGNIZED',
       employeeId,
-      confidence: aiResult?.confidence,
-      timestamp: new Date().toISOString(),
+      similarity:  match.similarity,
+      confidence,
+      deviceId,
+      timestamp:   new Date().toISOString(),
+    }).catch(() => {});
+
+    return res.json({
+      result: {
+        employeeId,
+        fullName:   match.metadata?.fullName,
+        similarity: match.similarity,
+        confidence,
+        faceId:     match.faceId,
+      },
+      record,
     });
-    return res.json({ result: aiResult, record });
   },
   async verifyMultipleFaces(req, res) {
     const parsed = z.object({ embeddings: z.array(z.array(z.number())) }).safeParse(req.body);
@@ -91,7 +136,7 @@ const FaceController = {
     const out = [];
     for (const e of parsed.data.embeddings) {
       // eslint-disable-next-line no-await-in-loop
-      const m = await faceDB.findMatch(e);
+      const m = await faceDB.findBestMatch(e);
       out.push(m);
     }
     return res.json({ results: out });
@@ -99,13 +144,13 @@ const FaceController = {
   async searchFaces(req, res) {
     const parsed = z.object({ embedding: z.array(z.number()) }).safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "invalid payload" });
-    const match = await faceDB.findMatch(parsed.data.embedding);
+    const match = await faceDB.findBestMatch(parsed.data.embedding);
     return res.json({ match });
   },
   async searchByEmbedding(req, res) {
     const parsed = z.object({ embedding: z.array(z.number()) }).safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "invalid payload" });
-    const match = await faceDB.findMatch(parsed.data.embedding);
+    const match = await faceDB.findBestMatch(parsed.data.embedding);
     return res.json({ match });
   },
   async uploadSnapshot(req, res) {

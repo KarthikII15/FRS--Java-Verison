@@ -27,6 +27,7 @@ import { mockAttendanceRecords, mockAIInsights } from '../../utils/mockData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { cn } from '../ui/utils';
 import { lightTheme } from '../../../theme/lightTheme';
+import { FaceEnrollButton } from './FaceEnrollButton';
 
 interface EmployeeProfileDashboardProps {
     employee: any;
@@ -138,6 +139,10 @@ export const EmployeeProfileDashboard: React.FC<EmployeeProfileDashboardProps> =
                     <TabsTrigger value="overview" className="rounded-lg px-6 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900/50 dark:data-[state=active]:text-blue-300">Overview</TabsTrigger>
                     <TabsTrigger value="attendance" className="rounded-lg px-6 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900/50 dark:data-[state=active]:text-blue-300">Attendance Log</TabsTrigger>
                     <TabsTrigger value="leaves" className="rounded-lg px-6 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900/50 dark:data-[state=active]:text-blue-300">Leave Management</TabsTrigger>
+                    <TabsTrigger value="biometrics" className="rounded-lg px-6 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 dark:data-[state=active]:bg-emerald-900/50 dark:data-[state=active]:text-emerald-300">
+                        <Camera className="w-3.5 h-3.5 mr-1.5" />
+                        Biometrics
+                    </TabsTrigger>
                     <TabsTrigger value="insights" className="rounded-lg px-6 data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900/50 dark:data-[state=active]:text-purple-300">
                         <Sparkles className="w-4 h-4 mr-2" />
                         AI Insights
@@ -424,6 +429,60 @@ export const EmployeeProfileDashboard: React.FC<EmployeeProfileDashboardProps> =
                             )}
                         </CardContent>
                     </Card>
+                </TabsContent>
+
+                <TabsContent value="biometrics" className="focus:outline-none">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2">
+                            <Card className={cn(lightTheme.background.card, lightTheme.border.default, "dark:bg-slate-900 dark:border-border")}>
+                                <CardHeader>
+                                    <CardTitle className="text-base">Face Enrollment</CardTitle>
+                                    <p className={cn("text-xs", lightTheme.text.muted)}>Register face biometric for camera attendance</p>
+                                </CardHeader>
+                                <CardContent>
+                                    <FaceEnrollButton
+                                        employeeId={String(employee.id)}
+                                        employeeName={employee.name}
+                                        enrolled={employee.faceEnrolled}
+                                        onEnrolled={() => { }}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <div className="lg:col-span-1">
+                            <Card className={cn(lightTheme.background.card, lightTheme.border.default, "dark:bg-slate-900 dark:border-border")}>
+                                <CardHeader>
+                                    <CardTitle className="text-base">Photo Requirements</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <ul className="space-y-2 text-sm">
+                                        {[
+                                            'Front-facing, eyes visible',
+                                            'Good, even lighting - no harsh shadows',
+                                            'Neutral expression preferred',
+                                            'No sunglasses or face coverings',
+                                            'Single person only - no group photos',
+                                            'Minimum 200x200 pixels, clear and in focus',
+                                        ].map((req) => (
+                                            <li key={req} className="flex items-start gap-2">
+                                                <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
+                                                <span className={cn(lightTheme.text.secondary, "dark:text-gray-300")}>{req}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-900/40 dark:text-amber-300 text-xs">
+                                        Re-enrollment is required if the employee changes appearance significantly (e.g. grows/removes beard, new glasses).
+                                        Poor quality photos will reduce recognition accuracy and may cause missed clock-ins.
+                                    </div>
+
+                                    <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-900/40 dark:text-blue-300 text-xs">
+                                        The face photo is processed by the on-device Jetson AI and only the mathematical embedding (not the photo itself) is stored in the database.
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="insights" className="focus:outline-none">

@@ -12,6 +12,7 @@ import {
 import { authProvider } from '../services/auth';
 import { tokenStorage } from '../services/auth/tokenStorage';
 import { authConfig } from '../config/authConfig';
+import { realtimeEngine } from '../engine/RealTimeEngine';
 
 interface AuthContextType {
   user: User | null;
@@ -104,6 +105,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setSites(bootstrap.catalog.sites);
         setUnits(bootstrap.catalog.units);
         applySession(bootstrap.session);
+        // Restore WebSocket connection for persisted sessions
+        if (bootstrap.session?.accessToken) {
+          realtimeEngine.connectSocket(
+            bootstrap.session.accessToken,
+            bootstrap.session.activeScope?.tenantId
+          );
+        }
       } catch {
         if (!isMounted) return;
         clearSession();
@@ -134,6 +142,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return false;
       }
       applySession(session);
+      // Connect WebSocket now that we have a token
+      if (session.accessToken) {
+        realtimeEngine.connectSocket(
+          session.accessToken,
+          session.activeScope?.tenantId
+        );
+      }
       return true;
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : "Login failed");
@@ -147,6 +162,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       await authProvider.logout(refreshToken);
     } finally {
+      realtimeEngine.disconnectSocket();
       clearSession();
       setAuthError(null);
     }

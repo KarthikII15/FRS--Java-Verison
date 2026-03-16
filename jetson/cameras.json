@@ -1,0 +1,37 @@
+{
+  "brand": "prama_hikvision",
+  "rtsp_port": 554,
+  "onvif_port": 80,
+  "notes": [
+    "Prama India = Prama Hikvision India Pvt Ltd.",
+    "RTSP format: rtsp://user:pass@IP:554/Streaming/Channels/XYZ",
+    "  X = channel number (1, 2, 3...)",
+    "  YZ = 01 for main stream, 02 for sub-stream",
+    "  Examples: 101=ch1-main, 102=ch1-sub, 201=ch2-main, 202=ch2-sub",
+    "Snapshot: http://user:pass@IP:80/ISAPI/Streaming/channels/101/picture",
+    "Use sub-stream (102) for live attendance — lower res, less CPU/bandwidth",
+    "Use main stream (101) for face enrollment — full resolution"
+  ],
+  "cameras": [
+    {
+      "id": "prama-entrance-01",
+      "name": "Main Entrance",
+      "model": "Prama IP Camera",
+      "ipAddress": "192.168.1.101",
+      "username": "admin",
+      "password": "YOUR_PASSWORD",
+      "channel": 1,
+      "rtspPort": 554,
+      "httpPort": 80,
+      "rtspUrl": "rtsp://admin:YOUR_PASSWORD@192.168.1.101:554/Streaming/Channels/102",
+      "rtspMainUrl": "rtsp://admin:YOUR_PASSWORD@192.168.1.101:554/Streaming/Channels/101",
+      "snapshotUrl": "http://admin:YOUR_PASSWORD@192.168.1.101:80/ISAPI/Streaming/channels/101/picture",
+      "onvifUrl": "http://192.168.1.101:80/onvif/device_service",
+      "fpsTarget": 5,
+      "resolution": "1280x720",
+      "streamType": "sub",
+      "role": "entry",
+      "enabled": true
+    }
+  ]
+}

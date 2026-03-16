@@ -13,6 +13,7 @@ import { dashboardRoutes } from "./routes/dashboardRoutes.js";
 import { searchRoutes } from "./routes/searchRoutes.js";
 import { faceRoutes } from "./routes/faceRoutes.js";
 import { reportRoutes } from "./routes/reportRoutes.js";
+import { cameraRoutes } from "./routes/cameraRoutes.js";
 import { pool } from "./db/pool.js";
 import { globalRateLimiter } from "./middleware/rateLimit.js";
 import { extractScope, validateScopeAccess } from "./middleware/scopeExtractor.js";
@@ -91,6 +92,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/face", faceRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/cameras", cameraRoutes);
 // Apply extractScope before auth to parse headers, then validate after auth
 app.use("/api/live", extractScope, liveRoutes);
 
@@ -225,7 +227,8 @@ async function startServer() {
       console.log(`📹 Video analytics service ready`);
     });
     try {
-      wsManager.initialize(server);
+      await wsManager.initialize(server);
+      console.log("✅ WebSocket initialized");
       attendanceService.setBroadcaster((event, payload) => {
         if (event === "attendance.marked" || event === "attendance.batchMarked") {
           wsManager.emitAttendanceUpdate(payload);

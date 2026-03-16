@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -8,6 +8,7 @@ import {
   UserPlus,
   UserMinus,
   Users,
+  ScanFace,
   TrendingUp,
   TrendingDown,
   Search,
@@ -16,9 +17,10 @@ import {
   UserX,
   Mail,
   Phone,
+  Copy,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { mockEmployees, mockWorkforceTrends, Employee, WorkforceTrend } from '../../data/enhancedMockData';
+import { mockEmployees, mockWorkforceTrends, Employee } from '../../data/enhancedMockData';
 import { cn } from '../ui/utils';
 import { lightTheme } from '../../../theme/lightTheme';
 import {
@@ -38,31 +40,82 @@ import {
 } from '../ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Line, ComposedChart } from 'recharts';
 import { EmployeeProfileDashboard } from './EmployeeProfileDashboard';
+import { FaceEnrollButton } from './FaceEnrollButton';
+import { useAuth } from '../../contexts/AuthContext';
+import { authConfig } from '../../config/authConfig';
+import { apiRequest } from '../../services/http/apiClient';
+
+type EmployeeWithEnrollment = Employee & {
+  faceEnrolled?: boolean;
+};
 
 export const EmployeeLifecycleManagement: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>(mockEmployees);
+  const { accessToken } = useAuth();
+  const [employees, setEmployees] = useState<EmployeeWithEnrollment[]>(
+    mockEmployees.map((e) => ({ ...e, faceEnrolled: false }))
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'Active' | 'On Leave' | 'Inactive'>('all');
+  const [filterEnrollment, setFilterEnrollment] = useState<'all' | 'enrolled' | 'not_enrolled'>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeWithEnrollment | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (authConfig.mode === 'mock') {
+      setEmployees(mockEmployees.map((e) => ({ ...e, faceEnrolled: false })));
+      return;
+    }
+    if (!accessToken) return;
+
+    let isMounted = true;
+    const fetchEmployees = async () => {
+      setIsLoading(true);
+      try {
+        const res = await apiRequest<{ data: any[] }>('/employees', { accessToken });
+        const mapped: EmployeeWithEnrollment[] = (res.data || []).map((e: any) => ({
+          ...e,
+          faceEnrolled: !!(e.faceEnrolled ?? e.face_enrolled),
+        }));
+        if (isMounted) {
+          setEmployees(mapped);
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to load employees';
+        toast.error('Employee fetch failed', { description: msg });
+        if (isMounted) {
+          setEmployees(mockEmployees.map((e) => ({ ...e, faceEnrolled: false })));
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+    fetchEmployees();
+    return () => {
+      isMounted = false;
+    };
+  }, [accessToken]);
 
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.department.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || emp.status === filterStatus;
-    return matchesSearch && matchesStatus;
+    const matchesEnrollment = filterEnrollment === 'all'
+      || (filterEnrollment === 'enrolled' && emp.faceEnrolled)
+      || (filterEnrollment === 'not_enrolled' && !emp.faceEnrolled);
+    return matchesSearch && matchesStatus && matchesEnrollment;
   });
 
   const activeCount = employees.filter(e => e.status === 'Active').length;
-  const onLeaveCount = employees.filter(e => e.status === 'On Leave').length;
-  const inactiveCount = employees.filter(e => e.status === 'Inactive').length;
+  const enrolledCount = employees.filter(e => e.faceEnrolled).length;
 
   // Calculate this month's stats
   const latestTrend = mockWorkforceTrends[mockWorkforceTrends.length - 1];
 
   const handleOnboard = (empData: Partial<Employee> & { lastName?: string }) => {
-    const newEmp: Employee = {
+    const newEmp: EmployeeWithEnrollment = {
       id: `EMP-${Math.floor(Math.random() * 10000)}`,
       employeeId: empData.employeeId || `EMP${Math.floor(Math.random() * 1000)}`,
       name: `${empData.name} ${empData.lastName || ''}`.trim() || 'New Employee',
@@ -73,7 +126,8 @@ export const EmployeeLifecycleManagement: React.FC = () => {
       status: 'Active',
       joinDate: empData.joinDate || new Date().toISOString().split('T')[0],
       phoneNumber: empData.phoneNumber || '',
-      profileImage: ''
+      profileImage: '',
+      faceEnrolled: false,
     };
 
     setEmployees(prev => [newEmp, ...prev]);
@@ -81,7 +135,7 @@ export const EmployeeLifecycleManagement: React.FC = () => {
     setIsAddDialogOpen(false);
   };
 
-  const handleEdit = (updatedEmp: Employee) => {
+  const handleEdit = (updatedEmp: EmployeeWithEnrollment) => {
     setEmployees(prev => prev.map(e => e.id === updatedEmp.id ? updatedEmp : e));
     toast.success("Employee Updated", { description: `${updatedEmp.name}'s profile has been updated.` });
   };
@@ -102,10 +156,81 @@ export const EmployeeLifecycleManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div>
+          <h3 className={cn("text-xl font-semibold", lightTheme.text.primary, "dark:text-white")}>Employee Lifecycle</h3>
+          <p className={cn("text-sm mt-1", lightTheme.text.secondary, "dark:text-gray-400")}>
+            Manage onboarding, status, and biometric readiness
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <ScanFace className="w-4 h-4 mr-2 text-emerald-500" />
+                Bulk Enroll
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[560px]">
+              <DialogHeader>
+                <DialogTitle>Bulk Face Enrollment</DialogTitle>
+                <DialogDescription>
+                  Enroll multiple employees at once by uploading a folder of photos named after their employee IDs.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3">
+                <pre className="text-xs p-3 rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-900 dark:border-border overflow-x-auto">
+AUTH_TOKEN=&lt;your-token&gt; node backend/scripts/bulk_enroll.js /path/to/photos
+                </pre>
+                <p className={cn("text-xs", lightTheme.text.muted)}>
+                  Photos must be named: <span className="font-mono">EMP001.jpg</span> or <span className="font-mono">42.jpg</span>
+                </p>
+                <p className={cn("text-xs", lightTheme.text.muted)}>
+                  The script processes up to 3 employees in parallel and outputs a CSV results file.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const cmd = 'AUTH_TOKEN=<your-token> node backend/scripts/bulk_enroll.js /path/to/photos';
+                      navigator.clipboard.writeText(cmd);
+                      toast.success('Command copied');
+                    }}
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy Command
+                  </Button>
+                  <Button onClick={() => setIsBulkDialogOpen(false)} className="ml-auto">
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Employee
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[550px]">
+              <DialogHeader>
+                <DialogTitle>Add Employee</DialogTitle>
+                <DialogDescription>
+                  Create a new employee profile for onboarding
+                </DialogDescription>
+              </DialogHeader>
+              <AddEmployeeForm onClose={() => setIsAddDialogOpen(false)} onAdd={handleOnboard} />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className={cn(lightTheme.background.card, lightTheme.border.default, "dark:bg-slate-900 dark:border-border")}>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -165,6 +290,24 @@ export const EmployeeLifecycleManagement: React.FC = () => {
               </div>
               <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
                 <UserMinus className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={cn(lightTheme.background.card, lightTheme.border.default, "dark:bg-slate-900 dark:border-border")}>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={cn("text-sm", lightTheme.text.secondary, "dark:text-gray-400")}>Face Enrolled</p>
+                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{enrolledCount}</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <ScanFace className="w-3 h-3 text-emerald-600" />
+                  <span className={cn("text-xs font-medium", lightTheme.status.success)}>Camera-ready</span>
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center">
+                <ScanFace className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
           </CardContent>
@@ -243,6 +386,16 @@ export const EmployeeLifecycleManagement: React.FC = () => {
                 <SelectItem value="Inactive">Inactive</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={filterEnrollment} onValueChange={(val: any) => setFilterEnrollment(val)}>
+              <SelectTrigger className="w-full lg:w-[180px]">
+                <SelectValue placeholder="Enrollment status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Enrollment</SelectItem>
+                <SelectItem value="enrolled">Enrolled</SelectItem>
+                <SelectItem value="not_enrolled">Not Enrolled</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -254,7 +407,17 @@ export const EmployeeLifecycleManagement: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {filteredEmployees.map((employee) => (
+            {isLoading && (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className={cn("p-4 rounded-lg animate-pulse", lightTheme.background.secondary, "dark:bg-gray-800/50")}>
+                    <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+                    <div className="h-3 w-64 bg-gray-200 dark:bg-gray-700 rounded" />
+                  </div>
+                ))}
+              </div>
+            )}
+            {!isLoading && filteredEmployees.map((employee) => (
               <EmployeeCard
                 key={employee.id}
                 employee={employee}
@@ -264,7 +427,7 @@ export const EmployeeLifecycleManagement: React.FC = () => {
               />
             ))}
 
-            {filteredEmployees.length === 0 && (
+            {!isLoading && filteredEmployees.length === 0 && (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No employees found</p>
@@ -278,8 +441,8 @@ export const EmployeeLifecycleManagement: React.FC = () => {
 };
 
 const EmployeeCard: React.FC<{
-  employee: Employee;
-  onEdit: (e: Employee) => void;
+  employee: EmployeeWithEnrollment;
+  onEdit: (e: EmployeeWithEnrollment) => void;
   onOffboard: (id: string, name: string) => void;
   onClick: () => void;
 }> = ({ employee, onEdit, onOffboard, onClick }) => {
@@ -314,6 +477,12 @@ const EmployeeCard: React.FC<{
             <Badge className={`${getStatusColor(employee.status)} text-xs`}>
               {employee.status}
             </Badge>
+            <FaceEnrollButton
+              employeeId={String(employee.id)}
+              employeeName={employee.name}
+              enrolled={employee.faceEnrolled ?? false}
+              compact
+            />
           </div>
 
           <div className={cn("flex items-center gap-4 mt-1 text-sm flex-wrap", lightTheme.text.secondary, "dark:text-gray-300")}>

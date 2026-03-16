@@ -93,47 +93,42 @@ class ModelManager extends EventEmitter {
   }
 
   async _loadModelInternal(modelId, config) {
-    // This is where you'd implement actual OpenVINO model loading
-    // For now, we'll create a mock implementation
-    
-    // Check if model files exist
-    const modelXmlPath = path.join(config.path, `${modelId}.xml`);
-    const modelBinPath = path.join(config.path, `${modelId}.bin`);
-    
+    // Delegate to the EdgeAI Python sidecar running on Jetson (or localhost for dev).
+    // The sidecar owns model loading — ModelManager just needs to verify it is alive
+    // and hand back a wrapper whose .infer() method proxies through the sidecar HTTP API.
+    const edgeAIClient = (await import('../clients/EdgeAIClient.js')).default;
+
     try {
-      await fs.access(modelXmlPath);
-      await fs.access(modelBinPath);
-    } catch (error) {
-      throw new Error(`Model files not found for ${modelId}: ${error.message}`);
+      const response = await edgeAIClient.http.get('/health');
+      if (response.data?.status !== 'ok') {
+        throw new Error(`EdgeAI sidecar returned unhealthy status: ${JSON.stringify(response.data)}`);
+      }
+      console.log(`[ModelManager] EdgeAI sidecar healthy — model "${modelId}" delegated.`);
+    } catch (e) {
+      // Non-fatal during local dev — Jetson may not be connected yet.
+      // Operations that send embeddings directly (Path A) will still work.
+      console.warn(`[ModelManager] EdgeAI sidecar unreachable for model "${modelId}": ${e.message}`);
+      console.warn(`[ModelManager] Image-upload inference (Path B/C) will fail until sidecar is running.`);
     }
 
-    // Mock model object - replace with actual OpenVINO implementation
-    const model = {
-      id: modelId,
-      path: config.path,
-      inputShape: config.inputShape || [1, 3, 640, 640],
-      outputLayers: config.outputLayers || [],
-      device: this.device,
-      // Mock inference function
-      async infer(input) {
-        // This will be replaced with actual OpenVINO inference
-        return {
-          detections: [],
-          inferenceTime: 0
-        };
+    return {
+      id:          modelId,
+      device:      'TENSORRT',
+      loaded:      true,
+      config:      config,
+      async infer(inputBuffer) {
+        // Re-import to always use the live instance (handles hot-reload scenarios)
+        const { default: client } = await import('../clients/EdgeAIClient.js');
+        if (Buffer.isBuffer(inputBuffer) || inputBuffer instanceof Uint8Array) {
+          return client.recognizeImageBuffer(Buffer.from(inputBuffer), { modelId });
+        }
+        // embedding array passed directly — nothing to infer, just return it
+        return { embedding: inputBuffer, detections: [], inferenceTime: 0 };
       },
-      // Mock warmup
       async warmup() {
-        console.log(`[ModelManager] Warming up model: ${modelId}`);
-        // Perform dummy inference to warm up
-        return true;
-      }
+        return true; // warmup is handled by the sidecar on its own startup
+      },
     };
-
-    // Warm up the model
-    await model.warmup();
-
-    return model;
   }
 
   // Get loaded model
@@ -179,7 +174,7 @@ class ModelManager extends EventEmitter {
 
   // Set inference device
   setDevice(device) {
-    const validDevices = ['CPU', 'GPU', 'MYRIAD', 'FPGA'];
+    const validDevices = ['CPU', 'GPU', 'MYRIAD', 'FPGA', 'CUDA', 'TENSORRT'];
     if (!validDevices.includes(device)) {
       throw new Error(`Invalid device: ${device}`);
     }

@@ -1,4 +1,18 @@
 {
-  "models": []
+  "face_detection": {
+    "path": "/opt/frs-models/trt",
+    "filename": "yolov8n-face-fp16.engine",
+    "inputShape": [1, 3, 640, 640],
+    "confThreshold": 0.5,
+    "nmsThreshold": 0.4,
+    "type": "tensorrt"
+  },
+  "face_embedding": {
+    "path": "/opt/frs-models/trt",
+    "filename": "arcface-r50-fp16.engine",
+    "inputShape": [1, 3, 112, 112],
+    "embeddingDim": 512,
+    "type": "tensorrt"
+  }
 }
 

@@ -5,6 +5,8 @@ import { validateBody } from '../validators/schemas.js';
 import { baseEventSchema, heartbeatSchema, batchEventsSchema } from '../validators/deviceEventSchemas.js';
 import { createDeviceEvent } from '../repositories/eventRepository.js';
 import { findDeviceById, updateDeviceHeartbeat } from '../repositories/deviceRepository.js';
+import kafkaEventService from '../core/kafka/KafkaEventService.js';
+import { pool } from '../db/pool.js';
 
 const router = express.Router();
 
@@ -47,19 +49,23 @@ router.post(
       frameUrl: eventData.frameData?.imageUrl
     });
     
-    // TODO: Publish to Kafka for processing (Week 2)
-    // try {
-    //   await publishDeviceEvent({
-    //     eventId: dbEvent.pk_event_id,
-    //     deviceId,
-    //     siteId: req.device.siteId,
-    //     eventType: eventData.eventType,
-    //     timestamp: eventData.timestamp,
-    //     payload: eventData
-    //   });
-    // } catch (err) {
-    //   console.error('[DeviceRoutes] Failed to publish to Kafka:', err);
-    // }
+    // Publish device event to Kafka for async processing pipeline
+    try {
+      await kafkaEventService.publishEvent({
+        type:       'DEVICE_EVENT',
+        eventId:    dbEvent.pk_event_id,
+        deviceId,
+        siteId:     req.device.siteId,
+        eventType:  eventData.eventType,
+        timestamp:  eventData.timestamp,
+        embedding:  eventData.faceData?.embedding,
+        confidence: eventData.faceData?.confidence,
+        frameUrl:   eventData.frameData?.imageUrl,
+      });
+    } catch (kafkaErr) {
+      // Non-fatal: event is already stored in DB
+      console.error('[DeviceRoutes] Kafka publish failed:', kafkaErr.message);
+    }
     
     res.status(201).json({
       success: true,
@@ -184,6 +190,38 @@ router.get(
     // TODO: Get active employees for this site (Week 2)
     // const siteEmployees = await getSiteEmployeesForDeviceSync(device.fk_site_id);
     
+    // Fetch active employees with face embeddings.
+    // Site filtering is best-effort because device/site IDs can come from
+    // different schemas (UUID in devices vs bigint in hr_employee.site_id).
+    let employees = [];
+    try {
+      const siteId = device.fk_site_id ?? req.device?.siteId ?? null;
+      const sql = `
+        SELECT
+          e.pk_employee_id    AS employee_id,
+          e.full_name,
+          e.employee_code,
+          efe.embedding::text AS embedding_str
+        FROM employee_face_embeddings efe
+        JOIN hr_employee e ON e.pk_employee_id = efe.employee_id
+        WHERE e.status = 'active'
+          ${siteId ? 'AND CAST(e.site_id AS text) = $1' : ''}
+        ORDER BY efe.enrolled_at DESC
+      `;
+      const params = siteId ? [String(siteId)] : [];
+      const { rows } = await pool.query(sql, params);
+      employees = rows.map(r => ({
+        employeeId:   String(r.employee_id),
+        fullName:     r.full_name,
+        employeeCode: r.employee_code,
+        embedding:    r.embedding_str
+          ? r.embedding_str.slice(1, -1).split(',').map(Number)
+          : [],
+      }));
+    } catch (e) {
+      console.error('[DeviceRoutes] Employee sync query failed:', e.message);
+    }
+
     res.json({
       device: {
         id: device.pk_device_id,
@@ -193,9 +231,9 @@ router.get(
       },
       config: device.config_json,
       employeeSync: {
-        lastUpdated: new Date().toISOString(),
-        employeeCount: 0, // TODO: Populate from site employees
-        employees: [] // TODO: Populate face embeddings
+        lastUpdated:   new Date().toISOString(),
+        employeeCount: employees.length,
+        employees,
       }
     });
   })

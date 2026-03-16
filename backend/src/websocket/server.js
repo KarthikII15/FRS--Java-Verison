@@ -5,20 +5,22 @@ class SocketServer {
   connections = new Map();
   tenantRooms = new Map();
 
-  initialize(httpServer) {
-    let ServerCtor = null;
-    try {
-      // Lazy require to avoid crashing if socket.io isn't installed yet.
-      // eslint-disable-next-line global-require
-      ServerCtor = require("socket.io").Server;
-    } catch {
-      throw new Error("socket.io is not installed. Please add it to dependencies to enable WebSocket server.");
-    }
-    this.io = new ServerCtor(httpServer, {
-      cors: { origin: "*", methods: ["GET", "POST"] },
+  async initialize(httpServer) {
+    // Dynamic import works correctly in ESM (require() does not)
+    const { Server } = await import("socket.io");
+
+    this.io = new Server(httpServer, {
+      cors: {
+        origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+        methods: ["GET", "POST"],
+        credentials: true,
+      },
+      pingTimeout: 60000,
+      pingInterval: 25000,
     });
 
     this.io.use((socket, next) => {
+      // Optional: validate socket auth token here in future
       next();
     });
 
