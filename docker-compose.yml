@@ -53,6 +53,7 @@ services:
       NODE_ENV: development
       PORT: 8080
       CLIENT_ORIGIN: http://localhost:5173
+      PUBLIC_BASE_URL: http://localhost:8080
       API_GATEWAY: http://ivis-cloud-gateway
       EDGE_AI_SERVICE: ivis-scanalitix-edge-ai
       RTSP_SERVICE: ivis-rtsp-service
@@ -87,7 +88,7 @@ services:
     container_name: attendance-frontend
     environment:
       VITE_AUTH_MODE: api
-      VITE_API_BASE_URL: http://localhost:8080/api
+      VITE_API_BASE_URL: http://backend:8080/api
       VITE_KEYCLOAK_URL: http://localhost:9090
       VITE_KEYCLOAK_REALM: attendance
       VITE_KEYCLOAK_CLIENT_ID: attendance-frontend
