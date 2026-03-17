@@ -1,6 +1,6 @@
 create table if not exists hr_department (
   pk_department_id bigserial primary key,
-  tenant_id bigint not null references ivis_tenant(pk_tenant_id),
+  tenant_id bigint not null references frs_tenant(pk_tenant_id),
   name varchar(150) not null,
   code varchar(30) not null,
   color varchar(20),
@@ -9,7 +9,7 @@ create table if not exists hr_department (
 
 create table if not exists hr_shift (
   pk_shift_id bigserial primary key,
-  tenant_id bigint not null references ivis_tenant(pk_tenant_id),
+  tenant_id bigint not null references frs_tenant(pk_tenant_id),
   name varchar(120) not null,
   shift_type varchar(30) not null check (shift_type in ('morning', 'evening', 'night', 'flexible')),
   start_time time,
@@ -20,10 +20,10 @@ create table if not exists hr_shift (
 
 create table if not exists hr_employee (
   pk_employee_id bigserial primary key,
-  tenant_id bigint not null references ivis_tenant(pk_tenant_id),
-  customer_id bigint references ivis_customer(pk_customer_id),
-  site_id bigint references ivis_site(pk_site_id),
-  unit_id bigint references ivis_unit(pk_unit_id),
+  tenant_id bigint not null references frs_tenant(pk_tenant_id),
+  customer_id bigint references frs_customer(pk_customer_id),
+  site_id bigint references frs_site(pk_site_id),
+  unit_id bigint references frs_unit(pk_unit_id),
   fk_department_id bigint references hr_department(pk_department_id),
   fk_shift_id bigint references hr_shift(pk_shift_id),
   employee_code varchar(40) not null,
@@ -41,10 +41,10 @@ create table if not exists hr_employee (
 
 create table if not exists attendance_record (
   pk_attendance_id bigserial primary key,
-  tenant_id bigint not null references ivis_tenant(pk_tenant_id),
-  customer_id bigint references ivis_customer(pk_customer_id),
-  site_id bigint references ivis_site(pk_site_id),
-  unit_id bigint references ivis_unit(pk_unit_id),
+  tenant_id bigint not null references frs_tenant(pk_tenant_id),
+  customer_id bigint references frs_customer(pk_customer_id),
+  site_id bigint references frs_site(pk_site_id),
+  unit_id bigint references frs_unit(pk_unit_id),
   fk_employee_id bigint not null references hr_employee(pk_employee_id),
   attendance_date date not null,
   check_in timestamptz,
@@ -66,10 +66,10 @@ create table if not exists attendance_record (
 
 create table if not exists facility_device (
   pk_device_id bigserial primary key,
-  tenant_id bigint not null references ivis_tenant(pk_tenant_id),
-  customer_id bigint references ivis_customer(pk_customer_id),
-  site_id bigint references ivis_site(pk_site_id),
-  unit_id bigint references ivis_unit(pk_unit_id),
+  tenant_id bigint not null references frs_tenant(pk_tenant_id),
+  customer_id bigint references frs_customer(pk_customer_id),
+  site_id bigint references frs_site(pk_site_id),
+  unit_id bigint references frs_unit(pk_unit_id),
   external_device_id varchar(80) not null,
   name varchar(200) not null,
   location_label varchar(200) not null,
@@ -85,10 +85,10 @@ create table if not exists facility_device (
 
 create table if not exists system_alert (
   pk_alert_id bigserial primary key,
-  tenant_id bigint not null references ivis_tenant(pk_tenant_id),
-  customer_id bigint references ivis_customer(pk_customer_id),
-  site_id bigint references ivis_site(pk_site_id),
-  unit_id bigint references ivis_unit(pk_unit_id),
+  tenant_id bigint not null references frs_tenant(pk_tenant_id),
+  customer_id bigint references frs_customer(pk_customer_id),
+  site_id bigint references frs_site(pk_site_id),
+  unit_id bigint references frs_unit(pk_unit_id),
   alert_type varchar(80) not null,
   severity varchar(20) not null check (severity in ('low', 'medium', 'high', 'critical')),
   title varchar(220),
@@ -101,11 +101,11 @@ create table if not exists system_alert (
 
 create table if not exists audit_log (
   pk_audit_id bigserial primary key,
-  tenant_id bigint not null references ivis_tenant(pk_tenant_id),
-  customer_id bigint references ivis_customer(pk_customer_id),
-  site_id bigint references ivis_site(pk_site_id),
-  unit_id bigint references ivis_unit(pk_unit_id),
-  fk_user_id bigint references ivis_user(pk_user_id),
+  tenant_id bigint not null references frs_tenant(pk_tenant_id),
+  customer_id bigint references frs_customer(pk_customer_id),
+  site_id bigint references frs_site(pk_site_id),
+  unit_id bigint references frs_unit(pk_unit_id),
+  fk_user_id bigint references frs_user(pk_user_id),
   action varchar(120) not null,
   details text not null,
   ip_address varchar(64),

@@ -19,7 +19,7 @@ This plan replaces the current custom authentication/session-token stack with Ke
 
 ### Migration Principle
 - **Authentication** moves to Keycloak.
-- **Authorization and scope** remain app-driven from `ivis_user_membership` in Phase 1.
+- **Authorization and scope** remain app-driven from `frs_user_membership` in Phase 1.
 
 ---
 
@@ -39,9 +39,9 @@ This plan replaces the current custom authentication/session-token stack with Ke
 - `src/app/config/authConfig.ts` (`mock|api` modes)
 
 ### Current schema constraints that matter
-- `ivis_user` requires: `fk_user_type_id`, `role in ('admin','hr')`, `password_hash`, `created_at`
-- `ivis_user` does **not** currently have `updated_at`
-- `ivis_user_membership` remains authorization source in this plan
+- `frs_user` requires: `fk_user_type_id`, `role in ('admin','hr')`, `password_hash`, `created_at`
+- `frs_user` does **not** currently have `updated_at`
+- `frs_user_membership` remains authorization source in this plan
 
 ---
 
@@ -55,7 +55,7 @@ This plan replaces the current custom authentication/session-token stack with Ke
 - Backend validates JWT access tokens via JWKS.
 
 ### Authorization model (preserved)
-- Keep `ivis_user_membership` + scope hierarchy checks in API.
+- Keep `frs_user_membership` + scope hierarchy checks in API.
 - Keep `requirePermission(...)` semantics unchanged.
 - Keep scope header behavior (`x-tenant-id`, `x-customer-id`, `x-site-id`, `x-unit-id`).
 
@@ -85,13 +85,13 @@ Deliverable: valid token issuance from Keycloak in each environment.
 Create migration `backend/src/db/migrations/00X_add_keycloak_identity.sql`:
 
 ```sql
-ALTER TABLE ivis_user
+ALTER TABLE frs_user
   ADD COLUMN IF NOT EXISTS keycloak_sub VARCHAR(64) UNIQUE,
   ADD COLUMN IF NOT EXISTS auth_provider VARCHAR(20) NOT NULL DEFAULT 'internal'
     CHECK (auth_provider IN ('internal', 'keycloak', 'federated')),
   ADD COLUMN IF NOT EXISTS last_identity_sync_at TIMESTAMPTZ;
 
-CREATE INDEX IF NOT EXISTS idx_ivis_user_keycloak_sub ON ivis_user(keycloak_sub);
+CREATE INDEX IF NOT EXISTS idx_frs_user_keycloak_sub ON frs_user(keycloak_sub);
 ```
 
 Notes:
@@ -133,7 +133,7 @@ Responsibilities:
 New file: `backend/src/services/identityMappingService.js`
 
 Mapping flow:
-1. Find by `ivis_user.keycloak_sub = token.sub`.
+1. Find by `frs_user.keycloak_sub = token.sub`.
 2. If not found, link by email (controlled one-time link).
 3. If email not found, reject by default (no auto-provision in phase 1).
 

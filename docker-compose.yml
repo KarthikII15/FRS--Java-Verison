@@ -54,11 +54,7 @@ services:
       PORT: 8080
       CLIENT_ORIGIN: http://localhost:5173
       PUBLIC_BASE_URL: http://localhost:8080
-      API_GATEWAY: http://ivis-cloud-gateway
-      EDGE_AI_SERVICE: ivis-scanalitix-edge-ai
-      RTSP_SERVICE: ivis-rtsp-service
-      CUSTOMER_SERVICE: ivis-customer-sitemgmt
-      OPERATIONS_SERVICE: ivis-scanalitix-operations-service
+      EDGE_AI_URL: http://host.docker.internal:5000
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: attendance_intelligence

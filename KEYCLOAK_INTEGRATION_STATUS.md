@@ -149,7 +149,7 @@ VITE_KEYCLOAK_CLIENT_ID=attendance-frontend
 6. Frontend calls GET /api/auth/bootstrap with JWT
 7. Backend verifies JWT signature via JWKS
 8. User looked up by keycloak_sub or auto-provisioned
-9. Memberships loaded from ivis_user_membership
+9. Memberships loaded from frs_user_membership
 10. Session established with permissions
 ```
 

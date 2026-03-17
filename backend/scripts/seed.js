@@ -27,52 +27,52 @@ const HR_PERMISSIONS = [
 
 async function getOrCreateTenant() {
   const inserted = await pool.query(
-    `insert into ivis_tenant(tenant_name)
+    `insert into frs_tenant(tenant_name)
      values ('Motivity Global')
      on conflict do nothing
      returning pk_tenant_id`
   );
   if (inserted.rows[0]) return inserted.rows[0].pk_tenant_id;
-  const existing = await pool.query("select pk_tenant_id from ivis_tenant where tenant_name='Motivity Global' limit 1");
+  const existing = await pool.query("select pk_tenant_id from frs_tenant where tenant_name='Motivity Global' limit 1");
   return existing.rows[0].pk_tenant_id;
 }
 
 async function getOrCreateCustomer(tenantId) {
   const inserted = await pool.query(
-    `insert into ivis_customer(customer_name, fk_tenant_id)
+    `insert into frs_customer(customer_name, fk_tenant_id)
      values ('North America Ops', $1)
      on conflict do nothing
      returning pk_customer_id`,
     [tenantId]
   );
   if (inserted.rows[0]) return inserted.rows[0].pk_customer_id;
-  const existing = await pool.query("select pk_customer_id from ivis_customer where customer_name='North America Ops' limit 1");
+  const existing = await pool.query("select pk_customer_id from frs_customer where customer_name='North America Ops' limit 1");
   return existing.rows[0].pk_customer_id;
 }
 
 async function getOrCreateSite(customerId) {
   const inserted = await pool.query(
-    `insert into ivis_site(site_name, fk_customer_id)
+    `insert into frs_site(site_name, fk_customer_id)
      values ('Dallas Campus', $1)
      on conflict do nothing
      returning pk_site_id`,
     [customerId]
   );
   if (inserted.rows[0]) return inserted.rows[0].pk_site_id;
-  const existing = await pool.query("select pk_site_id from ivis_site where site_name='Dallas Campus' limit 1");
+  const existing = await pool.query("select pk_site_id from frs_site where site_name='Dallas Campus' limit 1");
   return existing.rows[0].pk_site_id;
 }
 
 async function getOrCreateUnit(siteId) {
   const inserted = await pool.query(
-    `insert into ivis_unit(unit_name, fk_site_id)
+    `insert into frs_unit(unit_name, fk_site_id)
      values ('HR Operations', $1)
      on conflict do nothing
      returning pk_unit_id`,
     [siteId]
   );
   if (inserted.rows[0]) return inserted.rows[0].pk_unit_id;
-  const existing = await pool.query("select pk_unit_id from ivis_unit where unit_name='HR Operations' limit 1");
+  const existing = await pool.query("select pk_unit_id from frs_unit where unit_name='HR Operations' limit 1");
   return existing.rows[0].pk_unit_id;
 }
 
@@ -88,7 +88,7 @@ async function run() {
     const unitId = await getOrCreateUnit(siteId);
 
     const adminUser = await pool.query(
-      `insert into ivis_user(email, username, fk_user_type_id, role, password_hash, department)
+      `insert into frs_user(email, username, fk_user_type_id, role, password_hash, department)
        values ('admin@company.com', 'Admin User', 1, 'admin', $1, 'IT')
        on conflict (email) do update set password_hash = excluded.password_hash
        returning pk_user_id`,
@@ -96,7 +96,7 @@ async function run() {
     );
 
     const hrUser = await pool.query(
-      `insert into ivis_user(email, username, fk_user_type_id, role, password_hash, department)
+      `insert into frs_user(email, username, fk_user_type_id, role, password_hash, department)
        values ('hr@company.com', 'HR Manager', 2, 'hr', $1, 'Human Resources')
        on conflict (email) do update set password_hash = excluded.password_hash
        returning pk_user_id`,
@@ -107,26 +107,26 @@ async function run() {
     const hrUserId = hrUser.rows[0].pk_user_id;
 
     await pool.query(
-      `insert into ivis_tenant_user_map(fk_user_id, fk_tenant_id)
+      `insert into frs_tenant_user_map(fk_user_id, fk_tenant_id)
        values ($1, $2), ($3, $2)
        on conflict do nothing`,
       [adminUserId, tenantId, hrUserId]
     );
 
     await pool.query(
-      `insert into ivis_customer_user_map(fk_user_id, fk_customer_id)
+      `insert into frs_customer_user_map(fk_user_id, fk_customer_id)
        values ($1, $2), ($3, $2)
        on conflict do nothing`,
       [adminUserId, customerId, hrUserId]
     );
 
     await pool.query(
-      "delete from ivis_user_membership where fk_user_id = any($1::bigint[])",
+      "delete from frs_user_membership where fk_user_id = any($1::bigint[])",
       [[adminUserId, hrUserId]]
     );
 
     await pool.query(
-      `insert into ivis_user_membership(fk_user_id, role, tenant_id, customer_id, site_id, unit_id, permissions)
+      `insert into frs_user_membership(fk_user_id, role, tenant_id, customer_id, site_id, unit_id, permissions)
        values
          ($1, 'admin', $2, $3, $4, null, $5::text[]),
          ($6, 'hr', $2, $3, $4, $7, $8::text[])`,

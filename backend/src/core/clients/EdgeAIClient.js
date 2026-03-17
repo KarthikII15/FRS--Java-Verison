@@ -1,10 +1,13 @@
+import axios from 'axios';
 import FormData from 'form-data';
-import { createGatewayClient } from './GatewayHttp.js';
 import { env } from '../../config/env.js';
 
 class EdgeAIClient {
   constructor() {
-    this.http = createGatewayClient(env.services.edgeAIService || 'ivis-scanalitix-edge-ai');
+    this.http = axios.create({
+      baseURL: env.edgeAI.baseUrl,
+      timeout: env.http.timeoutMs || 15000,
+    });
   }
 
   async recognizeImageBuffer(buffer, metadata = {}) {

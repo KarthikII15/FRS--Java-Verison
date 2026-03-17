@@ -10,7 +10,7 @@ export async function findUserByEmail(email) {
       department,
       created_at,
       password_hash
-     from ivis_user
+     from frs_user
      where email = $1
      limit 1`,
     [email]
@@ -27,7 +27,7 @@ export async function findUserByKeycloakSub(keycloakSub) {
       role,
       department,
       created_at
-     from ivis_user
+     from frs_user
      where keycloak_sub = $1
      limit 1`,
     [keycloakSub]
@@ -47,7 +47,7 @@ export async function findUserByAccessToken(accessToken) {
       u.department,
       u.created_at
      from auth_session_token t
-     join ivis_user u on u.pk_user_id = t.fk_user_id
+     join frs_user u on u.pk_user_id = t.fk_user_id
      where t.access_token = $1
        and t.revoked = false
        and t.access_expires_at > now()
@@ -139,7 +139,7 @@ export async function getMembershipsByUserId(userId) {
       site_id,
       unit_id,
       permissions
-     from ivis_user_membership
+     from frs_user_membership
      where fk_user_id = $1
      order by pk_membership_id`,
     [userId]
@@ -154,14 +154,14 @@ export async function getCatalogForTenantIds(tenantIds) {
 
   const tenants = await query(
     `select pk_tenant_id, tenant_name
-     from ivis_tenant
+     from frs_tenant
      where pk_tenant_id = any($1::bigint[])`,
     [tenantIds]
   );
 
   const customers = await query(
     `select pk_customer_id, customer_name, fk_tenant_id
-     from ivis_customer
+     from frs_customer
      where fk_tenant_id = any($1::bigint[])`,
     [tenantIds]
   );
@@ -170,7 +170,7 @@ export async function getCatalogForTenantIds(tenantIds) {
   const sites = customerIds.length
     ? await query(
       `select pk_site_id, site_name, fk_customer_id
-         from ivis_site
+         from frs_site
          where fk_customer_id = any($1::bigint[])`,
       [customerIds]
     )
@@ -180,7 +180,7 @@ export async function getCatalogForTenantIds(tenantIds) {
   const units = siteIds.length
     ? await query(
       `select pk_unit_id, unit_name, fk_site_id
-         from ivis_unit
+         from frs_unit
          where fk_site_id = any($1::bigint[])`,
       [siteIds]
     )

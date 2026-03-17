@@ -4,7 +4,7 @@ This project is already designed and implemented to use **PostgreSQL** as its pr
 
 ### Why PostgreSQL
 
-- **Relational domain model**: The schema uses multiple related tables (`ivis_user`, `ivis_tenant`, `ivis_customer`, `ivis_site`, `ivis_unit`, `attendance_record`, `facility_device`, etc.) with foreign keys, which fits a relational database.
+- **Relational domain model**: The schema uses multiple related tables (`frs_user`, `frs_tenant`, `frs_customer`, `frs_site`, `frs_unit`, `attendance_record`, `facility_device`, etc.) with foreign keys, which fits a relational database.
 - **Advanced SQL features**: The migrations enable extensions such as `pgcrypto` and `pgvector`, which are first‑class in PostgreSQL and useful for analytics/AI‑driven use cases.
 - **Strong consistency & constraints**: The design relies on unique constraints, `CHECK` constraints, and transactional seeding, which are well supported in PostgreSQL.
 - **Scalability & maturity**: PostgreSQL scales well for analytical and transactional workloads and is widely supported in cloud environments.

@@ -2,7 +2,6 @@ import { query } from "../../db/pool.js";
 import * as eventRepo from "../../repositories/eventRepository.js";
 import * as liveRepo from "../../repositories/liveRepository.js";
 import { env } from "../../config/env.js";
-import operationsServiceClient from "../../core/clients/OperationsServiceClient.js";
 
 /**
  * AttendanceService
@@ -28,43 +27,30 @@ class AttendanceService {
   async markAttendance(payload) {
     const ts = payload.timestamp || new Date().toISOString();
     const status = payload.status || "present";
-    const body = {
-      employeeId: String(payload.employeeId),
-      deviceId: payload.deviceId,
-      timestamp: ts,
+    const sql = `
+      insert into attendance_record(
+        tenant_id, customer_id, site_id, unit_id,
+        fk_employee_id, attendance_date, check_in, status, location_label
+      ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      on conflict (tenant_id, fk_employee_id, attendance_date)
+      do update set check_in = coalesce(attendance_record.check_in, excluded.check_in),
+                    status = excluded.status
+      returning *`;
+    const params = [
+      payload.scope.tenantId,
+      payload.scope.customerId || null,
+      payload.scope.siteId || null,
+      payload.scope.unitId || null,
+      Number(payload.employeeId),
+      ts.slice(0, 10),
+      ts,
       status,
-      scope: payload.scope,
-    };
-    try {
-      const response = await operationsServiceClient.postAttendance(body);
-      this.#broadcast("attendance.marked", { record: response });
-      return response;
-    } catch (err) {
-      const sql = `
-        insert into attendance_record(
-          tenant_id, customer_id, site_id, unit_id,
-          fk_employee_id, attendance_date, check_in, status, location_label
-        ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-        on conflict (tenant_id, fk_employee_id, attendance_date)
-        do update set check_in = coalesce(attendance_record.check_in, excluded.check_in),
-                      status = excluded.status
-        returning *`;
-      const params = [
-        payload.scope.tenantId,
-        payload.scope.customerId || null,
-        payload.scope.siteId || null,
-        payload.scope.unitId || null,
-        Number(payload.employeeId),
-        ts.slice(0, 10),
-        ts,
-        status,
-        null,
-      ];
-      const res = await query(sql, params);
-      const record = res.rows[0];
-      this.#broadcast("attendance.marked", { record });
-      return record;
-    }
+      null,
+    ];
+    const res = await query(sql, params);
+    const record = res.rows[0];
+    this.#broadcast("attendance.marked", { record });
+    return record;
   }
 
   /**

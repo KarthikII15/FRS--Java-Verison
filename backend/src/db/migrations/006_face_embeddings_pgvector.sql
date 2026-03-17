@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS employee_face_embeddings (
   model_version   VARCHAR(50)  DEFAULT 'arcface-r50-fp16',
   quality_score   FLOAT,
   is_primary      BOOLEAN      DEFAULT FALSE,
-  enrolled_by     BIGINT       REFERENCES ivis_user(pk_user_id),
+  enrolled_by     BIGINT       REFERENCES frs_user(pk_user_id),
   enrolled_at     TIMESTAMPTZ  DEFAULT NOW()
 );
 
