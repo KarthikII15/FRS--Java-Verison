@@ -69,6 +69,8 @@ export interface Device {
   cpuUsage?: number;
   memoryUsage?: number;
   temperature?: number;
+  fpsActual?: number;
+  heartbeatAgeSeconds?: number;
   networkSignal?: 'Strong' | 'Moderate' | 'Weak';
   signalStrength?: string;
   warningState?: 'firmware-outdated' | 'high-temp' | 'low-storage' | 'overload' | 'network-unstable' | null;

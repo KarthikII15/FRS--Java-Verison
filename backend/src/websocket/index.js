@@ -18,6 +18,12 @@ class WebSocketManager {
   emitAttendanceUpdate(payload) {
     socketServer.broadcastAttendance(payload);
   }
+  emitDeviceHeartbeat(payload) {
+    socketServer.broadcastDeviceHeartbeat(payload);
+  }
+  emitDeviceStatus(payload) {
+    socketServer.broadcastDeviceStatus(payload);
+  }
   emitPresenceUpdate(payload) {
     socketServer.emitToTenant(payload?.tenantId ?? "all", "presence.update", payload);
   }

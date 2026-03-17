@@ -66,11 +66,11 @@ class RealTimeEngine {
             const wsUrl = import.meta.env.VITE_WS_URL || authConfig.apiBaseUrl.replace('/api', '');
 
             this.socket = io(wsUrl, {
-                auth:          { token },
-                transports:    ['websocket', 'polling'],
-                reconnection:  true,
-                reconnectionDelay:     2000,
-                reconnectionAttempts:  10,
+                auth: { token },
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionDelay: 2000,
+                reconnectionAttempts: 10,
             });
 
             this.socket.on('connect', () => {
@@ -98,15 +98,15 @@ class RealTimeEngine {
             // Fired by backend after attendanceService.markAttendance()
             this.socket.on('attendance.update', (payload: any) => {
                 const event: FacilityEvent = {
-                    id:           `evt-live-${Date.now()}`,
-                    type:         'entry',
-                    employeeId:   String(payload.employeeId || ''),
+                    id: `evt-live-${Date.now()}`,
+                    type: 'entry',
+                    employeeId: String(payload.employeeId || ''),
                     employeeName: payload.fullName || 'Unknown',
-                    cameraId:     payload.deviceId || '',
-                    cameraName:   payload.deviceId || 'Camera',
-                    floorId:      payload.siteId   || '',
-                    timestamp:    payload.timestamp || new Date().toISOString(),
-                    coordinates:  { x: 50, y: 50 },
+                    cameraId: payload.deviceId || '',
+                    cameraName: payload.deviceId || 'Camera',
+                    floorId: payload.siteId || '',
+                    timestamp: payload.timestamp || new Date().toISOString(),
+                    coordinates: { x: 50, y: 50 },
                 };
                 this.activeEvents = [event, ...this.activeEvents].slice(0, 100);
 
@@ -114,22 +114,22 @@ class RealTimeEngine {
                 const prev = this.presenceMap.get(event.employeeId);
                 this.presenceMap.set(event.employeeId, {
                     ...(prev || {
-                        employeeId:   event.employeeId,
+                        employeeId: event.employeeId,
                         employeeName: event.employeeName,
-                        department:   payload.department || '',
-                        duration:     '0h 0m',
-                        status:       'Present',
+                        department: payload.department || '',
+                        duration: '0h 0m',
+                        status: 'Present',
                         shiftEndTime: '17:00',
-                        entryCamera:  event.cameraName,
-                        floor:        '',
-                        area:         '',
+                        entryCamera: event.cameraName,
+                        floor: '',
+                        area: '',
                     }),
-                    checkInTime:     prev?.checkInTime || new Date().toLocaleTimeString(),
-                    lastSeenCamera:  event.cameraName,
-                    lastSeenTime:    new Date().toLocaleTimeString(),
-                    deviceUsed:      event.cameraName,
-                    location:        payload.location || '',
-                    status:          'Present',
+                    checkInTime: prev?.checkInTime || new Date().toLocaleTimeString(),
+                    lastSeenCamera: event.cameraName,
+                    lastSeenTime: new Date().toLocaleTimeString(),
+                    deviceUsed: event.cameraName,
+                    location: payload.location || '',
+                    status: 'Present',
                 });
 
                 this.emit(RteEventType.EMPLOYEE_ENTRY, event);
@@ -144,13 +144,28 @@ class RealTimeEngine {
             this.socket.on('device.heartbeat', (payload: any) => {
                 const device = this.devices.get(payload.deviceId);
                 if (device) {
-                    device.cpuUsage     = payload.cpuUsage     ?? device.cpuUsage;
-                    device.memoryUsage  = payload.memoryUsage  ?? device.memoryUsage;
-                    device.temperature  = payload.temperature  ?? device.temperature;
-                    device.status       = 'Online';
-                    device.lastActive   = 'Just now';
+                    device.cpuUsage = payload.cpuUsage ?? device.cpuUsage;
+                    device.memoryUsage = payload.memoryUsage ?? device.memoryUsage;
+                    device.temperature = payload.temperature ?? device.temperature;
+                    device.fpsActual = payload.fpsActual ?? device.fpsActual;
+                    device.status = 'Online';
+                    device.lastActive = 'Just now';
                 }
                 this.emit(RteEventType.DEVICE_HEARTBEAT, Array.from(this.devices.values()));
+            });
+
+            // Unknown face detection
+            this.socket.on('face.unknown', (payload: any) => {
+                this.emit(RteEventType.DEVICE_ALERT, {
+                    id: `unknown-${Date.now()}`,
+                    deviceId: payload.deviceId,
+                    deviceName: payload.deviceName || payload.deviceId,
+                    type: 'UnknownFace',
+                    severity: 'Low',
+                    timestamp: payload.timestamp || new Date().toISOString(),
+                    resolved: false,
+                    message: `Unrecognised face detected (confidence: ${((payload.confidence || 0) * 100).toFixed(0)}%)`,
+                });
             });
 
             // Device status change
@@ -196,9 +211,9 @@ class RealTimeEngine {
 
     public stop() {
         if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
-        if (this.eventTimer)     clearInterval(this.eventTimer);
+        if (this.eventTimer) clearInterval(this.eventTimer);
         this.heartbeatTimer = null;
-        this.eventTimer     = null;
+        this.eventTimer = null;
         console.log('[RealTimeEngine] Stopped simulation engine.');
     }
 
@@ -231,7 +246,7 @@ class RealTimeEngine {
         this.devices.forEach(device => {
             if (device.type === 'Edge Device' || device.cpuUsage !== undefined) {
                 const fluctuate = (val: number, max: number) => Math.max(0, Math.min(max, val + (Math.random() * 4 - 2)));
-                device.cpuUsage    = fluctuate(device.cpuUsage    || 40, 100);
+                device.cpuUsage = fluctuate(device.cpuUsage || 40, 100);
                 device.memoryUsage = fluctuate(device.memoryUsage || 50, 100);
                 device.temperature = fluctuate(device.temperature || 45, 90);
                 if (device.temperature > 80 && !this.activeAlerts.find(a => a.deviceId === device.id && a.type === 'Overheating' && !a.resolved)) {
@@ -278,12 +293,12 @@ class RealTimeEngine {
         };
         if (isEntry) {
             presence.lastSeenCamera = randomDevice.name;
-            presence.lastSeenTime   = new Date().toLocaleTimeString();
+            presence.lastSeenTime = new Date().toLocaleTimeString();
             presence.status = 'Present';
             this.presenceMap.set(employeeId, presence);
             this.emit(RteEventType.EMPLOYEE_ENTRY, event);
         } else {
-            presence.status       = 'Checked-In Only';
+            presence.status = 'Checked-In Only';
             presence.checkOutTime = new Date().toLocaleTimeString();
             this.presenceMap.set(employeeId, presence);
             this.emit(RteEventType.EMPLOYEE_EXIT, event);
@@ -295,10 +310,10 @@ class RealTimeEngine {
 
     // ── Getters ──────────────────────────────────────────────────────────────
 
-    public getDevices()  { return Array.from(this.devices.values()); }
+    public getDevices() { return Array.from(this.devices.values()); }
     public getPresence() { return Array.from(this.presenceMap.values()); }
-    public getEvents()   { return [...this.activeEvents]; }
-    public getAlerts()   { return [...this.activeAlerts]; }
+    public getEvents() { return [...this.activeEvents]; }
+    public getAlerts() { return [...this.activeAlerts]; }
 
     public addDevice(device: Device) {
         this.devices.set(device.id, device);
@@ -308,7 +323,7 @@ class RealTimeEngine {
     public checkoutEmployee(employeeId: string) {
         const presence = this.presenceMap.get(employeeId);
         if (presence) {
-            presence.status       = 'Checked-In Only';
+            presence.status = 'Checked-In Only';
             presence.checkOutTime = new Date().toLocaleTimeString();
             this.presenceMap.set(employeeId, presence);
             const event: FacilityEvent = {

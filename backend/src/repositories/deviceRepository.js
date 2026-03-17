@@ -57,7 +57,8 @@ export async function createDevice(deviceData) {
     ipAddress,
     keycloakClientId,
     capabilities,
-    firmwareVersion
+    firmwareVersion,
+    status = 'offline'
   } = deviceData;
   
   const result = await pool.query(
@@ -65,12 +66,12 @@ export async function createDevice(deviceData) {
       device_code, device_name, device_type, fk_site_id,
       location_description, ip_address, keycloak_client_id,
       capabilities, firmware_version, status
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'offline')
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *`,
     [
       deviceCode, deviceName, deviceType, siteId,
       locationDescription, ipAddress, keycloakClientId,
-      JSON.stringify(capabilities || []), firmwareVersion
+      JSON.stringify(capabilities || []), firmwareVersion, status
     ]
   );
   

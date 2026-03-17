@@ -6,7 +6,7 @@ import { authRoutes } from "./routes/authRoutes.js";
 import { healthRoutes } from "./routes/healthRoutes.js";
 import { liveRoutes } from "./routes/liveRoutes.js";
 import { meRoutes } from "./routes/meRoutes.js";
-import { deviceRoutes } from "./routes/deviceRoutes.js";
+import { devicePublicRoutes, deviceRoutes, deviceAdminRoutes } from "./routes/deviceRoutes.js";
 import { attendanceRoutes } from "./routes/attendanceRoutes.js";
 import { employeeRoutes } from "./routes/employeeRoutes.js";
 import { dashboardRoutes } from "./routes/dashboardRoutes.js";
@@ -78,12 +78,14 @@ app.get("/api/metrics", async (req, res) => {
       )
     }
   };
-  
+
   res.json(metrics);
 });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/me", meRoutes);
+app.use("/api/devices", deviceAdminRoutes);
+app.use("/api/devices", devicePublicRoutes);
 app.use("/api/devices", deviceRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/employees", employeeRoutes);
@@ -108,7 +110,7 @@ app.post("/api/frames/rtsp/:cameraId", async (req, res) => {
     };
 
     const result = await validationService.validateAndQueueFrame(cameraId, frameData, metadata);
-    
+
     if (result.queued) {
       res.status(202).json(result); // 202 Accepted
     } else {
@@ -125,7 +127,7 @@ app.post("/api/frames/smart/:cameraId", async (req, res) => {
   try {
     const { cameraId } = req.params;
     const { frame, profileId, searchParams } = req.body;
-    
+
     // Similar to RTSP but with smart search profile
     const result = await validationService.validateAndQueueFrame(cameraId, frame, {
       ...req.body.metadata,
@@ -134,7 +136,7 @@ app.post("/api/frames/smart/:cameraId", async (req, res) => {
       profileId,
       searchParams
     });
-    
+
     res.status(202).json(result);
   } catch (error) {
     console.error('Smart frame processing error:', error);
@@ -145,7 +147,7 @@ app.post("/api/frames/smart/:cameraId", async (req, res) => {
 // Error handling middleware
 app.use((err, _req, res, _next) => {
   console.error('Unhandled error:', err);
-  res.status(500).json({ 
+  res.status(500).json({
     message: "internal server error",
     error: env.NODE_ENV === 'development' ? err.message : undefined
   });
@@ -157,17 +159,17 @@ async function startServer() {
     // Load configurations
     await configLoaders.syncAllConfigs();
     console.log('✅ Configurations loaded');
-    
+
     // Initialize model manager
     await modelManager.initialize();
     console.log('✅ Model manager initialized');
-    
+
     // Initialize inference processor
     await inferenceProcessor.initialize();
     console.log('✅ Inference processor initialized');
-    
+
     // Validation service auto-initializes in constructor
-    
+
     // Set up event handlers
     inferenceProcessor.on('eventsGenerated', (data) => {
       // Queue events for pushing (like EventPushService)
@@ -231,19 +233,19 @@ async function startServer() {
     // Graceful shutdown handler
     const shutdown = async (signal) => {
       console.log(`\n🛑 Received ${signal}, starting graceful shutdown...`);
-      
+
       // Stop accepting new requests
       server.close(async () => {
         // Run shutdown manager
         await shutdownManager.shutdown(signal);
-        
+
         // Close database pool
         await pool.end();
-        
+
         console.log('👋 Shutdown complete');
         process.exit(0);
       });
-      
+
       // Force shutdown after timeout
       setTimeout(() => {
         console.error('Force shutdown due to timeout');

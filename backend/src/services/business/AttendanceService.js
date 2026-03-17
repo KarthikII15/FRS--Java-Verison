@@ -49,7 +49,18 @@ class AttendanceService {
     ];
     const res = await query(sql, params);
     const record = res.rows[0];
-    this.#broadcast("attendance.marked", { record });
+    const meta = payload.meta || {};
+    this.#broadcast("attendance.marked", {
+      record,
+      employeeId: String(payload.employeeId),
+      deviceId: payload.deviceId || null,
+      timestamp: ts,
+      tenantId: payload.scope.tenantId || null,
+      customerId: payload.scope.customerId || null,
+      siteId: payload.scope.siteId || null,
+      unitId: payload.scope.unitId || null,
+      ...meta,
+    });
     return record;
   }
 

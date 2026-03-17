@@ -25,6 +25,10 @@ import { Map, Activity as ActivityIcon } from 'lucide-react';
 import { lightTheme } from '../../theme/lightTheme';
 import { cn } from './ui/utils';
 import { useAuth } from '../contexts/AuthContext';
+import { DeviceLiveStats } from './admin/DeviceLiveStats';
+import { RecognitionFeed } from './admin/RecognitionFeed';
+import { DeviceManagement } from './admin/DeviceManagement';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 
 export const AdminDashboard: React.FC = () => {
   const { can } = useAuth();
@@ -32,6 +36,7 @@ export const AdminDashboard: React.FC = () => {
 
   const navigationItems = [
     { label: 'Overview', icon: Activity, value: 'overview', permission: 'devices.read' as const },
+    { label: 'Devices', icon: Monitor, value: 'devices', permission: 'devices.read' as const },
     { label: 'Users', icon: Users, value: 'users', permission: 'users.read' as const },
     { label: 'Operations Console', icon: Building2, value: 'operations', permission: 'facility.manage' as const },
     { label: 'Live Office Intelligence', icon: ActivityIcon, value: 'presence-monitor', permission: 'attendance.read' as const },
@@ -61,6 +66,25 @@ export const AdminDashboard: React.FC = () => {
     switch (activeTab) {
       case 'overview':
         return <SystemHealth devices={mockDevices} alerts={mockAlerts} />;
+      case 'devices':
+        return (
+          <div className="space-y-6">
+            <DeviceLiveStats />
+            <DeviceManagement />
+            <Card className="border-t-4 border-t-emerald-500 shadow-2xl">
+              <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3 flex flex-row items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Live Recognition Feed</CardTitle>
+                </div>
+                <Badge variant="outline" className="text-[10px] font-bold text-emerald-500 border-emerald-500/30">REAL-TIME ON</Badge>
+              </CardHeader>
+              <CardContent className="p-0">
+                <RecognitionFeed />
+              </CardContent>
+            </Card>
+          </div>
+        );
       case 'users':
         return <UserManagement users={mockUsers} employees={mockEmployees} />;
       case 'operations':

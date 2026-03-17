@@ -5,6 +5,8 @@ import attendanceService from "../services/business/AttendanceService.js";
 import kafkaEventService from "../core/kafka/KafkaEventService.js";
 import uploadSnapshotPushService from "../core/services/UploadSnapshotPushService.js";
 import edgeAIClient from "../core/clients/EdgeAIClient.js";
+import { createAttendanceEvent, createDeviceEvent } from "../repositories/eventRepository.js";
+import { findDeviceByCode, updateDeviceLastSeen } from "../repositories/deviceRepository.js";
 
 const FaceController = {
   async registerFace(req, res) {
@@ -40,18 +42,18 @@ const FaceController = {
     return res.json({ match });
   },
   async recognizeAndMark(req, res) {
-    let embedding  = null;
+    let embedding = null;
     let confidence = 0;
-    const deviceId  = req.body?.deviceId  || null;
+    const deviceId = req.body?.deviceId || null;
     const timestamp = req.body?.timestamp || null;
 
     // ── PATH A: Embedding already in JSON body (sent by Jetson runner.py)
     // FAST PATH — zero EdgeAI calls. Camera ran YOLO+ArcFace locally.
     if (Array.isArray(req.body?.embedding) && req.body.embedding.length === 512) {
-      embedding  = req.body.embedding;
+      embedding = req.body.embedding;
       confidence = Number(req.body.confidence || 0);
 
-    // ── PATH B: Image URL (external webhooks, manual API tests)
+      // ── PATH B: Image URL (external webhooks, manual API tests)
     } else if (req.body?.imageUrl) {
       let ai;
       try {
@@ -62,8 +64,8 @@ const FaceController = {
       if (!ai?.embedding?.length) return res.status(404).json({ message: 'No face detected in image URL' });
       embedding = ai.embedding; confidence = ai.confidence || 0;
 
-    // ── PATH C: File upload (HR admin test UI only)
-    // WARNING: camera service MUST NOT use this path — causes double inference.
+      // ── PATH C: File upload (HR admin test UI only)
+      // WARNING: camera service MUST NOT use this path — causes double inference.
     } else if (req.file?.buffer) {
       let ai;
       try {
@@ -80,6 +82,17 @@ const FaceController = {
       });
     }
 
+    const occurredAt = timestamp || new Date().toISOString();
+    const device = deviceId ? await findDeviceByCode(String(deviceId)) : null;
+    if (deviceId && !device) {
+      console.warn(`[FaceController] Device not found for code: ${deviceId}`);
+    }
+    const deviceDbId = device?.pk_device_id || null;
+    if (deviceDbId) {
+      await updateDeviceLastSeen(deviceDbId);
+    }
+
+
     // ── DB MATCH: embedding → employee (same for all 3 paths)
     const match = await faceDB.findBestMatch(embedding);
     if (!match) {
@@ -87,7 +100,18 @@ const FaceController = {
       kafkaEventService.publishEvent({
         type: 'UNKNOWN_FACE_DETECTED', deviceId, confidence,
         timestamp: timestamp || new Date().toISOString(),
-      }).catch(() => {});
+      }).catch(() => { });
+
+      // Task 3: Persist unknown face event
+      await createDeviceEvent({
+        deviceId: deviceDbId,
+        eventType: 'FACE_DETECTED',
+        occurredAt: occurredAt,
+        payloadJson: { confidence, reason: 'no_match' },
+        confidenceScore: confidence,
+        processingStatus: 'completed',
+      });
+
       return res.status(404).json({ message: 'Face not recognised — employee not enrolled or similarity below threshold' });
     }
 
@@ -100,32 +124,73 @@ const FaceController = {
     const record = await attendanceService.markAttendance({
       employeeId: String(employeeId),
       deviceId,
-      timestamp,
+      timestamp: occurredAt,
       scope: {
-        tenantId:   String(req.headers['x-tenant-id']   || req.auth?.scope?.tenantId   || ''),
+        tenantId: String(req.headers['x-tenant-id'] || req.auth?.scope?.tenantId || ''),
         customerId: req.headers['x-customer-id'] ? String(req.headers['x-customer-id']) : undefined,
-        siteId:     req.headers['x-site-id']     ? String(req.headers['x-site-id'])     : undefined,
-        unitId:     req.headers['x-unit-id']     ? String(req.headers['x-unit-id'])     : undefined,
+        siteId: req.headers['x-site-id'] ? String(req.headers['x-site-id']) : (device?.fk_site_id ? String(device.fk_site_id) : undefined),
+        unitId: req.headers['x-unit-id'] ? String(req.headers['x-unit-id']) : undefined,
       },
+      meta: {
+        fullName: match.metadata?.fullName,
+        employeeCode: match.metadata?.employeeCode,
+        deviceCode: deviceId,
+        deviceName: device?.device_name || null
+      }
     });
+
+    // Task 3: Persist successful match event
+    await createDeviceEvent({
+      deviceId: deviceDbId,
+      eventType: 'EMPLOYEE_ENTRY',
+      occurredAt: occurredAt,
+      payloadJson: {
+        employeeId,
+        similarity: match.similarity,
+        confidence,
+        fullName: match.metadata?.fullName,
+      },
+      confidenceScore: confidence,
+      processingStatus: 'completed',
+    });
+
+    if (deviceDbId) {
+      await createAttendanceEvent({
+        employeeId: String(employeeId),
+        deviceId: deviceDbId,
+        originalEventId: null,
+        eventType: "EMPLOYEE_ENTRY",
+        occurredAt,
+        confidenceScore: confidence,
+        verificationMethod: "face_recognition",
+        recognitionModelVersion: req.body?.modelVersion || null,
+        frameImageUrl: req.body?.imageUrl || null,
+        faceBoundingBox: req.body?.boundingBox,
+        locationZone: device?.location_description || null,
+        entryExitDirection: null,
+        shiftId: null,
+        isExpectedEntry: null,
+        isOnTime: null
+      });
+    }
 
     // ── PUBLISH TO KAFKA (non-fatal)
     kafkaEventService.publishEvent({
       type: 'FACE_RECOGNIZED',
       employeeId,
-      similarity:  match.similarity,
+      similarity: match.similarity,
       confidence,
       deviceId,
-      timestamp:   new Date().toISOString(),
-    }).catch(() => {});
+      timestamp: new Date().toISOString(),
+    }).catch(() => { });
 
     return res.json({
       result: {
         employeeId,
-        fullName:   match.metadata?.fullName,
+        fullName: match.metadata?.fullName,
         similarity: match.similarity,
         confidence,
-        faceId:     match.faceId,
+        faceId: match.faceId,
       },
       record,
     });
@@ -206,4 +271,3 @@ const FaceController = {
 };
 
 export default FaceController;
-

@@ -70,6 +70,12 @@ class SocketServer {
   broadcastAttendance(payload) {
     this.emitToTenant(payload?.tenantId ?? "all", "attendance.update", payload);
   }
+  broadcastDeviceHeartbeat(payload) {
+    this.emitToTenant(payload?.tenantId ?? 'all', 'device.heartbeat', payload);
+  }
+  broadcastDeviceStatus(payload) {
+    this.emitToTenant(payload?.tenantId ?? 'all', 'device.status', payload);
+  }
   broadcastAlert(payload) {
     this.emitToTenant(payload?.tenantId ?? "all", "alert", payload);
   }

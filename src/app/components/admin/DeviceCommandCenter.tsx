@@ -27,10 +27,19 @@ import { DeviceDetailDrawer } from './DeviceDetailDrawer';
 import { AddDeviceModal } from './AddDeviceModal';
 import { DeviceAlertsPanel } from './DeviceAlertsPanel';
 import { useRealTimeEngine } from '../../hooks/useRealTimeEngine';
+import { DeviceLiveStats } from './DeviceLiveStats';
+import { RecognitionFeed } from './RecognitionFeed';
+import { useAuth } from '../../contexts/AuthContext';
+import { useScopeHeaders } from '../../hooks/useScopeHeaders';
+import { apiRequest } from '../../services/http/apiClient';
 
 export const DeviceCommandCenter: React.FC = () => {
+    const { accessToken } = useAuth();
+    const scopeHeaders = useScopeHeaders();
     const { devices, alerts, addDevice } = useRealTimeEngine();
+    const [liveData, setLiveData] = useState<Record<string, any>>({});
     const [searchTerm, setSearchTerm] = useState('');
+    // ... rest of state
     const [activeType, setActiveType] = useState<'All' | 'Camera' | 'Edge Device'>('All');
     const [activeStatus, setActiveStatus] = useState<'All' | 'Online' | 'Offline' | 'Warning'>('All');
     const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
@@ -58,20 +67,39 @@ export const DeviceCommandCenter: React.FC = () => {
         totalWarnings: devices.filter(d => d.status === 'Warning' || d.warningState).length
     };
 
-    // Live Stream Simulation
-    const liveMonitoringFeed = [
-        { title: "Camera Lobby Entry Online", status: "success", time: "10:12 AM" },
-        { title: "Edge Device Floor 3 CPU at 91%", status: "warning", time: "10:17 AM" },
-        { title: "Parking Gate Reconnected", status: "success", time: "10:22 AM" },
-        { title: "Server Room Temp Warning", status: "error", time: "10:25 AM" },
-    ];
+    const fetchStats = useCallback(async () => {
+        try {
+            const data = await apiRequest<any>('/devices/live-stats', { accessToken, scopeHeaders });
+            const mapping: Record<string, any> = {};
+            data.deviceList.forEach((d: any) => {
+                mapping[d.id] = d;
+            });
+            setLiveData(mapping);
+        } catch (err) {
+            console.error('Failed to fetch live stats', err);
+        }
+    }, [accessToken, scopeHeaders]);
 
     useEffect(() => {
-        const interval = setInterval(() => {
+        fetchStats();
+        const interval = setInterval(fetchStats, 15000);
+
+        const streamInterval = setInterval(() => {
             setStreamIndex(prev => (prev + 1) % liveMonitoringFeed.length);
         }, 4000);
-        return () => clearInterval(interval);
-    }, []);
+        return () => {
+            clearInterval(interval);
+            clearInterval(streamInterval);
+        };
+    }, [fetchStats]);
+
+    const getRelativeTime = (isoString?: string) => {
+        if (!isoString) return 'Never';
+        const diff = Math.floor((new Date().getTime() - new Date(isoString).getTime()) / 1000);
+        if (diff < 60) return `${diff}s ago`;
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        return `${Math.floor(diff / 3600)}h ago`;
+    };
 
     const openDetails = (device: Device) => {
         setSelectedDevice(device);
@@ -81,14 +109,7 @@ export const DeviceCommandCenter: React.FC = () => {
     return (
         <div className="space-y-6">
             {/* ðŸ”· Summary HUD */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <StatCard title="Total Devices" value={stats.total} icon={Zap} color="text-blue-500" />
-                <StatCard title="Cameras Online" value={stats.camerasOnline} icon={Camera} color="text-emerald-500" />
-                <StatCard title="Cameras Offline" value={stats.camerasOffline} icon={Camera} color="text-rose-500" />
-                <StatCard title="Edge Online" value={stats.edgeOnline} icon={Cpu} color="text-emerald-500" />
-                <StatCard title="Issues / Warnings" value={stats.totalWarnings} icon={AlertTriangle} color="text-amber-500" />
-                <StatCard title="Events Today" value={stats.eventsToday.toLocaleString()} icon={Activity} color="text-indigo-500" />
-            </div>
+            <DeviceLiveStats />
 
             {/* ðŸ”· Live Monitor Strip */}
             <div className={cn("rounded-xl px-4 py-2 flex items-center justify-between overflow-hidden relative border", lightTheme.background.secondary, lightTheme.border.default, "dark:bg-slate-900 dark:border-border")}>
@@ -216,52 +237,82 @@ export const DeviceCommandCenter: React.FC = () => {
                                                 </Badge>
                                             </div>
                                         </td>
+                                        {/* Status & Uptime */}
                                         <td className="px-5 py-4">
-                                            <div className="flex items-center gap-2 mb-1.5">
-                                                <div className={cn(
-                                                    "w-2 h-2 rounded-full",
-                                                    device.status === 'Online' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
-                                                        device.status === 'Offline' ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" : "bg-amber-500"
-                                                )} />
-                                                <span className={cn("text-xs font-semibold", lightTheme.text.primary, "dark:text-white")}>{device.status}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className={cn("w-16 h-1 rounded-full overflow-hidden", lightTheme.background.secondary, "dark:bg-slate-800")}>
-                                                    <div
-                                                        className="h-full bg-blue-500"
-                                                        style={{ width: `${device.uptime || 100}%` }}
-                                                    />
-                                                </div>
-                                                <span className={cn("text-[10px]", lightTheme.text.secondary, "dark:text-slate-500")}>{device.uptime || 100}% uptime</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <div className={cn("text-xs font-mono", lightTheme.text.primary, "dark:text-slate-200")}>
-                                                {device.eventsToday?.toLocaleString() || 0} evts
-                                            </div>
-                                            <div className={cn("text-[10px] mt-1", lightTheme.text.secondary, "dark:text-slate-500")}>
-                                                Last Rec: {device.lastRecognitionTime ? new Date(device.lastRecognitionTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'None'}
-                                            </div>
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <div className="flex items-center gap-4">
-                                                {device.type === 'Edge Device' ? (
-                                                    <div className="space-y-1">
-                                                        <div className={cn("flex justify-between text-[8px] px-0.5", lightTheme.text.muted, "dark:text-slate-500")}>
-                                                            <span>CPU</span>
-                                                            <span className={cn(device.cpuUsage! > 80 ? "text-rose-500 dark:text-rose-400" : cn(lightTheme.text.muted, "dark:text-slate-400"))}>{device.cpuUsage}%</span>
+                                            {(() => {
+                                                const stats = liveData[device.id] || device;
+                                                const isStale = (stats.heartbeatAgeSeconds || 0) > 120;
+                                                const status = isStale ? 'Offline' : (stats.status || 'Offline');
+
+                                                return (
+                                                    <>
+                                                        <div className="flex items-center gap-2 mb-1.5">
+                                                            <div className={cn(
+                                                                "w-2 h-2 rounded-full",
+                                                                status === 'Online' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" :
+                                                                    status === 'Offline' ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" : "bg-amber-500"
+                                                            )} />
+                                                            <span className={cn("text-xs font-semibold uppercase tracking-tight", lightTheme.text.primary, "dark:text-white")}>
+                                                                {isStale ? 'STALE' : status}
+                                                            </span>
+                                                            {isStale && <Badge variant="outline" className="text-[8px] h-3.5 border-amber-500 text-amber-500 bg-amber-500/5">STALE</Badge>}
                                                         </div>
-                                                        <div className={cn("w-16 h-1 rounded-full overflow-hidden", lightTheme.background.secondary, "dark:bg-slate-800")}>
-                                                            <div className={cn("h-full", device.cpuUsage! > 80 ? "bg-rose-500" : "bg-blue-500")} style={{ width: `${device.cpuUsage}%` }} />
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={cn("text-[10px]", lightTheme.text.secondary, "dark:text-slate-500")}>
+                                                                {stats.heartbeatAgeSeconds ? `${stats.heartbeatAgeSeconds}s since pulse` : 'No pulse'}
+                                                            </span>
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
+                                        </td>
+
+                                        {/* Ops Activity */}
+                                        <td className="px-5 py-4">
+                                            {(() => {
+                                                const stats = liveData[device.id] || device;
+                                                return (
+                                                    <>
+                                                        <div className={cn("text-xs font-black", lightTheme.text.primary, "dark:text-slate-200")}>
+                                                            {(stats.recognitionsToday || 0).toLocaleString()} <span className="text-[9px] text-slate-500">RECS</span>
+                                                        </div>
+                                                        <div className={cn("text-[10px] mt-1 font-medium", lightTheme.text.secondary, "dark:text-slate-500")}>
+                                                            {getRelativeTime(stats.lastRecognitionAt || stats.lastRecognitionTime)}
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
+                                        </td>
+
+                                        {/* Pulse / Health */}
+                                        <td className="px-5 py-4">
+                                            {(() => {
+                                                const stats = liveData[device.id] || device;
+                                                const temp = stats.temperature || 0;
+                                                const fps = stats.fpsActual || 0;
+                                                const tempColor = temp > 75 ? "text-rose-500" : temp > 60 ? "text-amber-500" : "text-emerald-500";
+
+                                                return (
+                                                    <div className="flex items-center gap-6">
+                                                        <div className="space-y-1 w-20">
+                                                            <div className="flex justify-between text-[8px] uppercase font-black text-slate-400">
+                                                                <span>{fps.toFixed(1)} FPS</span>
+                                                                <span>Target 5</span>
+                                                            </div>
+                                                            <div className="h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                                <div
+                                                                    className={cn("h-full transition-all duration-500", fps < 3 ? "bg-amber-500" : "bg-emerald-500")}
+                                                                    style={{ width: `${Math.min(100, (fps / 5) * 100)}%` }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Thermometer className={cn("w-3.5 h-3.5", tempColor)} />
+                                                            <span className={cn("text-xs font-black", tempColor)}>{temp.toFixed(1)}°C</span>
                                                         </div>
                                                     </div>
-                                                ) : (
-                                                    <div className="flex items-center gap-3">
-                                                        <Signal className={cn("w-4 h-4", device.networkSignal === 'Strong' ? "text-emerald-500 dark:text-emerald-400" : "text-amber-500 dark:text-amber-400")} />
-                                                        <Thermometer className={cn("w-4 h-4", lightTheme.text.muted, "dark:text-slate-500")} />
-                                                    </div>
-                                                )}
-                                            </div>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="px-5 py-4 text-right">
                                             <Button variant="ghost" size="icon" className={cn("h-8 w-8 hover:bg-slate-100", lightTheme.text.secondary, "hover:text-foreground dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800")} onClick={(e) => { e.stopPropagation(); /* actions */ }}>
@@ -276,8 +327,15 @@ export const DeviceCommandCenter: React.FC = () => {
                 </CardContent>
             </Card>
 
-            {/* ðŸ”· Alerts System Panel */}
-            <DeviceAlertsPanel alerts={alerts} />
+            {/* ðŸ”· Bottom Insights Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <DeviceAlertsPanel alerts={alerts} />
+                </div>
+                <div className="lg:col-span-1">
+                    <RecognitionFeed />
+                </div>
+            </div>
 
             <DeviceDetailDrawer
                 device={devices.find(d => d.id === selectedDevice?.id) || null}
