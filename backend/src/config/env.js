@@ -23,22 +23,22 @@ export const env = {
   port: toNumber(process.env.PORT, 8080),
   nodeEnv: process.env.NODE_ENV || 'development',
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
-  
+
   http: {
     timeoutMs: toNumber(process.env.HTTP_TIMEOUT_MS, 15000),
   },
-  
+
   edgeAI: {
     baseUrl: process.env.EDGE_AI_URL || 'http://localhost:5000',
   },
-  
+
   analytics: {
     frameQueueSize: toNumber(process.env.FRAME_QUEUE_SIZE, 100),
     eventQueueSize: toNumber(process.env.EVENT_QUEUE_SIZE, 1000),
     snapshotQueueSize: toNumber(process.env.SNAPSHOT_QUEUE_SIZE, 500),
     inferenceThreads: toNumber(process.env.INFERENCE_THREADS, 4),
     eventPushThreads: toNumber(process.env.EVENT_PUSH_THREADS, 2),
-    maxHeapMemoryPercent: toNumber(process.env.MAX_HEAP_MEMORY_PERCENT, 80),
+    maxHeapMemoryPercent: toNumber(process.env.MAX_HEAP_MEMORY_PERCENT, 95),
     frameBufferSize: toNumber(process.env.FRAME_BUFFER_SIZE, 10),
     motionSkipFrames: toNumber(process.env.MOTION_SKIP_FRAMES, 3),
     configPath: process.env.CONFIG_PATH || path.join(__dirname, '../../conf'),
@@ -66,7 +66,7 @@ export const env = {
     rebalanceTimeout: toNumber(process.env.KAFKA_CONSUMER_REBALANCE_TIMEOUT, 60000),
     numPartitions: toNumber(process.env.KAFKA_NUM_PARTITIONS, 3),
     replicationFactor: toNumber(process.env.KAFKA_REPLICATION_FACTOR, 1),
-    
+
     topics: {
       rawFrames: process.env.KAFKA_TOPIC_RAW_FRAMES || 'scanalitix.raw-frames',
       detections: process.env.KAFKA_TOPIC_DETECTIONS || 'scanalitix.detections',
@@ -103,14 +103,14 @@ export const env = {
     idleTimeoutMillis: toNumber(process.env.DB_IDLE_TIMEOUT_MS, 30000),
     connectionTimeoutMillis: toNumber(process.env.DB_CONNECTION_TIMEOUT_MS, 5000),
   },
-  
+
   token: {
     accessTokenTtlMinutes: toNumber(process.env.ACCESS_TOKEN_TTL_MINUTES, 30),
     refreshTokenTtlDays: toNumber(process.env.REFRESH_TOKEN_TTL_DAYS, 7),
   },
-  
+
   authMode: process.env.AUTH_MODE || 'api',
-  
+
   keycloak: {
     url: process.env.KEYCLOAK_URL || 'http://localhost:9090',
     realm: process.env.KEYCLOAK_REALM || 'attendance',
